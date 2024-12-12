@@ -1,6 +1,8 @@
+import 'package:animations/animations.dart';
 import 'package:diary/components/my_button.dart';
 import 'package:diary/components/my_text_field.dart';
-import 'package:diary/utils/app_routes.dart';
+import 'package:diary/pages/register_page.dart';
+import 'package:diary/utils/bottom_nav_bar.dart';
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -59,8 +61,23 @@ class _LoginPageState extends State<LoginPage> {
                     MyButton(
                       text: "Sign In",
                       onTap: () {
-                        Navigator.of(context)
-                            .pushReplacementNamed(AppRoutes.bottomNavBar);
+                        Navigator.of(context).pushReplacement(
+                          PageRouteBuilder(
+                            transitionDuration:
+                                const Duration(milliseconds: 500),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    const BottomNavBar(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              return FadeThroughTransition(
+                                animation: animation,
+                                secondaryAnimation: secondaryAnimation,
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
                       },
                     ),
                     const SizedBox(height: 20),
@@ -74,8 +91,23 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context)
-                                .pushNamed(AppRoutes.registerPage);
+                            Navigator.of(context).pushReplacement(
+                              PageRouteBuilder(
+                                transitionDuration:
+                                    const Duration(milliseconds: 500),
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const RegisterPage(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeThroughTransition(
+                                    animation: animation,
+                                    secondaryAnimation: secondaryAnimation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );                            
                           },
                           child: Text(
                             "Register Now",

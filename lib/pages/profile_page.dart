@@ -1,3 +1,4 @@
+import 'package:diary/utils/media.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -30,23 +31,22 @@ class ProfilePage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.blue[50],
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.8),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.grey.withOpacity(0.8),
+        //     spreadRadius: 1,
+        //     blurRadius: 5,
+        //     offset: const Offset(0, 2),
+        //   ),
+        // ],
       ),
       child: Row(
         children: [
           const CircleAvatar(
             radius: 40,
-            backgroundImage: NetworkImage(
-                'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
+            backgroundImage: AssetImage(AppMedia.dp),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -73,7 +73,7 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.edit, color: Colors.brown),
+            icon: const Icon(Icons.edit, color: Colors.blue),
             onPressed: () {
               // TODO: Implement edit profile functionality
             },
@@ -86,16 +86,16 @@ class ProfilePage extends StatelessWidget {
   Widget _buildMoodChart() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.blue[50],
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.8),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.grey.withOpacity(0.8),
+        //     spreadRadius: 1,
+        //     blurRadius: 5,
+        //     offset: const Offset(0, 2),
+        //   ),
+        // ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -158,10 +158,10 @@ class ProfilePage extends StatelessWidget {
                         },
                       ),
                     ),
-                    topTitles:
-                        const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles:
-                        const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
                   ),
                   borderData: FlBorderData(show: false),
                   lineBarsData: [

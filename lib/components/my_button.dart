@@ -18,13 +18,13 @@ class MyButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(5),
         ),
         padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.37, vertical: screenHeight * 0.017),
+            horizontal: screenWidth * 0.38, vertical: screenHeight * 0.018),
         child: Text(
           text,
           style: GoogleFonts.manrope(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontSize: 14,
           ),
         ),
       ),

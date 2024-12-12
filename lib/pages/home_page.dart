@@ -13,10 +13,11 @@ class HomePage extends StatelessWidget {
     final Box<String> diaryBox = Hive.box<String>('diaryBox');
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(),
       drawer: const CustomAppDrawer(),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: ValueListenableBuilder(
           valueListenable: diaryBox.listenable(),
           builder: (context, Box<String> box, _) {

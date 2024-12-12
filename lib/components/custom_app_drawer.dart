@@ -1,3 +1,5 @@
+import 'package:diary/utils/app_routes.dart';
+import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppDrawer extends StatelessWidget {
@@ -6,6 +8,7 @@ class CustomAppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: Colors.white,
       elevation: 16.0,
       child: SafeArea(
         child: Column(
@@ -26,9 +29,7 @@ class CustomAppDrawer extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 30,
-                      backgroundImage: const NetworkImage(
-                        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                      ),
+                      backgroundImage: const AssetImage(AppMedia.dp),
                       backgroundColor: Colors.grey.shade300,
                     ),
                     const SizedBox(width: 16),
@@ -82,7 +83,7 @@ class CustomAppDrawer extends StatelessWidget {
                     style: TextStyle(color: Colors.red),
                   ),
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.of(context).pushNamed(AppRoutes.loginPage);
                   },
                 ),
               ],

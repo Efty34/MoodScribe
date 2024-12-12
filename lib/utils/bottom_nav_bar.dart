@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:diary/pages/category_page.dart';
 import 'package:diary/pages/diary_entry.dart';
 import 'package:diary/pages/home_page.dart';
@@ -29,7 +30,16 @@ class _BottomNavBarState extends State<BottomNavBar> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       extendBody: true, // Allows content to extend behind the bottom nav bar
-      body: _pages[currentIndex],
+      body: PageTransitionSwitcher(
+        duration: const Duration(milliseconds: 500),
+        transitionBuilder: (child, animation, secondaryAnimation) =>
+            FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        ),
+        child: _pages[currentIndex],
+      ),
       bottomNavigationBar: Container(
         margin: const EdgeInsets.all(20),
         height: size.width * .155,
@@ -50,11 +60,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
           padding: EdgeInsets.symmetric(horizontal: size.width * .024),
           itemBuilder: (context, index) => InkWell(
             onTap: () {
-              setState(
-                () {
-                  currentIndex = index;
-                },
-              );
+              setState(() {
+                currentIndex = index;
+              });
             },
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
