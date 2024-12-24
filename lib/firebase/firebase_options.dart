@@ -6,7 +6,7 @@ class FirebaseOptions {
   /// Save a diary entry (text and prediction) to Firestore
   static Future<void> saveDiaryEntry(String text, String prediction) async {
     try {
-      await _firestore.collection('diaryEntries').add({
+      await FirebaseFirestore.instance.collection('diaryEntries').add({
         'text': text,
         'prediction': prediction,
         'timestamp': FieldValue.serverTimestamp(),

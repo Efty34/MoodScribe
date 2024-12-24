@@ -1,23 +1,23 @@
 import 'dart:convert';
 
+import 'package:diary/firebase/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 
-
 class DiaryEntry extends StatefulWidget {
   const DiaryEntry({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _DiaryEntryState createState() => _DiaryEntryState();
 }
 
 class _DiaryEntryState extends State<DiaryEntry> {
   final TextEditingController _postController = TextEditingController();
   late Box<String> diaryBox;
-  String? _prediction;
 
   @override
   void initState() {
@@ -29,13 +29,28 @@ class _DiaryEntryState extends State<DiaryEntry> {
   void _saveEntry() async {
     final text = _postController.text.trim();
     if (text.isNotEmpty) {
-      diaryBox.add(text); // Save the text into the Hive box
-      _postController.clear(); // Clear the TextField
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Your diary entry has been saved!')),
-      );
-      // Send the text to the backend for prediction
-    await monitorStress(text);
+      try {
+        diaryBox.add(text); // Save the text into the Hive box
+
+        // Fetch prediction from backend
+        final prediction =
+            await monitorStress(text); // Ensure this returns a String
+
+        // Save to Firebase using FirebaseOptions
+        await FirebaseOptions.saveDiaryEntry(text, prediction);
+
+        // Clear the TextField
+        _postController.clear();
+
+        // Notify user
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Your diary entry has been saved!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please write something before saving.')),
@@ -43,33 +58,23 @@ class _DiaryEntryState extends State<DiaryEntry> {
     }
   }
 
-  Future<void> monitorStress(String text) async {
+  Future<String> monitorStress(String text) async {
     try {
-      // API Endpoint
-      final url = Uri.parse('http://10.0.2.2:5000/predict'); 
-
-      // Send POST request
+      final url = Uri.parse('http://10.0.2.2:8000/predict');
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
         body: json.encode({'text': text}),
       );
 
-      // Parse the response
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        setState(() {
-          _prediction = responseData['prediction'];
-        });
+        return responseData['prediction'] as String; // Return the prediction
       } else {
-        setState(() {
-          _prediction = 'Error: Unable to fetch prediction.';
-        });
+        return 'Error: Unable to fetch prediction.';
       }
     } catch (e) {
-      setState(() {
-        _prediction = 'Error: $e';
-      });
+      return 'Error: $e';
     }
   }
 

@@ -58,6 +58,6 @@ class BuildProfileSection extends StatelessWidget {
           ),
         ],
       ),
-    );;
+    );
   }
 }

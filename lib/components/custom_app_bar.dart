@@ -1,5 +1,6 @@
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final TextEditingController _searchController = TextEditingController();
@@ -43,9 +44,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 10),
           ),
-          style: const TextStyle(
+          style: GoogleFonts.manrope(
             color: Colors.black87,
-            fontSize: 14,
+            fontSize: 16,
           ),
         ),
       ),

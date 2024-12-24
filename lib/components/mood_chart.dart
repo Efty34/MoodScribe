@@ -1,9 +1,56 @@
+import 'package:diary/firebase/firebase_options.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class MoodChart extends StatelessWidget {
-  final String stressAnalysis;
-  const MoodChart({super.key, required this.stressAnalysis});
+class MoodChart extends StatefulWidget {
+  // final String stressAnalysis;
+  const MoodChart({super.key});
+
+  @override
+  State<MoodChart> createState() => _MoodChartState();
+}
+
+class _MoodChartState extends State<MoodChart> {
+  int stressValue = 0;
+  int nonStressValue = 0;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDiaryEntries();
+  }
+
+  Future<void> _fetchDiaryEntries() async {
+    try {
+      // Get the stream and fetch the latest snapshot
+      final snapshot = await FirebaseOptions.getDiaryEntries().first;
+
+      // Map the documents to a list of entries
+      final entries = snapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      // Count the occurrences of "Stressed" and "Not Stressed"
+      final stressCount =
+          entries.where((entry) => entry['prediction'] == 'Stressed').length;
+      final nonStressCount = entries
+          .where((entry) => entry['prediction'] == 'Not Stressed')
+          .length;
+
+      // Update the state with the fetched data
+      setState(() {
+        stressValue = stressCount;
+        nonStressValue = nonStressCount;
+        isLoading = false;
+      });
+    } catch (e) {
+      // Handle errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching diary entries: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,54 +61,56 @@ class MoodChart extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              stressAnalysis,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Stress Analysis",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 250,
+                    child: PieChart(
+                      PieChartData(
+                        sections: _buildPieChartSections(),
+                        sectionsSpace: 2, // Space between sections
+                        centerSpaceRadius: 40, // Empty center space
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildLegendItem(Colors.red, 'Stress'),
+                      _buildLegendItem(Colors.green, 'Non-Stress'),
+                    ],
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 250,
-              child: PieChart(
-                PieChartData(
-                  sections: _buildPieChartSections(),
-                  sectionsSpace: 2, // Space between sections
-                  centerSpaceRadius: 40, // Empty center space
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildLegendItem(Colors.red, 'Stress'),
-                _buildLegendItem(Colors.green, 'Non-Stress'),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
 
   List<PieChartSectionData> _buildPieChartSections() {
-    // Replace these values with actual data
-    final stressValue = 30; // Stress percentage
-    final nonStressValue = 70; // Non-stress percentage
+    final total = stressValue + nonStressValue;
+    final stressPercentage = total > 0 ? (stressValue / total) * 100 : 0;
+    final nonStressPercentage = total > 0 ? (nonStressValue / total) * 100 : 0;
 
     return [
       PieChartSectionData(
         color: Colors.red,
-        value: stressValue.toDouble(),
-        title: '$stressValue%',
+        value: stressPercentage.toDouble(),
+        title: '${stressPercentage.toStringAsFixed(1)}%',
         radius: 60,
-        titleStyle: TextStyle(
+        titleStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
           color: Colors.white,
@@ -69,10 +118,10 @@ class MoodChart extends StatelessWidget {
       ),
       PieChartSectionData(
         color: Colors.green,
-        value: nonStressValue.toDouble(),
-        title: '$nonStressValue%',
+        value: nonStressPercentage.toDouble(),
+        title: '${nonStressPercentage.toStringAsFixed(1)}%',
         radius: 60,
-        titleStyle: TextStyle(
+        titleStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
           color: Colors.white,

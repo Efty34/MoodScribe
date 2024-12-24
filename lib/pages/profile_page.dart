@@ -18,17 +18,7 @@ class ProfilePage extends StatelessWidget {
               children: [
                 BuildProfileSection(),
                 SizedBox(height: 20),
-                MoodChart(
-                  stressAnalysis: "Stress Analysis per Day",
-                ),
-                SizedBox(height: 20),
-                MoodChart(
-                  stressAnalysis: "Stress Analysis per Week",
-                ),
-                SizedBox(height: 20),
-                MoodChart(
-                  stressAnalysis: "Stress Analysis per Month",
-                ),
+                MoodChart(),
               ],
             ),
           ),
