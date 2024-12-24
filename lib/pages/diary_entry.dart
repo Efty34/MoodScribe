@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
+
 
 class DiaryEntry extends StatefulWidget {
   const DiaryEntry({super.key});
@@ -13,6 +17,7 @@ class DiaryEntry extends StatefulWidget {
 class _DiaryEntryState extends State<DiaryEntry> {
   final TextEditingController _postController = TextEditingController();
   late Box<String> diaryBox;
+  String? _prediction;
 
   @override
   void initState() {
@@ -21,7 +26,7 @@ class _DiaryEntryState extends State<DiaryEntry> {
     diaryBox = Hive.box<String>('diaryBox');
   }
 
-  void _saveEntry() {
+  void _saveEntry() async {
     final text = _postController.text.trim();
     if (text.isNotEmpty) {
       diaryBox.add(text); // Save the text into the Hive box
@@ -29,10 +34,42 @@ class _DiaryEntryState extends State<DiaryEntry> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Your diary entry has been saved!')),
       );
+      // Send the text to the backend for prediction
+    await monitorStress(text);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please write something before saving.')),
       );
+    }
+  }
+
+  Future<void> monitorStress(String text) async {
+    try {
+      // API Endpoint
+      final url = Uri.parse('http://10.0.2.2:5000/predict'); 
+
+      // Send POST request
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({'text': text}),
+      );
+
+      // Parse the response
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          _prediction = responseData['prediction'];
+        });
+      } else {
+        setState(() {
+          _prediction = 'Error: Unable to fetch prediction.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _prediction = 'Error: $e';
+      });
     }
   }
 
