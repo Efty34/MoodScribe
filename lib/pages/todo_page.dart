@@ -1,3 +1,4 @@
+import 'package:diary/todo/todo_builder.dart';
 import 'package:diary/todo/todo_upper_section.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,9 @@ class TodoPage extends StatelessWidget {
       body: const Column(
         children: [
           TodoUpperSection(),
-          // Expanded(child: TodoBuilder(),),
+          Expanded(
+            child: TodoBuilder(),
+          ),
         ],
       ),
     );
