@@ -1,3 +1,4 @@
+import 'package:diary/todo/todo_upper_section.dart';
 import 'package:flutter/material.dart';
 
 class TodoPage extends StatelessWidget {
@@ -5,10 +6,16 @@ class TodoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Text('Todo Page'),
+      appBar: AppBar(
+        title: const Text('Todo List'),
+      ),
+      body: const Column(
+        children: [
+          TodoUpperSection(),
+          // Expanded(child: TodoBuilder(),),
+        ],
       ),
     );
   }
