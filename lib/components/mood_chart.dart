@@ -56,7 +56,8 @@ class _MoodChartState extends State<MoodChart> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.blue[50],
+        // color: Colors.blue[50],
+        border: Border.all(color: Colors.black),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(

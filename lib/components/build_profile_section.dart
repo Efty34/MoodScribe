@@ -9,7 +9,8 @@ class BuildProfileSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
+        // color: Colors.white38,
+        border: Border.all(color: Colors.black),
         borderRadius: BorderRadius.circular(12),
         // boxShadow: [
         //   BoxShadow(
