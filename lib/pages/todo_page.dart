@@ -7,18 +7,18 @@ class TodoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Todo List'),
-      ),
-      body: const Column(
-        children: [
-          TodoUpperSection(),
-          Expanded(
-            child: TodoBuilder(),
-          ),
-        ],
+      body: Padding(
+        padding: EdgeInsets.only(top: 50),
+        child: Column(
+          children: [
+            TodoUpperSection(),
+            Expanded(
+              child: TodoBuilder(),
+            ),
+          ],
+        ),
       ),
     );
   }

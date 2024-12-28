@@ -22,7 +22,7 @@ class TodoUpperSection extends StatelessWidget {
             todos.where((doc) => doc['isDone'] == true).length;
 
         return Container(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
