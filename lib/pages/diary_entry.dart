@@ -11,7 +11,6 @@ class DiaryEntry extends StatefulWidget {
   const DiaryEntry({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _DiaryEntryState createState() => _DiaryEntryState();
 }
 
@@ -30,19 +29,17 @@ class _DiaryEntryState extends State<DiaryEntry> {
     final text = _postController.text.trim();
     if (text.isNotEmpty) {
       try {
-        diaryBox.add(text); // Save the text into the Hive box
+        // 1) Save locally to Hive (Optional)
+        diaryBox.add(text);
 
-        // Fetch prediction from backend
-        final prediction =
-            await monitorStress(text); // Ensure this returns a String
+        // 2) Get prediction from Flask backend
+        final prediction = await _monitorStress(text);
 
-        // Save to Firebase using FirebaseOptions
+        // 3) Save to Firebase
         await FirebaseOptions.saveDiaryEntry(text, prediction);
 
-        // Clear the TextField
+        // 4) Clear the TextField & show a SnackBar
         _postController.clear();
-
-        // Notify user
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Your diary entry has been saved!')),
         );
@@ -58,9 +55,9 @@ class _DiaryEntryState extends State<DiaryEntry> {
     }
   }
 
-  Future<String> monitorStress(String text) async {
+  Future<String> _monitorStress(String text) async {
     try {
-      final url = Uri.parse('http://10.0.2.2:8000/predict');
+      final url = Uri.parse('http://10.0.2.2:5000/predict');
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -69,12 +66,16 @@ class _DiaryEntryState extends State<DiaryEntry> {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        return responseData['prediction'] as String; // Return the prediction
+        if (responseData.containsKey('prediction')) {
+          return responseData['prediction']; // "stress" or "no stress"
+        } else {
+          throw Exception('Invalid response format: ${response.body}');
+        }
       } else {
-        return 'Error: Unable to fetch prediction.';
+        throw Exception('HTTP Error: ${response.statusCode}');
       }
     } catch (e) {
-      return 'Error: $e';
+      throw Exception('Error in _monitorStress: $e');
     }
   }
 
@@ -108,7 +109,7 @@ class _DiaryEntryState extends State<DiaryEntry> {
               ),
               const SizedBox(height: 24),
 
-              // Textarea-like TextField
+              // TextField area
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
@@ -135,14 +136,13 @@ class _DiaryEntryState extends State<DiaryEntry> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
 
               // Submit Button
               Center(
                 child: OutlinedButton.icon(
                   style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),

@@ -3,7 +3,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class MoodChart extends StatefulWidget {
-  // final String stressAnalysis;
   const MoodChart({super.key});
 
   @override
@@ -23,29 +22,31 @@ class _MoodChartState extends State<MoodChart> {
 
   Future<void> _fetchDiaryEntries() async {
     try {
-      // Get the stream and fetch the latest snapshot
-      final snapshot = await FirebaseOptions.getDiaryEntries().first;
+      // 1) Get the stream of diary entries
+      final snapshots = FirebaseOptions.getDiaryEntries();
 
-      // Map the documents to a list of entries
+      // 2) We only need the latest snapshot once
+      //    (If you want real-time updates, consider StreamBuilder)
+      final snapshot = await snapshots.first;
+
+      // 3) Convert to a list of maps
       final entries = snapshot.docs
           .map((doc) => doc.data() as Map<String, dynamic>)
           .toList();
 
-      // Count the occurrences of "Stressed" and "Not Stressed"
+      // 4) Count "stress" vs "no stress"
       final stressCount =
-          entries.where((entry) => entry['prediction'] == 'Stressed').length;
-      final nonStressCount = entries
-          .where((entry) => entry['prediction'] == 'Not Stressed')
-          .length;
+          entries.where((e) => e['prediction'] == 'stress').length;
+      final nonStressCount =
+          entries.where((e) => e['prediction'] == 'no stress').length;
 
-      // Update the state with the fetched data
+      // 5) Update state
       setState(() {
         stressValue = stressCount;
         nonStressValue = nonStressCount;
         isLoading = false;
       });
     } catch (e) {
-      // Handle errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error fetching diary entries: $e')),
       );
@@ -56,7 +57,6 @@ class _MoodChartState extends State<MoodChart> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        // color: Colors.blue[50],
         border: Border.all(color: Colors.black),
         borderRadius: BorderRadius.circular(12),
       ),

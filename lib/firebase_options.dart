@@ -59,4 +59,5 @@ class DefaultFirebaseOptions {
     projectId: 'systembeta-7881e',
     storageBucket: 'systembeta-7881e.firebasestorage.app',
   );
+
 }

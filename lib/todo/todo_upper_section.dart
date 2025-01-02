@@ -10,7 +10,7 @@ class TodoUpperSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('todos').snapshots(),
+      stream: FirebaseFirestore.instance.collection('todo').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());

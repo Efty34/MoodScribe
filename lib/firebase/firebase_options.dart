@@ -6,7 +6,8 @@ class FirebaseOptions {
   /// Save a diary entry (text and prediction) to Firestore
   static Future<void> saveDiaryEntry(String text, String prediction) async {
     try {
-      await FirebaseFirestore.instance.collection('diaryEntries').add({
+      // Use the SAME collection name for both saving & fetching
+      await _firestore.collection('diaryEntries').add({
         'text': text,
         'prediction': prediction,
         'timestamp': FieldValue.serverTimestamp(),
@@ -18,13 +19,9 @@ class FirebaseOptions {
 
   /// Fetch all diary entries as a stream
   static Stream<QuerySnapshot> getDiaryEntries() {
-    try {
-      return _firestore
-          .collection('diaryEntries')
-          .orderBy('timestamp', descending: true)
-          .snapshots();
-    } catch (e) {
-      throw Exception('Failed to fetch diary entries: $e');
-    }
+    return _firestore
+        .collection('diaryEntries')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
   }
 }
