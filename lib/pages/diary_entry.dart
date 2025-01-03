@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:diary/firebase/firebase_options.dart';
+import 'package:diary/firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';

@@ -1,4 +1,4 @@
-import 'package:diary/firebase/firebase_options.dart';
+import 'package:diary/firebase/firebase.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
