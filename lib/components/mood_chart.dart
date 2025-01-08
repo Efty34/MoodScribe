@@ -1,6 +1,7 @@
 import 'package:diary/firebase/firebase.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MoodChart extends StatefulWidget {
   const MoodChart({super.key});
@@ -9,15 +10,35 @@ class MoodChart extends StatefulWidget {
   State<MoodChart> createState() => _MoodChartState();
 }
 
-class _MoodChartState extends State<MoodChart> {
+class _MoodChartState extends State<MoodChart>
+    with SingleTickerProviderStateMixin {
   int stressValue = 0;
   int nonStressValue = 0;
   bool isLoading = true;
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+
     _fetchDiaryEntries();
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchDiaryEntries() async {
@@ -55,48 +76,73 @@ class _MoodChartState extends State<MoodChart> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Stress Analysis",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    height: 250,
-                    child: PieChart(
-                      PieChartData(
-                        sections: _buildPieChartSections(),
-                        sectionsSpace: 2, // Space between sections
-                        centerSpaceRadius: 40, // Empty center space
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade200,
+                offset: const Offset(0, 4),
+                blurRadius: 12,
+              ),
+            ],
+          ),
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Mood Analysis",
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildLegendItem(Colors.red, 'Stress'),
-                      _buildLegendItem(Colors.green, 'Non-Stress'),
-                    ],
-                  ),
-                ],
-              ),
-      ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      height: 250,
+                      child: Transform.scale(
+                        scale: _animation.value,
+                        child: PieChart(
+                          PieChartData(
+                            sections: _buildPieChartSections(),
+                            sectionsSpace: 2,
+                            centerSpaceRadius: 40,
+                            startDegreeOffset: -90 * _animation.value,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildLegendItem(
+                          const Color(0xFF4CAF50),
+                          'Positive',
+                          nonStressValue,
+                        ),
+                        const SizedBox(width: 24),
+                        _buildLegendItem(
+                          const Color(0xFFE57373),
+                          'Stressed',
+                          stressValue,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+        );
+      },
     );
   }
 
@@ -107,31 +153,32 @@ class _MoodChartState extends State<MoodChart> {
 
     return [
       PieChartSectionData(
-        color: Colors.red,
-        value: stressPercentage.toDouble(),
-        title: '${stressPercentage.toStringAsFixed(1)}%',
+        color: const Color(0xFFE57373),
+        value: stressPercentage * _animation.value,
+        title: '${(stressPercentage * _animation.value).toStringAsFixed(1)}%',
         radius: 60,
-        titleStyle: const TextStyle(
+        titleStyle: GoogleFonts.poppins(
           fontSize: 14,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
       ),
       PieChartSectionData(
-        color: Colors.green,
-        value: nonStressPercentage.toDouble(),
-        title: '${nonStressPercentage.toStringAsFixed(1)}%',
+        color: const Color(0xFF4CAF50),
+        value: nonStressPercentage * _animation.value,
+        title:
+            '${(nonStressPercentage * _animation.value).toStringAsFixed(1)}%',
         radius: 60,
-        titleStyle: const TextStyle(
+        titleStyle: GoogleFonts.poppins(
           fontSize: 14,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
       ),
     ];
   }
 
-  Widget _buildLegendItem(Color color, String label) {
+  Widget _buildLegendItem(Color color, String label, int value) {
     return Row(
       children: [
         Container(
@@ -142,13 +189,26 @@ class _MoodChartState extends State<MoodChart> {
             shape: BoxShape.circle,
           ),
         ),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey[700],
-            fontSize: 12,
-          ),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                color: Colors.grey[700],
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              '$value entries',
+              style: GoogleFonts.poppins(
+                color: Colors.grey[600],
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
       ],
     );

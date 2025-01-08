@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:diary/components/my_button.dart';
 import 'package:diary/components/my_text_field.dart';
 import 'package:diary/pages/login_page.dart';
@@ -85,20 +84,65 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context).pushReplacement(
+                            // Get the current scaffold background
+                            final container = Container(
+                              decoration: BoxDecoration(
+                                // Your existing background decoration
+                                color: Colors.black.withOpacity(0.5),
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(150),
+                                  bottomRight: Radius.circular(150),
+                                ),
+                              ),
+                            );
+
+                            Navigator.of(context).push(
                               PageRouteBuilder(
                                 transitionDuration:
-                                    const Duration(milliseconds: 500),
+                                    const Duration(milliseconds: 600),
+                                reverseTransitionDuration:
+                                    const Duration(milliseconds: 600),
                                 pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        const LoginPage(),
+                                    (context, animation, secondaryAnimation) {
+                                  return Stack(
+                                    children: [
+                                      // Keep the background constant
+                                      container,
+                                      // Animate only the content
+                                      AnimatedBuilder(
+                                        animation: animation,
+                                        builder: (context, child) {
+                                          return FadeTransition(
+                                            opacity: Tween<double>(
+                                              begin: 0.0,
+                                              end: 1.0,
+                                            ).animate(
+                                              CurvedAnimation(
+                                                parent: animation,
+                                                curve: Curves.easeOut,
+                                              ),
+                                            ),
+                                            child: SlideTransition(
+                                              position: Tween<Offset>(
+                                                begin: const Offset(0, 0.1),
+                                                end: Offset.zero,
+                                              ).animate(
+                                                CurvedAnimation(
+                                                  parent: animation,
+                                                  curve: Curves.easeOutCubic,
+                                                ),
+                                              ),
+                                              child: const LoginPage(),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
                                 transitionsBuilder: (context, animation,
                                     secondaryAnimation, child) {
-                                  return FadeThroughTransition(
-                                    animation: animation,
-                                    secondaryAnimation: secondaryAnimation,
-                                    child: child,
-                                  );
+                                  return child;
                                 },
                               ),
                             );

@@ -91,23 +91,64 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context).pushReplacement(
+                            // Get the current scaffold background
+                            final container = Container(
+                              decoration: BoxDecoration(
+                                // Your existing background decoration
+                                color: Colors.black.withOpacity(0.5),
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(150),
+                                  bottomRight: Radius.circular(150),
+                                ),
+                              ),
+                            );
+
+                            Navigator.of(context).push(
                               PageRouteBuilder(
-                                transitionDuration:
-                                    const Duration(milliseconds: 500),
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        const RegisterPage(),
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  return FadeThroughTransition(
-                                    animation: animation,
-                                    secondaryAnimation: secondaryAnimation,
-                                    child: child,
+                                transitionDuration: const Duration(milliseconds: 600),
+                                reverseTransitionDuration: const Duration(milliseconds: 600),
+                                pageBuilder: (context, animation, secondaryAnimation) {
+                                  return Stack(
+                                    children: [
+                                      // Keep the background constant
+                                      container,
+                                      // Animate only the content
+                                      AnimatedBuilder(
+                                        animation: animation,
+                                        builder: (context, child) {
+                                          return FadeTransition(
+                                            opacity: Tween<double>(
+                                              begin: 0.0,
+                                              end: 1.0,
+                                            ).animate(
+                                              CurvedAnimation(
+                                                parent: animation,
+                                                curve: Curves.easeOut,
+                                              ),
+                                            ),
+                                            child: SlideTransition(
+                                              position: Tween<Offset>(
+                                                begin: const Offset(0, 0.1),
+                                                end: Offset.zero,
+                                              ).animate(
+                                                CurvedAnimation(
+                                                  parent: animation,
+                                                  curve: Curves.easeOutCubic,
+                                                ),
+                                              ),
+                                              child: const RegisterPage(),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   );
                                 },
+                                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                  return child;
+                                },
                               ),
-                            );                            
+                            );
                           },
                           child: Text(
                             "Register Now",

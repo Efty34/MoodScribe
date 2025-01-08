@@ -10,38 +10,82 @@ class CategoryPage extends StatelessWidget {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        backgroundColor: Colors.grey[100],
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
+        backgroundColor: Colors.grey[50],
+        body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 50, left: 20),
-                child: Text(
-                  'Your Recommendations',
-                  style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              Container(
-                color: Colors.white,
-                padding: EdgeInsets.only(top: 5.0),
-                child: const TabBar(
-                  labelColor: Colors.blue,
-                  unselectedLabelColor: Colors.grey,
-                  indicatorColor: Colors.blue,
-                  tabs: [
-                    Tab(icon: Icon(Icons.music_note), text: 'Music'),
-                    Tab(icon: Icon(Icons.movie), text: 'Movies'),
-                    Tab(icon: Icon(Icons.book), text: 'Books'),
-                    Tab(icon: Icon(Icons.fitness_center), text: 'Exercise'),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Discover',
+                      style: GoogleFonts.poppins(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Find what suits your mood',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                    ),
                   ],
                 ),
               ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade200,
+                      offset: const Offset(0, 2),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+                child: TabBar(
+                  labelColor: Colors.blue,
+                  unselectedLabelColor: Colors.grey[400],
+                  indicatorSize: TabBarIndicatorSize.label,
+                  indicatorColor: Colors.blue,
+                  labelStyle: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  unselectedLabelStyle: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  tabs: const [
+                    Tab(
+                      icon: Icon(Icons.music_note_rounded),
+                      text: 'Music',
+                    ),
+                    Tab(
+                      icon: Icon(Icons.movie_creation_rounded),
+                      text: 'Movies',
+                    ),
+                    Tab(
+                      icon: Icon(Icons.auto_stories_rounded),
+                      text: 'Books',
+                    ),
+                    Tab(
+                      icon: Icon(Icons.self_improvement_rounded),
+                      text: 'Exercise',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 2),
               const Expanded(
                 child: TabBarView(
                   children: [

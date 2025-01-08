@@ -1,11 +1,13 @@
 import 'package:diary/components/custom_app_bar.dart';
 import 'package:diary/components/custom_app_drawer.dart';
+import 'package:diary/components/diary_detail_page.dart';
+import 'package:diary/components/diary_entry_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,32 +41,24 @@ class HomePage extends StatelessWidget {
               itemCount: box.length,
               itemBuilder: (context, index) {
                 final String entry = box.getAt(index) ?? '';
-
-                return GestureDetector(
-                  onLongPress: () => _showOptions(context, box, index, entry),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      // color: Colors.brown.shade100,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: Colors.black),
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.grey.withOpacity(0.5),
-                      //     spreadRadius: 2,
-                      //     blurRadius: 5,
-                      //     offset: const Offset(0, 3),
-                      //   ),
-                      // ],
-                    ),
-                    child: Text(
-                      entry,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
+                return DiaryEntryCard(
+                  entry: entry,
+                  onTap: () {
+                    // Pass both index and entry to the detail page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DiaryDetailPage(
+                          index: index,
+                          initialEntry: entry,
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
+                  onLongPress: () {
+                    // Show options to edit or delete
+                    _showOptions(context, box, index, entry);
+                  },
                 );
               },
             );
@@ -104,38 +98,87 @@ class HomePage extends StatelessWidget {
   }
 
   void _showEditDialog(
-      BuildContext context, Box<String> box, int index, String entry) {
-    final TextEditingController controller = TextEditingController(text: entry);
+    BuildContext context,
+    Box<String> box,
+    int index,
+    String entry,
+  ) {
+    final controller = TextEditingController(text: entry);
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Entry'),
-          content: TextField(
-            controller: controller,
-            maxLines: null,
-            decoration: const InputDecoration(hintText: 'Update your note'),
+        final theme = Theme.of(context);
+
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+          backgroundColor: theme.colorScheme.surface,
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Edit Note',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                TextField(
+                  controller: controller,
+                  maxLines: null,
+                  style: theme.textTheme.bodyLarge,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: theme.colorScheme.surfaceContainerHighest
+                        .withOpacity(0.3),
+                    hintText: 'Update your note',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    FilledButton(
+                      onPressed: () {
+                        final updatedText = controller.text.trim();
+                        if (updatedText.isNotEmpty) {
+                          box.putAt(index, updatedText);
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Note updated'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Save'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () {
-                final updatedText = controller.text.trim();
-                if (updatedText.isNotEmpty) {
-                  box.putAt(index, updatedText);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Note updated successfully!')),
-                  );
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
+          ),
         );
       },
     );

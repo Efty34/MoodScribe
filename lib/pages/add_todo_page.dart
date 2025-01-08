@@ -45,7 +45,18 @@ class _AddTodoPageState extends State<AddTodoPage> {
   void _saveTodo() {
     if (_descriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Description cannot be empty.')),
+        SnackBar(
+          content: Text(
+            'Description cannot be empty.',
+            style: GoogleFonts.poppins(),
+          ),
+          backgroundColor: Colors.red[400],
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
       );
       return;
     }
@@ -63,7 +74,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
       todoData['time'] = _selectedTime!.format(context);
     }
     if (_selectedDate != null) {
-      todoData['date'] = DateFormat.yMMMd().format(_selectedDate!);
+      todoData['date'] = DateFormat('MMM dd, yyyy').format(_selectedDate!);
     }
 
     FirebaseFirestore.instance.collection('todos').add(todoData);
@@ -73,145 +84,258 @@ class _AddTodoPageState extends State<AddTodoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('ToDo List'),
+        title: Text(
+          'My Tasks',
+          style: GoogleFonts.manrope(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.grey[800],
+            size: 22,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.add_task_rounded,
+                      color: Colors.blue[700],
+                      size: 30,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    'Add New Task',
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+
+              // Title Field
               Text(
-                'Add New Task',
+                'Title',
                 style: GoogleFonts.poppins(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[700],
                 ),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title (Optional)',
-                  labelStyle: TextStyle(color: Colors.grey, fontSize: 16),
-                  border: OutlineInputBorder(),
-                  focusColor: Colors.black,
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade200,
+                      offset: const Offset(0, 2),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _titleController,
+                  style: GoogleFonts.poppins(fontSize: 16),
+                  decoration: InputDecoration(
+                    hintText: 'Enter task title',
+                    hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _descriptionController,
-                maxLines: null,
-                textAlign: TextAlign.start,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  labelStyle: TextStyle(color: Colors.grey, fontSize: 16),
-                  border: OutlineInputBorder(),
-                  focusColor: Colors.black,
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
+              const SizedBox(height: 24),
+
+              // Description Field
+              Text(
+                'Description',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[700],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade200,
+                      offset: const Offset(0, 2),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _descriptionController,
+                  maxLines: 4,
+                  style: GoogleFonts.poppins(fontSize: 16),
+                  decoration: InputDecoration(
+                    hintText: 'Enter task description',
+                    hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
                   ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Schedule Section
+              Text(
+                'Schedule',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[700],
                 ),
               ),
               const SizedBox(height: 16),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    _selectedTime == null
-                        ? 'No time set'
-                        : _selectedTime!.format(context),
-                    style: GoogleFonts.manrope(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue),
-                  ),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.black),
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
+                  Expanded(
+                    child: InkWell(
+                      onTap: _selectDate,
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade200,
+                              offset: const Offset(0, 2),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_today,
+                                color: Colors.blue[700], size: 20),
+                            const SizedBox(width: 12),
+                            Text(
+                              _selectedDate == null
+                                  ? 'Select Date'
+                                  : DateFormat('MMM dd, yyyy')
+                                      .format(_selectedDate!),
+                              style: GoogleFonts.poppins(
+                                color: _selectedDate == null
+                                    ? Colors.grey[600]
+                                    : Colors.grey[800],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    onPressed: _selectTime,
-                    child: Text(
-                      'Pick Time',
-                      style: GoogleFonts.manrope(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: InkWell(
+                      onTap: _selectTime,
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade200,
+                              offset: const Offset(0, 2),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.access_time,
+                                color: Colors.blue[700], size: 20),
+                            const SizedBox(width: 12),
+                            Text(
+                              _selectedTime == null
+                                  ? 'Select Time'
+                                  : _selectedTime!.format(context),
+                              style: GoogleFonts.poppins(
+                                color: _selectedTime == null
+                                    ? Colors.grey[600]
+                                    : Colors.grey[800],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    _selectedDate == null
-                        ? 'No date set'
-                        : DateFormat.yMMMd().format(_selectedDate!),
-                    style: GoogleFonts.manrope(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue),
-                  ),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.black),
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
-                    ),
-                    onPressed: _selectDate,
-                    child: Text(
-                      'Pick Date',
-                      style: GoogleFonts.manrope(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Center(
-                child: OutlinedButton.icon(
-                  style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                  ),
-                  onPressed: _saveTodo,
-                  icon: const Icon(
-                    Icons.add,
-                    size: 20,
-                    color: Colors.black,
-                  ),
-                  label: Text(
-                    "Save ToDo",
-                    style: GoogleFonts.manrope(
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
               ),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade200,
+              offset: const Offset(0, -2),
+              blurRadius: 6,
+            ),
+          ],
+        ),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue[700],
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            elevation: 0,
+          ),
+          onPressed: _saveTodo,
+          child: Text(
+            'Add Task',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+            ),
           ),
         ),
       ),

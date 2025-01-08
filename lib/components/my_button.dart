@@ -3,28 +3,52 @@ import 'package:google_fonts/google_fonts.dart';
 
 class MyButton extends StatelessWidget {
   final String text;
-  final Function()? onTap;
-  const MyButton({super.key, required this.text, this.onTap});
+  final VoidCallback onTap;
+  final bool isSecondary;
+
+  const MyButton({
+    super.key,
+    required this.text,
+    required this.onTap,
+    this.isSecondary = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.sizeOf(context).width;
-    double screenHeight = MediaQuery.sizeOf(context).height;
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.circular(5),
+          gradient: isSecondary
+              ? null
+              : LinearGradient(
+                  colors: [
+                    Colors.blue.shade600,
+                    Colors.blue.shade700,
+                  ],
+                ),
+          color: isSecondary ? Colors.grey[200] : null,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: isSecondary
+              ? null
+              : [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
         ),
-        padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.38, vertical: screenHeight * 0.018),
-        child: Text(
-          text,
-          style: GoogleFonts.manrope(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
+        child: Center(
+          child: Text(
+            text,
+            style: GoogleFonts.poppins(
+              color: isSecondary ? Colors.grey[800] : Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
           ),
         ),
       ),

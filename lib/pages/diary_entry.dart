@@ -119,7 +119,7 @@ class _DiaryEntryState extends State<DiaryEntry> {
                   child: TextField(
                     controller: _postController,
                     maxLines: null,
-                    expands: true,
+                    expands: false,
                     textAlignVertical: TextAlignVertical.top,
                     decoration: InputDecoration(
                       hintText: 'Chronicles of a Wandering Mind...',
@@ -142,7 +142,7 @@ class _DiaryEntryState extends State<DiaryEntry> {
               Center(
                 child: OutlinedButton.icon(
                   style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
