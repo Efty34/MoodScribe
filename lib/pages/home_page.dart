@@ -18,51 +18,53 @@ class HomePage extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: CustomAppBar(),
       drawer: const CustomAppDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: ValueListenableBuilder(
-          valueListenable: diaryBox.listenable(),
-          builder: (context, Box<String> box, _) {
-            // Check if the box is empty
-            if (box.isEmpty) {
-              return const Center(
-                child: Text(
-                  'No diary entries yet. Add some thoughts!',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-              );
-            }
-
-            // Build the MasonryGridView with diary entries
-            return MasonryGridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              itemCount: box.length,
-              itemBuilder: (context, index) {
-                final String entry = box.getAt(index) ?? '';
-                return DiaryEntryCard(
-                  entry: entry,
-                  onTap: () {
-                    // Pass both index and entry to the detail page
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => DiaryDetailPage(
-                          index: index,
-                          initialEntry: entry,
-                        ),
-                      ),
-                    );
-                  },
-                  onLongPress: () {
-                    // Show options to edit or delete
-                    _showOptions(context, box, index, entry);
-                  },
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: ValueListenableBuilder(
+            valueListenable: diaryBox.listenable(),
+            builder: (context, Box<String> box, _) {
+              // Check if the box is empty
+              if (box.isEmpty) {
+                return const Center(
+                  child: Text(
+                    'No diary entries yet. Add some thoughts!',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
                 );
-              },
-            );
-          },
+              }
+
+              // Build the MasonryGridView with diary entries
+              return MasonryGridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                itemCount: box.length,
+                itemBuilder: (context, index) {
+                  final String entry = box.getAt(index) ?? '';
+                  return DiaryEntryCard(
+                    entry: entry,
+                    onTap: () {
+                      // Pass both index and entry to the detail page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => DiaryDetailPage(
+                            index: index,
+                            initialEntry: entry,
+                          ),
+                        ),
+                      );
+                    },
+                    onLongPress: () {
+                      // Show options to edit or delete
+                      _showOptions(context, box, index, entry);
+                    },
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );

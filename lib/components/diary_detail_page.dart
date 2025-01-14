@@ -7,10 +7,10 @@ class DiaryDetailPage extends StatefulWidget {
   final String initialEntry;
 
   const DiaryDetailPage({
-    Key? key,
+    super.key,
     required this.index,
     required this.initialEntry,
-  }) : super(key: key);
+  });
 
   @override
   State<DiaryDetailPage> createState() => _DiaryDetailPageState();
