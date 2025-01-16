@@ -27,12 +27,14 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blueGrey,
         textTheme: GoogleFonts.interTextTheme(),
         brightness: Brightness.light,
+        primaryColor: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
       home: const WelcomePage(),
+      themeMode: ThemeMode.system,
       routes: {
-        AppRoutes.loginPage: (context) => LoginPage(),
-        AppRoutes.registerPage: (context) => RegisterPage(),
+        AppRoutes.loginPage: (context) => const LoginPage(),
+        AppRoutes.registerPage: (context) => const RegisterPage(),
         AppRoutes.bottomNavBar: (context) => const BottomNavBar(),
       },
     );

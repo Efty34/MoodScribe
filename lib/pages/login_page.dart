@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
           Container(
             margin: const EdgeInsets.symmetric(vertical: 80),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withOpacity(0.8),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(150),
                 bottomRight: Radius.circular(150),
@@ -105,9 +105,12 @@ class _LoginPageState extends State<LoginPage> {
 
                             Navigator.of(context).push(
                               PageRouteBuilder(
-                                transitionDuration: const Duration(milliseconds: 600),
-                                reverseTransitionDuration: const Duration(milliseconds: 600),
-                                pageBuilder: (context, animation, secondaryAnimation) {
+                                transitionDuration:
+                                    const Duration(milliseconds: 600),
+                                reverseTransitionDuration:
+                                    const Duration(milliseconds: 600),
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) {
                                   return Stack(
                                     children: [
                                       // Keep the background constant
@@ -144,7 +147,8 @@ class _LoginPageState extends State<LoginPage> {
                                     ],
                                   );
                                 },
-                                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
                                   return child;
                                 },
                               ),

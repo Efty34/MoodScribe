@@ -100,6 +100,10 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -225,8 +229,9 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),

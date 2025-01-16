@@ -75,25 +75,33 @@ class HomePage extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.edit, color: Colors.blue),
-              title: const Text('Edit'),
-              onTap: () {
-                Navigator.pop(context);
-                _showEditDialog(context, box, index, entry);
-              },
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(22),
             ),
-            ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Delete'),
-              onTap: () {
-                Navigator.pop(context);
-                _showDeleteConfirmation(context, box, index);
-              },
-            ),
-          ],
+          ),
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.edit, color: Colors.blue),
+                title: const Text('Edit'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showEditDialog(context, box, index, entry);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text('Delete'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showDeleteConfirmation(context, box, index);
+                },
+              ),
+            ],
+          ),
         );
       },
     );

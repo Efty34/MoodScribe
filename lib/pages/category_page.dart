@@ -42,8 +42,9 @@ class CategoryPage extends StatelessWidget {
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
+                  // border: Border.all(color: Colors.blue, width: 1),
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.shade200,
@@ -53,6 +54,7 @@ class CategoryPage extends StatelessWidget {
                   ],
                 ),
                 child: TabBar(
+                  dividerColor: Colors.transparent,
                   labelColor: Colors.blue,
                   unselectedLabelColor: Colors.grey[400],
                   indicatorSize: TabBarIndicatorSize.label,

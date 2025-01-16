@@ -315,7 +315,7 @@ class _TodoBuilderState extends State<TodoBuilder> {
             return Dialog(
               insetPadding: const EdgeInsets.symmetric(horizontal: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: SingleChildScrollView(
                 child: Container(
@@ -588,8 +588,9 @@ class _TodoBuilderState extends State<TodoBuilder> {
     return await showDialog(
       context: context,
       builder: (context) => Dialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),

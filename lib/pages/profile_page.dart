@@ -23,7 +23,7 @@ class ProfilePage extends StatelessWidget {
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
                   'Profile',
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.start,
                   style: GoogleFonts.poppins(
                     color: Colors.grey[800],
                     fontWeight: FontWeight.w600,
@@ -50,7 +50,7 @@ class ProfilePage extends StatelessWidget {
                         opacity: 1,
                         child: Container(
                           margin: const EdgeInsets.only(
-                              top: 8, left: 8, right: 8, bottom: 8),
+                              top: 8, left: 8, right: 8, bottom: 2),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(
                                 22.0), // Adjust the radius as needed
@@ -88,8 +88,11 @@ class ProfilePage extends StatelessWidget {
                     // ),
                     // const SizedBox(height: 16),
                     MoodChart(),
+                    SizedBox(height: 10),
                     MoodChart(),
+                    SizedBox(height: 10),
                     MoodChart(),
+                    SizedBox(height: 10),
                     MoodChart(),
 
                     // const SizedBox(height: 24),
