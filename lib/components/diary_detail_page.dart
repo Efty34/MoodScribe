@@ -3,12 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class DiaryDetailPage extends StatefulWidget {
-  final int index;
+  final String entryKey;
   final String initialEntry;
 
   const DiaryDetailPage({
     super.key,
-    required this.index,
+    required this.entryKey,
     required this.initialEntry,
   });
 
@@ -24,7 +24,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   void initState() {
     super.initState();
     diaryBox = Hive.box<String>('diaryBox');
-    entry = diaryBox.getAt(widget.index) ?? widget.initialEntry;
+    entry = diaryBox.get(widget.entryKey) ?? widget.initialEntry;
   }
 
   @override
@@ -200,11 +200,12 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                       onPressed: () {
                         final updatedText = controller.text.trim();
                         if (updatedText.isNotEmpty) {
-                          diaryBox.putAt(widget.index, updatedText);
+                          diaryBox.put(widget.entryKey, updatedText);
                           setState(() {
                             entry = updatedText;
                           });
                           Navigator.pop(context);
+                          _showSuccessSnackBar('Entry updated successfully!');
                         }
                       },
                       child: Text(
@@ -292,7 +293,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                       ),
                     ),
                     onPressed: () {
-                      diaryBox.deleteAt(widget.index);
+                      diaryBox.delete(widget.entryKey);
                       Navigator.pop(context);
                       Navigator.pop(context);
                     },

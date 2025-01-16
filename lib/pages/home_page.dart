@@ -7,11 +7,10 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Open the Hive box
     final Box<String> diaryBox = Hive.box<String>('diaryBox');
 
     return Scaffold(
@@ -24,7 +23,6 @@ class HomePage extends StatelessWidget {
           child: ValueListenableBuilder(
             valueListenable: diaryBox.listenable(),
             builder: (context, Box<String> box, _) {
-              // Check if the box is empty
               if (box.isEmpty) {
                 return const Center(
                   child: Text(
@@ -34,31 +32,48 @@ class HomePage extends StatelessWidget {
                 );
               }
 
-              // Build the MasonryGridView with diary entries
+              // Get all entries and sort them by timestamp
+              final entries = List.generate(box.length, (index) {
+                final key = box.keyAt(index);
+                return {
+                  'key': key,
+                  'timestamp': int.tryParse(key.toString()) ?? 0,
+                  'text': box.getAt(index) ?? '',
+                };
+              });
+
+              // Sort entries by timestamp in descending order (newest first)
+              entries.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
+
               return MasonryGridView.count(
                 crossAxisCount: 2,
                 mainAxisSpacing: 8,
                 crossAxisSpacing: 8,
-                itemCount: box.length,
+                itemCount: entries.length,
                 itemBuilder: (context, index) {
-                  final String entry = box.getAt(index) ?? '';
+                  final entry = entries[index];
+                  final originalIndex = box.keyAt(index);
+
                   return DiaryEntryCard(
-                    entry: entry,
+                    entry: entry['text'] as String,
                     onTap: () {
-                      // Pass both index and entry to the detail page
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => DiaryDetailPage(
-                            index: index,
-                            initialEntry: entry,
+                            entryKey: entry['key'] as String,
+                            initialEntry: entry['text'] as String,
                           ),
                         ),
                       );
                     },
                     onLongPress: () {
-                      // Show options to edit or delete
-                      _showOptions(context, box, index, entry);
+                      _showOptions(
+                        context, 
+                        box, 
+                        box.keyAt(box.toMap().values.toList().indexOf(entry['text'])), 
+                        entry['text'] as String,
+                      );
                     },
                   );
                 },
@@ -70,8 +85,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _showOptions(
-      BuildContext context, Box<String> box, int index, String entry) {
+  void _showOptions(BuildContext context, Box<String> box, dynamic key, String entry) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -89,7 +103,7 @@ class HomePage extends StatelessWidget {
                 title: const Text('Edit'),
                 onTap: () {
                   Navigator.pop(context);
-                  _showEditDialog(context, box, index, entry);
+                  _showEditDialog(context, box, key, entry);
                 },
               ),
               ListTile(
@@ -97,7 +111,7 @@ class HomePage extends StatelessWidget {
                 title: const Text('Delete'),
                 onTap: () {
                   Navigator.pop(context);
-                  _showDeleteConfirmation(context, box, index);
+                  _showDeleteConfirmation(context, box, key);
                 },
               ),
             ],
@@ -110,7 +124,7 @@ class HomePage extends StatelessWidget {
   void _showEditDialog(
     BuildContext context,
     Box<String> box,
-    int index,
+    String key,
     String entry,
   ) {
     final controller = TextEditingController(text: entry);
@@ -172,7 +186,7 @@ class HomePage extends StatelessWidget {
                       onPressed: () {
                         final updatedText = controller.text.trim();
                         if (updatedText.isNotEmpty) {
-                          box.putAt(index, updatedText);
+                          box.put(key, updatedText);
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -195,7 +209,7 @@ class HomePage extends StatelessWidget {
   }
 
   void _showDeleteConfirmation(
-      BuildContext context, Box<String> box, int index) {
+      BuildContext context, Box<String> box, String key) {
     showDialog(
       context: context,
       builder: (context) {
@@ -209,7 +223,7 @@ class HomePage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                box.deleteAt(index);
+                box.delete(key);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Note deleted successfully!')),

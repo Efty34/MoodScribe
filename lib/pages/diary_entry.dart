@@ -29,8 +29,11 @@ class _DiaryEntryState extends State<DiaryEntry> {
     final text = _postController.text.trim();
     if (text.isNotEmpty) {
       try {
-        // 1) Save locally to Hive (Optional)
-        diaryBox.add(text);
+        // 1) Save locally to Hive with timestamp as key
+        final now = DateTime.now();
+        final key = now.millisecondsSinceEpoch
+            .toString(); // Convert DateTime to string key
+        await diaryBox.put(key, text);
 
         // 2) Get prediction from Flask backend
         final prediction = await _monitorStress(text);

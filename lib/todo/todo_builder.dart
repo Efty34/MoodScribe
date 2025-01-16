@@ -26,22 +26,22 @@ class _TodoBuilderState extends State<TodoBuilder> {
       onRefresh: _refreshData,
       color: Colors.blue[700],
       child: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection('todos')
-            .orderBy('created_at', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+      stream: FirebaseFirestore.instance
+          .collection('todos')
+          .orderBy('created_at', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
             return Center(
               child: CircularProgressIndicator(
                 color: Colors.blue[700],
               ),
             );
-          }
+        }
 
-          final todos = snapshot.data!.docs;
+        final todos = snapshot.data!.docs;
 
-          if (todos.isEmpty) {
+        if (todos.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -69,27 +69,27 @@ class _TodoBuilderState extends State<TodoBuilder> {
                     ),
                   ),
                 ],
-              ),
-            );
-          }
+            ),
+          );
+        }
 
-          return ListView.builder(
-            itemCount: todos.length,
+        return ListView.builder(
+          itemCount: todos.length,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            itemBuilder: (context, index) {
-              final todo = todos[index];
-              final data = todo.data();
+          itemBuilder: (context, index) {
+            final todo = todos[index];
+            final data = todo.data();
 
-              return Dismissible(
-                key: Key(todo.id),
-                direction: DismissDirection.horizontal,
-                background: Container(
+            return Dismissible(
+              key: Key(todo.id),
+              direction: DismissDirection.horizontal,
+              background: Container(
                   margin: const EdgeInsets.symmetric(vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.blue[600],
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  alignment: Alignment.centerLeft,
+                alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     children: [
@@ -151,17 +151,17 @@ class _TodoBuilderState extends State<TodoBuilder> {
                       ),
                       backgroundColor: Colors.red[400],
                       behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
+                              shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                       margin: const EdgeInsets.all(16),
                       duration: const Duration(seconds: 2),
                     ),
                   );
-                },
-                child: Container(
+              },
+              child: Container(
                   margin: const EdgeInsets.symmetric(vertical: 5),
-                  decoration: BoxDecoration(
+                decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.grey.shade300),
@@ -205,8 +205,8 @@ class _TodoBuilderState extends State<TodoBuilder> {
                       ),
                     ),
                     subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                         if (data['description']?.isNotEmpty ?? false) ...[
                           const SizedBox(height: 4),
                           Text(
@@ -218,8 +218,8 @@ class _TodoBuilderState extends State<TodoBuilder> {
                           ),
                         ],
                         const SizedBox(height: 8),
-                        Row(
-                          children: [
+                            Row(
+                              children: [
                             if (data['date']?.isNotEmpty ?? false)
                               Container(
                                 padding: const EdgeInsets.symmetric(
@@ -237,16 +237,16 @@ class _TodoBuilderState extends State<TodoBuilder> {
                                       size: 14,
                                       color: Colors.blue[700],
                                     ),
-                                    const SizedBox(width: 4),
-                                    Text(
+                                const SizedBox(width: 4),
+                                Text(
                                       data['date'],
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         color: Colors.blue[700],
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
+                              ],
+                            ),
                               ),
                             if (data['time']?.isNotEmpty ?? false) ...[
                               const SizedBox(width: 8),
@@ -260,34 +260,34 @@ class _TodoBuilderState extends State<TodoBuilder> {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Row(
-                                  children: [
+                              children: [
                                     Icon(
                                       Icons.access_time,
                                       size: 14,
                                       color: Colors.blue[700],
                                     ),
-                                    const SizedBox(width: 4),
-                                    Text(
+                                const SizedBox(width: 4),
+                                Text(
                                       data['time'],
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         color: Colors.blue[700],
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
+                              ],
+                            ),
                               ),
                             ],
-                          ],
-                        ),
+                        ],
+                      ),
                       ],
                     ),
-                  ),
                 ),
-              );
-            },
-          );
-        },
+              ),
+            );
+          },
+        );
+      },
       ),
     );
   }
@@ -312,23 +312,23 @@ class _TodoBuilderState extends State<TodoBuilder> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            return Dialog(
+        return Dialog(
               insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-              shape: RoundedRectangleBorder(
+          shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SingleChildScrollView(
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+            borderRadius: BorderRadius.circular(20),
+          ),
                   width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                       // Header
                       Row(
                         children: [
@@ -345,10 +345,10 @@ class _TodoBuilderState extends State<TodoBuilder> {
                             ),
                           ),
                           const SizedBox(width: 16),
-                          Text(
-                            'Update Task',
+                Text(
+                  'Update Task',
                             style: GoogleFonts.poppins(
-                              fontSize: 24,
+                    fontSize: 24,
                               fontWeight: FontWeight.w600,
                               color: Colors.grey[800],
                             ),
@@ -406,9 +406,9 @@ class _TodoBuilderState extends State<TodoBuilder> {
                             borderSide: BorderSide.none,
                           ),
                           contentPadding: const EdgeInsets.all(16),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
+                  ),
+                ),
+                const SizedBox(height: 24),
 
                       // Date & Time Section
                       Text(
@@ -419,7 +419,7 @@ class _TodoBuilderState extends State<TodoBuilder> {
                           color: Colors.grey[700],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                const SizedBox(height: 16),
                       Row(
                         children: [
                           Expanded(
@@ -506,11 +506,11 @@ class _TodoBuilderState extends State<TodoBuilder> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
+                const SizedBox(height: 32),
 
                       // Action Buttons
-                      Row(
-                        children: [
+                Row(
+                  children: [
                           Expanded(
                             child: TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -521,16 +521,16 @@ class _TodoBuilderState extends State<TodoBuilder> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              child: Text(
-                                'Cancel',
+                      child: Text(
+                        'Cancel',
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.grey[600],
                                 ),
-                              ),
-                            ),
-                          ),
+                        ),
+                      ),
+                    ),
                           const SizedBox(width: 16),
                           Expanded(
                             child: ElevatedButton(
@@ -545,9 +545,9 @@ class _TodoBuilderState extends State<TodoBuilder> {
                               ),
                               onPressed: () async {
                                 await FirebaseFirestore.instance
-                                    .collection('todos')
-                                    .doc(docId)
-                                    .update({
+                            .collection('todos')
+                            .doc(docId)
+                            .update({
                                   'title': titleController.text.trim(),
                                   'description':
                                       descriptionController.text.trim(),
@@ -560,21 +560,21 @@ class _TodoBuilderState extends State<TodoBuilder> {
                                       : selectedTime!.format(context),
                                 });
                                 Navigator.pop(context, true);
-                              },
-                              child: Text(
-                                'Update',
+                      },
+                      child: Text(
+                        'Update',
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ],
+            ),
+          ),
               ),
             );
           },
@@ -644,7 +644,7 @@ class _TodoBuilderState extends State<TodoBuilder> {
                       backgroundColor: Colors.red[400],
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
-                        vertical: 12,
+          vertical: 12,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

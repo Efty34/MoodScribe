@@ -1,4 +1,5 @@
 import 'package:diary/components/build_profile_section.dart';
+import 'package:diary/components/diary_streak_calendar.dart';
 import 'package:diary/components/mood_chart.dart';
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
@@ -75,30 +76,13 @@ class ProfilePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     BuildProfileSection(),
-                    SizedBox(height: 12),
+                    SizedBox(height: 16),
 
-                    // Stats Section
-                    // Text(
-                    //   'Statistics',
-                    //   style: GoogleFonts.poppins(
-                    //     fontSize: 20,
-                    //     fontWeight: FontWeight.w600,
-                    //     color: Colors.grey[800],
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 16),
-                    MoodChart(),
-                    SizedBox(height: 10),
-                    MoodChart(),
-                    SizedBox(height: 10),
-                    MoodChart(),
-                    SizedBox(height: 10),
-                    MoodChart(),
+                    // Add the streak calendar here
+                    DiaryStreakCalendar(),
+                    SizedBox(height: 24),
 
-                    // const SizedBox(height: 24),
-
-                    // Additional Sections (if needed)
-                    // ...
+                    MoodChart(),
                   ],
                 ),
               ),
