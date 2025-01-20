@@ -1,29 +1,108 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/components/custom_app_bar.dart';
 import 'package:diary/components/custom_app_drawer.dart';
 import 'package:diary/components/diary_detail_page.dart';
 import 'package:diary/components/diary_entry_card.dart';
+import 'package:diary/services/diary_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final Box<String> diaryBox = Hive.box<String>('diaryBox');
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  final DiaryService _diaryService = DiaryService();
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _isSearching = !_isSearching;
+      if (!_isSearching) {
+        _searchController.clear();
+        _searchQuery = '';
+      }
+    });
+  }
+
+  Widget _highlightText(String text, String query) {
+    if (query.isEmpty) return Text(text);
+
+    List<TextSpan> spans = [];
+    final String lowercaseText = text.toLowerCase();
+    final String lowercaseQuery = query.toLowerCase();
+    int start = 0;
+
+    while (true) {
+      final int index = lowercaseText.indexOf(lowercaseQuery, start);
+      if (index == -1) {
+        spans.add(TextSpan(text: text.substring(start)));
+        break;
+      }
+
+      if (index > start) {
+        spans.add(TextSpan(text: text.substring(start, index)));
+      }
+
+      spans.add(
+        TextSpan(
+          text: text.substring(index, index + query.length),
+          style: TextStyle(
+            backgroundColor: Colors.blue[100],
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+
+      start = index + query.length;
+    }
+
+    return RichText(
+        text: TextSpan(
+            children: spans, style: const TextStyle(color: Colors.black)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(
+        searchController: _searchController,
+        onSearchChanged: (query) => setState(() => _searchQuery = query),
+        isSearching: _isSearching,
+        onSearchToggle: _toggleSearch,
+      ),
       drawer: const CustomAppDrawer(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ValueListenableBuilder(
-            valueListenable: diaryBox.listenable(),
-            builder: (context, Box<String> box, _) {
-              if (box.isEmpty) {
+          child: StreamBuilder<QuerySnapshot>(
+            stream: _diaryService.getEntries(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return const Center(
                   child: Text(
                     'No diary entries yet. Add some thoughts!',
@@ -32,48 +111,52 @@ class HomePage extends StatelessWidget {
                 );
               }
 
-              // Get all entries and sort them by timestamp
-              final entries = List.generate(box.length, (index) {
-                final key = box.keyAt(index);
-                return {
-                  'key': key,
-                  'timestamp': int.tryParse(key.toString()) ?? 0,
-                  'text': box.getAt(index) ?? '',
-                };
-              });
+              final entries = snapshot.data!.docs;
+              final filteredEntries = _searchQuery.isEmpty
+                  ? entries
+                  : entries.where((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      final text = (data['text'] as String).toLowerCase();
+                      return text.contains(_searchQuery.toLowerCase());
+                    }).toList();
 
-              // Sort entries by timestamp in descending order (newest first)
-              entries.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
+              if (filteredEntries.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No entries found for "$_searchQuery"',
+                    style: const TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                );
+              }
 
               return MasonryGridView.count(
                 crossAxisCount: 2,
                 mainAxisSpacing: 8,
                 crossAxisSpacing: 8,
-                itemCount: entries.length,
+                itemCount: filteredEntries.length,
                 itemBuilder: (context, index) {
-                  final entry = entries[index];
-                  final originalIndex = box.keyAt(index);
+                  final doc = filteredEntries[index];
+                  final data = doc.data() as Map<String, dynamic>;
+                  final text = data['text'] as String;
 
                   return DiaryEntryCard(
-                    entry: entry['text'] as String,
+                    entry: text,
+                    highlightedEntry: _searchQuery.isNotEmpty
+                        ? _highlightText(text, _searchQuery)
+                        : null,
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => DiaryDetailPage(
-                            entryKey: entry['key'] as String,
-                            initialEntry: entry['text'] as String,
+                            entryId: doc.id,
+                            initialEntry: text,
                           ),
                         ),
                       );
                     },
                     onLongPress: () {
-                      _showOptions(
-                        context, 
-                        box, 
-                        box.keyAt(box.toMap().values.toList().indexOf(entry['text'])), 
-                        entry['text'] as String,
-                      );
+                      _showOptions(context, doc.id, text);
                     },
                   );
                 },
@@ -85,7 +168,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _showOptions(BuildContext context, Box<String> box, dynamic key, String entry) {
+  void _showOptions(BuildContext context, String docId, String entry) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -103,7 +186,7 @@ class HomePage extends StatelessWidget {
                 title: const Text('Edit'),
                 onTap: () {
                   Navigator.pop(context);
-                  _showEditDialog(context, box, key, entry);
+                  _showEditDialog(context, docId, entry);
                 },
               ),
               ListTile(
@@ -111,7 +194,7 @@ class HomePage extends StatelessWidget {
                 title: const Text('Delete'),
                 onTap: () {
                   Navigator.pop(context);
-                  _showDeleteConfirmation(context, box, key);
+                  _showDeleteConfirmation(context, docId);
                 },
               ),
             ],
@@ -121,12 +204,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _showEditDialog(
-    BuildContext context,
-    Box<String> box,
-    String key,
-    String entry,
-  ) {
+  void _showEditDialog(BuildContext context, String docId, String entry) {
     final controller = TextEditingController(text: entry);
 
     showDialog(
@@ -183,17 +261,26 @@ class HomePage extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     FilledButton(
-                      onPressed: () {
+                      onPressed: () async {
                         final updatedText = controller.text.trim();
                         if (updatedText.isNotEmpty) {
-                          box.put(key, updatedText);
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Note updated'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                          try {
+                            await _diaryService.updateEntry(docId, updatedText);
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Note updated'),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error updating note: $e'),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
                         }
                       },
                       child: const Text('Save'),
@@ -208,8 +295,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _showDeleteConfirmation(
-      BuildContext context, Box<String> box, String key) {
+  void _showDeleteConfirmation(BuildContext context, String docId) {
     showDialog(
       context: context,
       builder: (context) {
@@ -222,12 +308,22 @@ class HomePage extends StatelessWidget {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                box.delete(key);
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Note deleted successfully!')),
-                );
+              onPressed: () async {
+                try {
+                  await _diaryService.deleteEntry(docId);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Note deleted successfully!'),
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error deleting note: $e'),
+                    ),
+                  );
+                }
               },
               child: const Text('Delete'),
             ),

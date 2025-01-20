@@ -1,4 +1,5 @@
 import 'package:diary/firebase_options.dart';
+import 'package:diary/mood_buddy/pages/mood_buddy_page.dart';
 import 'package:diary/pages/login_page.dart';
 import 'package:diary/pages/register_page.dart';
 import 'package:diary/pages/welcome_page.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.loginPage: (context) => const LoginPage(),
         AppRoutes.registerPage: (context) => const RegisterPage(),
         AppRoutes.bottomNavBar: (context) => const BottomNavBar(),
+        AppRoutes.moodBuddyPage: (context) => const MoodBuddyPage(),
       },
     );
   }

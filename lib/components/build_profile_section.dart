@@ -1,7 +1,7 @@
+import 'package:diary/services/diary_service.dart';
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 class BuildProfileSection extends StatefulWidget {
   const BuildProfileSection({super.key});
@@ -15,6 +15,12 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
+  final DiaryService _diaryService = DiaryService();
+  
+  bool isLoading = true;
+  int totalEntries = 0;
+  int currentStreak = 0;
+  int longestStreak = 0;
 
   @override
   void initState() {
@@ -39,61 +45,25 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
     );
 
     _controller.forward();
+    _loadStats();
   }
 
-  Map<String, int> _calculateStats(Box<String> box) {
-    if (box.isEmpty) return {'entries': 0, 'current': 0, 'longest': 0};
-
-    // Get all entries and sort them by timestamp
-    final entries = List.generate(box.length, (index) {
-      final key = box.keyAt(index);
-      return int.tryParse(key.toString()) ?? 0;
-    });
-
-    entries.sort();
-
-    // Convert timestamps to dates
-    final dates = entries.map((timestamp) {
-      final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-      return DateTime(date.year, date.month, date.day);
-    }).toList();
-
-    int tempStreak = 1;
-    int maxStreak = 1;
-    int currentStreak = 1;
-    DateTime? lastDate;
-
-    for (var date in dates) {
-      if (lastDate != null) {
-        final difference = date.difference(lastDate).inDays;
-        if (difference == 1) {
-          tempStreak++;
-          maxStreak = tempStreak > maxStreak ? tempStreak : maxStreak;
-        } else if (difference > 1) {
-          tempStreak = 1;
-        }
-      }
-      lastDate = date;
+  Future<void> _loadStats() async {
+    try {
+      final streakInfo = await _diaryService.getStreakInfo();
+      
+      setState(() {
+        totalEntries = streakInfo['total'] ?? 0;
+        currentStreak = streakInfo['current'] ?? 0;
+        longestStreak = streakInfo['longest'] ?? 0;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading stats: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
-
-    // Calculate current streak
-    if (dates.isNotEmpty) {
-      final today = DateTime.now();
-      final lastEntryDate = dates.last;
-      final difference = today.difference(lastEntryDate).inDays;
-
-      if (difference <= 1) {
-        currentStreak = tempStreak;
-      } else {
-        currentStreak = 0;
-      }
-    }
-
-    return {
-      'entries': box.length,
-      'current': currentStreak,
-      'longest': maxStreak,
-    };
   }
 
   @override
@@ -104,11 +74,17 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: Hive.box<String>('diaryBox').listenable(),
-      builder: (context, Box<String> box, _) {
-        final stats = _calculateStats(box);
+    return StreamBuilder<void>(
+      stream: _diaryService.getEntries().map((_) => null),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          _loadStats(); // Reload stats when entries change
+        }
         
+        if (isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
         return ScaleTransition(
           scale: _scaleAnimation,
           child: FadeTransition(
@@ -162,11 +138,11 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildStatItem('Entries', stats['entries'].toString()),
+                      _buildStatItem('Entries', totalEntries.toString()),
                       _buildDivider(),
-                      _buildStatItem('Current Streak', '${stats['current']} days'),
+                      _buildStatItem('Current Streak', '$currentStreak days'),
                       _buildDivider(),
-                      _buildStatItem('Longest Streak', '${stats['longest']} days'),
+                      _buildStatItem('Longest Streak', '$longestStreak days'),
                     ],
                   ),
                 ],

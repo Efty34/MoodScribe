@@ -1,6 +1,9 @@
 class AppRoutes {
-  static const loginPage = '/login_page';
-  static const registerPage = '/register_page';
+  static const String welcomePage = '/welcome';
+  static const String loginPage = '/login';
+  static const String registerPage = '/register';
+  static const String homePage = '/home';
+  static const String moodBuddyPage = '/mood-buddy';
   static const bottomNavBar = '/bottom_nav_bar';
   static const addtodo = '/add_todo';
 }

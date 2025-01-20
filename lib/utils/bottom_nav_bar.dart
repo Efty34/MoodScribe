@@ -18,7 +18,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   // List of pages to navigate to
   final List<Widget> _pages = [
-    const HomePage(),
+    HomePage(),
     const CategoryPage(),
     const DiaryEntry(),
     const TodoPage(),

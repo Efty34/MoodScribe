@@ -1,6 +1,6 @@
 import 'package:diary/utils/app_routes.dart';
-import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomAppDrawer extends StatelessWidget {
   const CustomAppDrawer({super.key});
@@ -9,89 +9,199 @@ class CustomAppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: Colors.white,
-      elevation: 16.0,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Minimal Drawer Header
-            Container(
-              // decoration: BoxDecoration(
-              //   color: Colors.blue.shade100,
-              //   borderRadius: const BorderRadius.only(
-              //     bottomLeft: Radius.circular(50),
-              //     topRight: Radius.circular(50),
-              //   ),
-              // ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundImage: const AssetImage(AppMedia.dp),
-                      backgroundColor: Colors.grey.shade300,
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'John Doe',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'john.doe@gmail.com',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 14,
-                          ),
+      child: Column(
+        children: [
+          // App Logo Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.blue.shade600,
+                  Colors.blue.shade800,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Placeholder for app logo
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
                         ),
                       ],
                     ),
-                  ],
-                ),
+                    child: const Icon(
+                      Icons.auto_stories_rounded,
+                      color: Colors.blue,
+                      size: 30,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Mind Journal',
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
-            Column(
+          ),
+
+          // Menu Items
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 16),
               children: [
-                ListTile(
-                  leading: const Icon(Icons.home_outlined),
-                  title: const Text('Home'),
+                _buildMenuItem(
+                  icon: Icons.home_rounded,
+                  title: 'Home',
+                  onTap: () => Navigator.pop(context),
+                ),
+                _buildMenuItem(
+                  icon: Icons.mood_rounded,
+                  title: 'Mood Buddy',
+                  onTap: () => Navigator.of(context)
+                    ..pop()
+                    ..pushNamed(AppRoutes.moodBuddyPage),
+                  showNew: true,
+                ),
+                _buildMenuItem(
+                  icon: Icons.calendar_month_rounded,
+                  title: 'Appointments',
                   onTap: () {
+                    // Navigate to Appointments
                     Navigator.pop(context);
                   },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.settings_outlined),
-                  title: const Text('Settings'),
+                _buildMenuItem(
+                  icon: Icons.games_rounded,
+                  title: 'Games',
                   onTap: () {
+                    // Navigate to Games
+                    Navigator.pop(context);
+                  },
+                  showBadge: '3',
+                ),
+                _buildMenuItem(
+                  icon: Icons.settings_rounded,
+                  title: 'Settings',
+                  onTap: () {
+                    // Navigate to Settings
                     Navigator.pop(context);
                   },
                 ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.logout_outlined,
-                    color: Colors.red,
-                  ),
-                  title: const Text(
-                    'Logout',
-                    style: TextStyle(color: Colors.red),
-                  ),
+                const Divider(height: 40),
+                _buildMenuItem(
+                  icon: Icons.logout_rounded,
+                  title: 'Logout',
                   onTap: () {
                     Navigator.of(context).pushNamed(AppRoutes.loginPage);
                   },
+                  isDestructive: true,
                 ),
               ],
             ),
-            // Drawer Menu Items
-          ],
+          ),
+
+          // Bottom Section
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'Version 1.0.0',
+              style: GoogleFonts.poppins(
+                color: Colors.grey,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+    bool showNew = false,
+    String? showBadge,
+  }) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: isDestructive ? Colors.red : Colors.grey[700],
+        size: 22,
+      ),
+      title: Text(
+        title,
+        style: GoogleFonts.poppins(
+          color: isDestructive ? Colors.red : Colors.grey[800],
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
         ),
       ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (showNew)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'NEW',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          if (showBadge != null)
+            Container(
+              margin: const EdgeInsets.only(left: 8),
+              padding: const EdgeInsets.all(6),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                showBadge,
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+        ],
+      ),
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      dense: true,
     );
   }
 }

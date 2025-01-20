@@ -46,6 +46,7 @@ dependencies:
   cloud_firestore: ^5.6.0
   flutter_svg: ^2.0.9
   flutter_heatmap_calendar: ^1.0.5
+  google_generative_ai: ^0.2.0
 
 dev_dependencies:
   flutter_test:

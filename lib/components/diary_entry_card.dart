@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 class DiaryEntryCard extends StatelessWidget {
   final String entry;
+  final Widget? highlightedEntry;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
   const DiaryEntryCard({
     super.key,
     required this.entry,
+    this.highlightedEntry,
     required this.onTap,
     required this.onLongPress,
   });
@@ -31,12 +33,13 @@ class DiaryEntryCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Text(
-          entry,
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 16, color: Colors.black),
-        ),
+        child: highlightedEntry ??
+            Text(
+              entry,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 16, color: Colors.black),
+            ),
       ),
     );
   }

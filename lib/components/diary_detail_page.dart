@@ -1,14 +1,15 @@
+import 'package:diary/services/diary_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DiaryDetailPage extends StatefulWidget {
-  final String entryKey;
+  final String entryId;
   final String initialEntry;
 
   const DiaryDetailPage({
     super.key,
-    required this.entryKey,
+    required this.entryId,
     required this.initialEntry,
   });
 
@@ -17,14 +18,13 @@ class DiaryDetailPage extends StatefulWidget {
 }
 
 class _DiaryDetailPageState extends State<DiaryDetailPage> {
-  late final Box<String> diaryBox;
+  final DiaryService _diaryService = DiaryService();
   late String entry;
 
   @override
   void initState() {
     super.initState();
-    diaryBox = Hive.box<String>('diaryBox');
-    entry = diaryBox.get(widget.entryKey) ?? widget.initialEntry;
+    entry = widget.initialEntry;
   }
 
   @override
@@ -197,15 +197,19 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                         ),
                         elevation: 0,
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         final updatedText = controller.text.trim();
                         if (updatedText.isNotEmpty) {
-                          diaryBox.put(widget.entryKey, updatedText);
-                          setState(() {
-                            entry = updatedText;
-                          });
-                          Navigator.pop(context);
-                          _showSuccessSnackBar('Entry updated successfully!');
+                          try {
+                            await _diaryService.updateEntry(widget.entryId, updatedText);
+                            setState(() {
+                              entry = updatedText;
+                            });
+                            Navigator.pop(context);
+                            _showSuccessSnackBar('Entry updated successfully!');
+                          } catch (e) {
+                            _showSuccessSnackBar('Error updating entry: $e');
+                          }
                         }
                       },
                       child: Text(
@@ -292,10 +296,14 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () {
-                      diaryBox.delete(widget.entryKey);
-                      Navigator.pop(context);
-                      Navigator.pop(context);
+                    onPressed: () async {
+                      try {
+                        await _diaryService.deleteEntry(widget.entryId);
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      } catch (e) {
+                        _showSuccessSnackBar('Error deleting entry: $e');
+                      }
                     },
                     child: Text(
                       'Delete',

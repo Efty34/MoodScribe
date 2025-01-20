@@ -1,10 +1,9 @@
 import 'dart:convert';
 
 import 'package:diary/firebase/firebase.dart';
+import 'package:diary/services/diary_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 
 class DiaryEntry extends StatefulWidget {
@@ -16,24 +15,14 @@ class DiaryEntry extends StatefulWidget {
 
 class _DiaryEntryState extends State<DiaryEntry> {
   final TextEditingController _postController = TextEditingController();
-  late Box<String> diaryBox;
-
-  @override
-  void initState() {
-    super.initState();
-    // Open the Hive box
-    diaryBox = Hive.box<String>('diaryBox');
-  }
+  final DiaryService _diaryService = DiaryService();
 
   void _saveEntry() async {
     final text = _postController.text.trim();
     if (text.isNotEmpty) {
       try {
-        // 1) Save locally to Hive with timestamp as key
-        final now = DateTime.now();
-        final key = now.millisecondsSinceEpoch
-            .toString(); // Convert DateTime to string key
-        await diaryBox.put(key, text);
+        // 1) Save to Firestore using DiaryService
+        await _diaryService.addEntry(text);
 
         // 2) Get prediction from Flask backend
         final prediction = await _monitorStress(text);
