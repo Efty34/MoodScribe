@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class DiaryService {
   final CollectionReference _diaryCollection =
@@ -72,47 +73,83 @@ class DiaryService {
   // Get streak information
   Future<Map<String, int>> getStreakInfo() async {
     try {
-      final QuerySnapshot snapshot =
-          await _diaryCollection.orderBy('timestamp').get();
+      final QuerySnapshot snapshot = 
+          await _diaryCollection.orderBy('timestamp', descending: true).get();
 
       if (snapshot.docs.isEmpty) {
         return {'current': 0, 'longest': 0, 'total': 0};
       }
 
-      final dates = snapshot.docs.map((doc) {
+      final List<DateTime> dates = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         final timestamp = data['timestamp'] as int;
         return DateTime.fromMillisecondsSinceEpoch(timestamp);
       }).toList();
 
-      int currentStreak = 1;
-      int longestStreak = 1;
-      int tempStreak = 1;
-      DateTime? lastDate;
+      // Sort dates in ascending order
+      dates.sort();
 
+      int currentStreak = 0;
+      int longestStreak = 0;
+      int tempStreak = 0;
+
+      // Get today's date without time
+      final today = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+      );
+
+      // Check if there's an entry today
+      final hasEntryToday = dates.any((date) =>
+          date.year == today.year &&
+          date.month == today.month &&
+          date.day == today.day);
+
+      DateTime? previousDate;
       for (var date in dates) {
-        if (lastDate != null) {
-          final difference = date.difference(lastDate).inDays;
+        // Normalize date to remove time component
+        final normalizedDate = DateTime(date.year, date.month, date.day);
+        
+        if (previousDate == null) {
+          tempStreak = 1;
+        } else {
+          final difference = normalizedDate.difference(previousDate).inDays;
           if (difference == 1) {
             tempStreak++;
-            longestStreak =
-                tempStreak > longestStreak ? tempStreak : longestStreak;
           } else if (difference > 1) {
+            // Break in streak
+            if (tempStreak > longestStreak) {
+              longestStreak = tempStreak;
+            }
             tempStreak = 1;
           }
         }
-        lastDate = date;
+        previousDate = normalizedDate;
+      }
+
+      // Update longest streak if the current temp streak is longer
+      if (tempStreak > longestStreak) {
+        longestStreak = tempStreak;
       }
 
       // Calculate current streak
-      final today = DateTime.now();
-      final lastEntryDate = dates.last;
-      final difference = today.difference(lastEntryDate).inDays;
-
-      if (difference <= 1) {
+      if (hasEntryToday) {
         currentStreak = tempStreak;
       } else {
-        currentStreak = 0;
+        // Check if the last entry was yesterday
+        final lastEntryDate = dates.last;
+        final normalizedLastEntry = DateTime(
+          lastEntryDate.year,
+          lastEntryDate.month,
+          lastEntryDate.day,
+        );
+        
+        if (today.difference(normalizedLastEntry).inDays == 1) {
+          currentStreak = tempStreak;
+        } else {
+          currentStreak = 0;
+        }
       }
 
       return {
@@ -121,7 +158,8 @@ class DiaryService {
         'total': snapshot.docs.length,
       };
     } catch (e) {
-      throw Exception('Failed to get streak information: $e');
+      debugPrint('Error calculating streaks: $e');
+      return {'current': 0, 'longest': 0, 'total': 0};
     }
   }
 }

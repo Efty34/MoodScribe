@@ -1,7 +1,7 @@
+import 'package:diary/services/diary_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:diary/services/diary_service.dart';
 import 'package:intl/intl.dart';
 
 class DiaryStreakCalendar extends StatefulWidget {
@@ -28,7 +28,7 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar> {
     try {
       // Get heatmap data
       final heatmapData = await _diaryService.getEntriesForHeatmap();
-      
+
       // Get streak information
       final streakInfo = await _diaryService.getStreakInfo();
 
@@ -53,7 +53,7 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),

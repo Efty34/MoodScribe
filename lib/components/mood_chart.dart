@@ -80,7 +80,7 @@ class _MoodChartState extends State<MoodChart>
       animation: _animation,
       builder: (context, child) {
         return Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),

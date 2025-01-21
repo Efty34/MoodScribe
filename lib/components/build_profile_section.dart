@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/services/diary_service.dart';
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   final DiaryService _diaryService = DiaryService();
-  
+
   bool isLoading = true;
   int totalEntries = 0;
   int currentStreak = 0;
@@ -48,24 +49,6 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
     _loadStats();
   }
 
-  Future<void> _loadStats() async {
-    try {
-      final streakInfo = await _diaryService.getStreakInfo();
-      
-      setState(() {
-        totalEntries = streakInfo['total'] ?? 0;
-        currentStreak = streakInfo['current'] ?? 0;
-        longestStreak = streakInfo['longest'] ?? 0;
-        isLoading = false;
-      });
-    } catch (e) {
-      debugPrint('Error loading stats: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
   @override
   void dispose() {
     _controller.dispose();
@@ -74,13 +57,13 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<void>(
-      stream: _diaryService.getEntries().map((_) => null),
+    return StreamBuilder<QuerySnapshot>(
+      stream: _diaryService.getEntries(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           _loadStats(); // Reload stats when entries change
         }
-        
+
         if (isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -90,6 +73,7 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
           child: FadeTransition(
             opacity: _fadeAnimation,
             child: Container(
+              margin: const EdgeInsets.only(top: 12, left: 12, right: 12),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -182,5 +166,23 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
       width: 1,
       color: Colors.grey[300],
     );
+  }
+
+  Future<void> _loadStats() async {
+    try {
+      final streakInfo = await _diaryService.getStreakInfo();
+
+      setState(() {
+        totalEntries = streakInfo['total'] ?? 0;
+        currentStreak = streakInfo['current'] ?? 0;
+        longestStreak = streakInfo['longest'] ?? 0;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading stats: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 }

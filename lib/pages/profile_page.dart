@@ -22,15 +22,19 @@ class ProfilePage extends StatelessWidget {
               pinned: true,
               backgroundColor: Colors.white,
               flexibleSpace: FlexibleSpaceBar(
-                title: Text(
-                  'Profile',
-                  textAlign: TextAlign.start,
-                  style: GoogleFonts.poppins(
-                    color: Colors.grey[800],
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20,
-                    // color: Colors.blue[700],
-                  ),
+                title: Row(
+                  children: [
+                    Text(
+                      'Profile',
+                      textAlign: TextAlign.start,
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey[800],
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                        // color: Colors.blue[700],
+                      ),
+                    ),
+                  ],
                 ),
                 background: Container(
                   // decoration: BoxDecoration(
@@ -69,22 +73,48 @@ class ProfilePage extends StatelessWidget {
             ),
 
             // Profile Content
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    BuildProfileSection(),
-                    SizedBox(height: 16),
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  const BuildProfileSection(),
+                  const SizedBox(height: 10),
 
-                    // Add the streak calendar here
-                    DiaryStreakCalendar(),
-                    SizedBox(height: 24),
+                  Text(
+                    'Statistics',
+                    textAlign: TextAlign.start,
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue,
+                    ),
+                  ),
 
-                    MoodChart(),
-                  ],
-                ),
+                  const SizedBox(height: 10),
+
+                  // Add horizontal scrolling for DiaryStreak and MoodChart
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        // DiaryStreak with constrained width
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          child: const MoodChart(),
+                        ),
+                        const SizedBox(width: 16),
+                        // MoodChart with constrained width
+
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          child: const DiaryStreakCalendar(),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
           ],
