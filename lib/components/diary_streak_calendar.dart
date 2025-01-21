@@ -112,30 +112,28 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar> {
               5: Colors.green[700]!, // Exceptional contribution
             },
             onClick: (value) {
-              if (value != null) {
-                final normalizedDate = DateTime(
-                  value.year,
-                  value.month,
-                  value.day,
-                );
-                final entries = datasets[normalizedDate] ?? 0;
+              final normalizedDate = DateTime(
+                value.year,
+                value.month,
+                value.day,
+              );
+              final entries = datasets[normalizedDate] ?? 0;
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      entries > 0
-                          ? '$entries ${entries == 1 ? 'entry' : 'entries'} on ${DateFormat('MMM dd, yyyy').format(value)}'
-                          : 'No entries on ${DateFormat('MMM dd, yyyy').format(value)}',
-                      style: GoogleFonts.poppins(),
-                    ),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    margin: const EdgeInsets.all(16),
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    entries > 0
+                        ? '$entries ${entries == 1 ? 'entry' : 'entries'} on ${DateFormat('MMM dd, yyyy').format(value)}'
+                        : 'No entries on ${DateFormat('MMM dd, yyyy').format(value)}',
+                    style: GoogleFonts.poppins(),
                   ),
-                );
-              }
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  margin: const EdgeInsets.all(16),
+                ),
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -171,42 +169,6 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar> {
                 ),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStreakCard(
-      String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: color,
-            size: 24,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-          Text(
-            value,
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[800],
-            ),
           ),
         ],
       ),

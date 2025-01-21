@@ -9,8 +9,7 @@ class TodoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: EdgeInsets.only(top: 50),
+      body: SafeArea(
         child: Column(
           children: [
             TodoUpperSection(),

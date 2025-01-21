@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/pages/add_todo_page.dart';
 import 'package:flutter/material.dart';
@@ -12,79 +11,81 @@ class TodoUpperSection extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('todos').snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+        int totalTasks = 0;
+        int completedTasks = 0;
+
+        if (snapshot.hasData) {
+          totalTasks = snapshot.data!.docs.length;
+          completedTasks = snapshot.data!.docs
+              .where((doc) => (doc.data() as Map)['isDone'] == true)
+              .length;
         }
 
-        final todos = snapshot.data!.docs;
-        final totalTasks = todos.length;
-        final completedTasks =
-            todos.where((doc) => doc['isDone'] == true).length;
-
         return Container(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.all(24),
+          child: Column(
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // CircularProgressIndicator(),
-                  const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'My Tasks',
-                        style: GoogleFonts.manrope(
+                        style: GoogleFonts.poppins(
                           fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
                         ),
                       ),
+                      const SizedBox(height: 8),
                       Text(
-                        '$completedTasks of $totalTasks Tasks',
-                        style: GoogleFonts.manrope(
-                          fontSize: 18,
+                        '$completedTasks of $totalTasks tasks completed',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
                           color: Colors.blue,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
+                  FloatingActionButton(
+                    onPressed: () => _showAddTodoPage(context),
+                    backgroundColor: Colors.blue,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.add_rounded,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                  ),
                 ],
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    PageRouteBuilder(
-                      transitionDuration: const Duration(milliseconds: 500),
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          const AddTodoPage(),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeThroughTransition(
-                          animation: animation,
-                          secondaryAnimation: secondaryAnimation,
-                          child: child,
-                        );
-                      },
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.all(12),
+              const SizedBox(height: 24),
+              LinearProgressIndicator(
+                value: totalTasks == 0 ? 0 : completedTasks / totalTasks,
+                backgroundColor: Colors.blue[100],
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Colors.blue[700] ?? Colors.blue,
                 ),
-                child: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
+                borderRadius: BorderRadius.circular(10),
+                minHeight: 10,
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  void _showAddTodoPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AddTodoPage()),
     );
   }
 }

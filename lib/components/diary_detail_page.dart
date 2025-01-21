@@ -1,7 +1,6 @@
 import 'package:diary/services/diary_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DiaryDetailPage extends StatefulWidget {
   final String entryId;
@@ -91,7 +90,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
   void _showEditDialog() {
     final controller = TextEditingController(text: entry);
-    final theme = Theme.of(context);
+    Theme.of(context);
 
     showDialog(
       context: context,
@@ -201,10 +200,12 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                         final updatedText = controller.text.trim();
                         if (updatedText.isNotEmpty) {
                           try {
-                            await _diaryService.updateEntry(widget.entryId, updatedText);
+                            await _diaryService.updateEntry(
+                                widget.entryId, updatedText);
                             setState(() {
                               entry = updatedText;
                             });
+                            // ignore: use_build_context_synchronously
                             Navigator.pop(context);
                             _showSuccessSnackBar('Entry updated successfully!');
                           } catch (e) {
@@ -299,7 +300,9 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                     onPressed: () async {
                       try {
                         await _diaryService.deleteEntry(widget.entryId);
+                        // ignore: use_build_context_synchronously
                         Navigator.pop(context);
+                        // ignore: use_build_context_synchronously
                         Navigator.pop(context);
                       } catch (e) {
                         _showSuccessSnackBar('Error deleting entry: $e');
