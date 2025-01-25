@@ -1,9 +1,117 @@
+import 'package:diary/auth/auth_service.dart';
 import 'package:diary/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomAppDrawer extends StatelessWidget {
   const CustomAppDrawer({super.key});
+
+  Future<void> _handleLogout(BuildContext context) async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.logout_rounded,
+                  color: Colors.grey[800],
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Logout',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Are you sure you want to logout?',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  color: Colors.grey[600],
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: Text(
+                      'Cancel',
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[800],
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Logout',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (shouldLogout == true) {
+      await AuthService().signOut();
+
+      if (context.mounted) {
+        Navigator.of(context)
+          ..pop()
+          ..pushNamedAndRemoveUntil(
+            AppRoutes.loginPage,
+            (route) => false,
+          );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,9 +219,7 @@ class CustomAppDrawer extends StatelessWidget {
                 _buildMenuItem(
                   icon: Icons.logout_rounded,
                   title: 'Logout',
-                  onTap: () {
-                    Navigator.of(context).pushNamed(AppRoutes.loginPage);
-                  },
+                  onTap: () => _handleLogout(context),
                   isDestructive: true,
                 ),
               ],

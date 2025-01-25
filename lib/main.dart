@@ -1,8 +1,8 @@
+import 'package:diary/auth/auth_wrapper.dart';
 import 'package:diary/firebase_options.dart';
 import 'package:diary/mood_buddy/pages/mood_buddy_page.dart';
 import 'package:diary/pages/login_page.dart';
 import 'package:diary/pages/register_page.dart';
-import 'package:diary/pages/welcome_page.dart';
 import 'package:diary/utils/app_routes.dart';
 import 'package:diary/utils/bottom_nav_bar.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: const WelcomePage(),
+      home: const AuthWrapper(),
       themeMode: ThemeMode.system,
       routes: {
         AppRoutes.loginPage: (context) => const LoginPage(),

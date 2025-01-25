@@ -3,13 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class MyButton extends StatelessWidget {
   final String text;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool isSecondary;
 
   const MyButton({
     super.key,
     required this.text,
-    required this.onTap,
+    this.onTap,
     this.isSecondary = false,
   });
 
@@ -28,7 +28,7 @@ class MyButton extends StatelessWidget {
                     Colors.blue.shade700,
                   ],
                 ),
-          color: isSecondary ? Colors.grey[200] : null,
+          color: onTap == null ? Colors.grey : isSecondary ? Colors.grey[200] : null,
           borderRadius: BorderRadius.circular(8),
           boxShadow: isSecondary
               ? null
@@ -44,7 +44,7 @@ class MyButton extends StatelessWidget {
           child: Text(
             text,
             style: GoogleFonts.poppins(
-              color: isSecondary ? Colors.grey[800] : Colors.white,
+              color: onTap == null ? Colors.grey : isSecondary ? Colors.grey[800] : Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,

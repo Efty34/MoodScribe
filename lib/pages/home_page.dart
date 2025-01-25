@@ -1,14 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diary/components/custom_app_bar.dart';
 import 'package:diary/components/custom_app_drawer.dart';
 import 'package:diary/components/diary_detail_page.dart';
 import 'package:diary/components/diary_entry_card.dart';
 import 'package:diary/services/diary_service.dart';
+import 'package:diary/utils/search_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final SearchState searchState;
+
+  const HomePage({
+    super.key,
+    required this.searchState,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -16,24 +21,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final DiaryService _diaryService = DiaryService();
-  final TextEditingController _searchController = TextEditingController();
-  bool _isSearching = false;
-  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    widget.searchState.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    setState(() {});
+  }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    widget.searchState.removeListener(_onSearchChanged);
     super.dispose();
-  }
-
-  void _toggleSearch() {
-    setState(() {
-      _isSearching = !_isSearching;
-      if (!_isSearching) {
-        _searchController.clear();
-        _searchQuery = '';
-      }
-    });
   }
 
   Widget _highlightText(String text, String query) {
@@ -77,12 +79,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        searchController: _searchController,
-        onSearchChanged: (query) => setState(() => _searchQuery = query),
-        isSearching: _isSearching,
-        onSearchToggle: _toggleSearch,
-      ),
+      // appBar: CustomAppBar(
+      //   searchController: _searchController,
+      //   onSearchChanged: (query) => setState(() => _searchQuery = query),
+      //   isSearching: _isSearching,
+      //   onSearchToggle: _toggleSearch,
+      // ),
       drawer: const CustomAppDrawer(),
       body: SafeArea(
         child: Padding(
@@ -112,18 +114,19 @@ class _HomePageState extends State<HomePage> {
               }
 
               final entries = snapshot.data!.docs;
-              final filteredEntries = _searchQuery.isEmpty
+              final filteredEntries = widget.searchState.query.isEmpty
                   ? entries
                   : entries.where((doc) {
                       final data = doc.data() as Map<String, dynamic>;
                       final text = (data['text'] as String).toLowerCase();
-                      return text.contains(_searchQuery.toLowerCase());
+                      return text
+                          .contains(widget.searchState.query.toLowerCase());
                     }).toList();
 
               if (filteredEntries.isEmpty) {
                 return Center(
                   child: Text(
-                    'No entries found for "$_searchQuery"',
+                    'No entries found for "${widget.searchState.query}"',
                     style: const TextStyle(fontSize: 18, color: Colors.grey),
                   ),
                 );
@@ -141,8 +144,8 @@ class _HomePageState extends State<HomePage> {
 
                   return DiaryEntryCard(
                     entry: text,
-                    highlightedEntry: _searchQuery.isNotEmpty
-                        ? _highlightText(text, _searchQuery)
+                    highlightedEntry: widget.searchState.query.isNotEmpty
+                        ? _highlightText(text, widget.searchState.query)
                         : null,
                     onTap: () {
                       Navigator.push(
