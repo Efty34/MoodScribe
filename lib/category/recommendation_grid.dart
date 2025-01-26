@@ -21,6 +21,7 @@ class RecommendationGrid extends StatelessWidget {
           title: 'Title $index',
           subtitle: 'Subtitle description for $type item $index',
           imageUrl: 'https://picsum.photos/200/300?random=$index',
+          category: type,
           onTap: () {
             // Handle item tap
           },

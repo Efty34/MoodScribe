@@ -42,32 +42,30 @@ class AuthService {
     required String password,
   }) async {
     try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      // Verify if user exists
-      if (userCredential.user == null) {
-        return 'Login failed. Please try again.';
-      }
-
       return null; // Return null if successful
     } on FirebaseAuthException catch (e) {
-      print('Firebase Auth Error: ${e.code}'); // Add this for debugging
-      if (e.code == 'user-not-found') {
-        return 'No user found for that email';
-      } else if (e.code == 'wrong-password') {
-        return 'Wrong password provided';
-      } else if (e.code == 'invalid-email') {
-        return 'Invalid email address';
-      } else if (e.code == 'user-disabled') {
-        return 'This account has been disabled';
+      switch (e.code) {
+        case 'user-not-found':
+          return 'No account found with this email. Please register first.';
+        case 'wrong-password':
+          return 'Incorrect password. Please try again.';
+        case 'invalid-email':
+          return 'Invalid email format. Please check your email.';
+        case 'user-disabled':
+          return 'This account has been disabled. Please contact support.';
+        case 'too-many-requests':
+          return 'Too many failed attempts. Please try again later.';
+        default:
+          print('Firebase Auth Error: ${e.code}'); // For debugging
+          return 'Authentication failed. Please try again.';
       }
-      return 'An error occurred. Please try again later';
     } catch (e) {
-      print('General Error: $e'); // Add this for debugging
-      return 'An error occurred. Please try again later';
+      print('General Error: $e'); // For debugging
+      return 'An unexpected error occurred. Please try again.';
     }
   }
 

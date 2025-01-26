@@ -42,26 +42,31 @@ class _ModernTextFieldState extends State<ModernTextField> {
       style: GoogleFonts.poppins(
         color: Colors.white,
         fontSize: 15,
+        fontWeight: FontWeight.w400,
       ),
       decoration: InputDecoration(
         hintText: widget.hintText,
         hintStyle: GoogleFonts.poppins(
-          color: Colors.white70,
+          color: Colors.white60,
           fontSize: 15,
+          fontWeight: FontWeight.w300,
         ),
         prefixIcon: widget.prefixIcon != null
             ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: widget.prefixIcon,
               )
             : null,
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.white70,
-                  size: 20,
+                  _obscureText
+                      ? Icons.visibility_off_rounded
+                      : Icons.visibility_rounded,
+                  color: Colors.white60,
+                  size: 22,
                 ),
+                splashRadius: 24,
                 onPressed: () {
                   setState(() {
                     _obscureText = !_obscureText;
@@ -69,9 +74,9 @@ class _ModernTextFieldState extends State<ModernTextField> {
                 },
               )
             : null,
-        prefixIconConstraints: const BoxConstraints(minWidth: 50),
+        prefixIconConstraints: const BoxConstraints(minWidth: 56),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.1),
+        fillColor: Colors.white.withOpacity(0.08),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -79,8 +84,8 @@ class _ModernTextFieldState extends State<ModernTextField> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.white.withOpacity(0.1),
-            width: 1,
+            color: Colors.white.withOpacity(0.12),
+            width: 1.5,
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -94,22 +99,26 @@ class _ModernTextFieldState extends State<ModernTextField> {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
             color: Colors.red.withOpacity(0.5),
-            width: 1,
+            width: 1.5,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.red.withOpacity(0.5),
+            color: Colors.red.withOpacity(0.6),
             width: 2,
           ),
         ),
         errorStyle: GoogleFonts.poppins(
           color: Colors.red[300],
           fontSize: 12,
+          fontWeight: FontWeight.w400,
         ),
-        contentPadding: const EdgeInsets.all(16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
       ),
     );
   }
-} 
+}

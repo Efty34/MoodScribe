@@ -39,7 +39,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   // List of titles for each page
   final List<String> _titles = [
     'Home',
-    'Categories',
+    'Discover',
     'New Entry',
     'Todo List',
     'Profile',

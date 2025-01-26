@@ -77,19 +77,19 @@ class _DiaryEntryState extends State<DiaryEntry> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Inspirational Text
-              Text(
-                'Ease Your Mind, \nLighten Your Heart.',
-                style: GoogleFonts.poppins(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
+              // Text(
+              //   'Ease Your Mind, \nLighten Your Heart.',
+              //   style: GoogleFonts.poppins(
+              //     fontSize: 24,
+              //     fontWeight: FontWeight.w600,
+              //     color: Colors.black,
+              //   ),
+              // ),
               const SizedBox(height: 16),
               Text(
                 'Every moment tells a story. What\'s yours today?',

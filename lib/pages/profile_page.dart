@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diary/category/recommendation_card.dart';
 import 'package:diary/components/build_profile_section.dart';
 import 'package:diary/components/diary_streak_calendar.dart';
 import 'package:diary/components/mood_chart.dart';
-import 'package:diary/utils/media.dart';
+import 'package:diary/services/favorites_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,111 +15,174 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            // Custom App Bar
-            SliverAppBar(
-              expandedHeight: 200,
-              floating: false,
-              pinned: true,
-              backgroundColor: Colors.white,
-              flexibleSpace: FlexibleSpaceBar(
-                title: Row(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile Section
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4),
+                child: BuildProfileSection(),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Statistics Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
                   children: [
+                    Container(
+                      width: 4,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                     Text(
-                      'Profile',
-                      textAlign: TextAlign.start,
+                      'Statistics',
                       style: GoogleFonts.poppins(
-                        color: Colors.grey[800],
+                        fontSize: 24,
                         fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                        // color: Colors.blue[700],
+                        color: Colors.grey[800],
                       ),
                     ),
                   ],
                 ),
-                background: Container(
-                  // decoration: BoxDecoration(
-                  //   gradient: LinearGradient(
-                  //     begin: Alignment.topCenter,
-                  //     end: Alignment.bottomCenter,
-                  //     colors: [
-                  //       Colors.blue[800]!,
-                  //       Colors.blue[400]!,
-                  //     ],
-                  //   ),
-                  // ),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      // Background pattern
-                      Opacity(
-                        opacity: 1,
-                        child: Container(
-                          margin: const EdgeInsets.only(
-                              top: 8, left: 8, right: 8, bottom: 2),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                                22.0), // Adjust the radius as needed
-                            child: Image.asset(
-                              AppMedia.coverImg,
-                              fit: BoxFit.cover,
-                            ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Charts Section
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                      child: const MoodChart(),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const DiaryStreakCalendar(),
+                    ),
+                  ],
                 ),
               ),
-            ),
 
-            // Profile Content
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  const BuildProfileSection(),
-                  const SizedBox(height: 10),
+              const SizedBox(height: 32),
 
-                  Text(
-                    'Statistics',
-                    textAlign: TextAlign.start,
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue,
+              // Favorites Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // Add horizontal scrolling for DiaryStreak and MoodChart
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        // DiaryStreak with constrained width
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          child: const MoodChart(),
-                        ),
-                        const SizedBox(width: 16),
-                        // MoodChart with constrained width
-
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          child: const DiaryStreakCalendar(),
-                        ),
-                      ],
+                    const SizedBox(width: 12),
+                    Text(
+                      'Favorites',
+                      style: GoogleFonts.poppins(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 20),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 20),
+
+              // Favorites List
+              SizedBox(
+                height: 220,
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FavoritesService().getFavorites(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final favorites = snapshot.data?.docs ?? [];
+
+                    if (favorites.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'No favorites yet',
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: favorites.length,
+                      itemBuilder: (context, index) {
+                        final favorite =
+                            favorites[index].data() as Map<String, dynamic>;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 16),
+                          child: SizedBox(
+                            width: 160,
+                            child: RecommendationCard(
+                              title: favorite['title'],
+                              subtitle: favorite['subtitle'],
+                              imageUrl: favorite['imageUrl'],
+                              category: favorite['category'],
+                              isFavorite: true,
+                              favoriteId: favorites[index].id,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
