@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/services/diary_service.dart';
+import 'package:diary/services/user_service.dart';
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,6 +18,7 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   final DiaryService _diaryService = DiaryService();
+  final UserService _userService = UserService();
 
   bool isLoading = true;
   int totalEntries = 0;
@@ -57,82 +59,97 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _diaryService.getEntries(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.active) {
-          _loadStats(); // Reload stats when entries change
+    return StreamBuilder<DocumentSnapshot>(
+      stream: _userService.getUserProfile(),
+      builder: (context, userSnapshot) {
+        if (userSnapshot.hasError) {
+          return Center(child: Text('Error: ${userSnapshot.error}'));
         }
 
-        if (isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        final userData = userSnapshot.data?.data() as Map<String, dynamic>?;
+        final username = userData?['username'] ?? 'User';
+        final email = userData?['email'] ?? 'No email';
 
-        return ScaleTransition(
-          scale: _scaleAnimation,
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: Container(
-              margin: const EdgeInsets.only(top: 12, left: 12, right: 12),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade200,
-                    offset: const Offset(0, 4),
-                    blurRadius: 12,
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundImage: const AssetImage(AppMedia.dp),
-                        backgroundColor: Colors.grey.shade300,
+        return StreamBuilder<QuerySnapshot>(
+          stream: _diaryService.getEntries(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.active) {
+              _loadStats();
+            }
+
+            if (isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return ScaleTransition(
+              scale: _scaleAnimation,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Container(
+                  margin: const EdgeInsets.only(top: 12, left: 12, right: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade200,
+                        offset: const Offset(0, 4),
+                        blurRadius: 12,
                       ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
-                          Text(
-                            'John Doe',
-                            style: GoogleFonts.poppins(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
-                            ),
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: const AssetImage(AppMedia.dp),
+                            backgroundColor: Colors.grey.shade300,
                           ),
-                          Text(
-                            'john.doe@gmail.com',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                username,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                              Text(
+                                email,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildStatItem('Entries', totalEntries.toString()),
+                          _buildDivider(),
+                          _buildStatItem(
+                              'Current Streak', '$currentStreak days'),
+                          _buildDivider(),
+                          _buildStatItem(
+                              'Longest Streak', '$longestStreak days'),
                         ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildStatItem('Entries', totalEntries.toString()),
-                      _buildDivider(),
-                      _buildStatItem('Current Streak', '$currentStreak days'),
-                      _buildDivider(),
-                      _buildStatItem('Longest Streak', '$longestStreak days'),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

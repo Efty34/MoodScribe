@@ -1,3 +1,4 @@
+import 'package:diary/services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
@@ -22,6 +23,12 @@ class AuthService {
 
       // Update display name
       await userCredential.user?.updateDisplayName(username);
+
+      // Store user data in Firestore
+      await UserService().updateUserProfile(
+        username: username,
+        email: email,
+      );
 
       return null; // Return null if successful
     } on FirebaseAuthException catch (e) {
