@@ -91,21 +91,24 @@ class _DiaryEntryState extends State<DiaryEntry> {
               //   ),
               // ),
               const SizedBox(height: 16),
-              Text(
-                'Every moment tells a story. What\'s yours today?',
-                style: GoogleFonts.dancingScript(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
+              Text('Every moment tells a story. What\'s yours today?',
+                  // style: GoogleFonts.dancingScript(
+                  //   fontSize: 26,
+                  //   fontWeight: FontWeight.bold,
+                  //   color: Colors.blue,
+                  // ),
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w200,
+                  )),
               const SizedBox(height: 24),
 
               // TextField area
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
+                    border: Border.all(color: Colors.grey.shade500),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: TextField(
@@ -132,25 +135,36 @@ class _DiaryEntryState extends State<DiaryEntry> {
 
               // Submit Button
               Center(
-                child: OutlinedButton.icon(
-                  style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                child: SizedBox(
+                  height: 50,
+                  width: 250,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      elevation: 3,
+                      shadowColor: Colors.black.withOpacity(0.3),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      animationDuration: const Duration(milliseconds: 200),
                     ),
-                  ),
-                  onPressed: _saveEntry,
-                  icon: const Icon(
-                    Icons.add,
-                    size: 20,
-                    color: Colors.black,
-                  ),
-                  label: Text(
-                    "Save the Day",
-                    style: GoogleFonts.manrope(
-                      fontSize: 18,
-                      color: Colors.black,
+                    onPressed: () {
+                      // Add button press animation
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      _saveEntry();
+                    },
+                    icon: const Icon(
+                      Icons.add,
+                      size: 20,
+                    ),
+                    label: Text(
+                      "Save Entry",
+                      style: GoogleFonts.manrope(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                 ),

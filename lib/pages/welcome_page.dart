@@ -23,7 +23,7 @@ class _WelcomePageState extends State<WelcomePage>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 3),
     );
 
     _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(

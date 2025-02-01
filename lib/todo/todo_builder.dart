@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diary/services/todo_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -11,13 +12,33 @@ class TodoBuilder extends StatefulWidget {
 }
 
 class _TodoBuilderState extends State<TodoBuilder> {
+  final TodoService _todoService = TodoService();
+
+  IconData _getCategoryIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'submission':
+        return Icons.assignment;
+      case 'shopping':
+        return Icons.shopping_bag;
+      case 'groceries':
+        return Icons.shopping_cart;
+      case 'fitness':
+        return Icons.fitness_center;
+      case 'self-care':
+        return Icons.spa_outlined;
+      case 'social':
+        return Icons.people_outline;
+      case 'medicine':
+        return Icons.medical_services;
+      default:
+        return Icons.add_to_photos_sharp;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('todos')
-          .orderBy('created_at', descending: true)
-          .snapshots(),
+      stream: _todoService.getTodos(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(
@@ -118,14 +139,12 @@ class _TodoBuilderState extends State<TodoBuilder> {
               ),
               onDismissed: (direction) async {
                 if (direction == DismissDirection.endToStart) {
-                  await FirebaseFirestore.instance
-                      .collection('todos')
-                      .doc(todo.id)
-                      .delete();
+                  await _todoService.deleteTodo(todo.id);
                 }
               },
               confirmDismiss: (direction) async {
                 if (direction == DismissDirection.startToEnd) {
+                  await _showUpdateDialog(context, todo.id, data);
                   return false;
                 } else {
                   final shouldDelete =
@@ -183,116 +202,153 @@ class _TodoBuilderState extends State<TodoBuilder> {
                 ),
                 child: ListTile(
                   contentPadding: const EdgeInsets.all(16),
-                  leading: Checkbox(
-                    value: data['isDone'] ?? false,
-                    onChanged: (value) async {
-                      await FirebaseFirestore.instance
-                          .collection('todos')
-                          .doc(todo.id)
-                          .update({'isDone': value});
-                    },
-                    activeColor: Colors.blue[700],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  title: Text(
-                    data['title'] ?? '',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      decoration: data['isDone'] == true
-                          ? TextDecoration.lineThrough
-                          : null,
-                      color: data['isDone'] == true
-                          ? Colors.grey[500]
-                          : Colors.grey[800],
-                    ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  leading: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (data['description']?.isNotEmpty ?? false) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          data['description'],
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
+                      Checkbox(
+                        value: data['isDone'] ?? false,
+                        onChanged: (value) async {
+                          await _todoService.toggleTodoStatus(
+                            todoId: todo.id,
+                            isDone: value ?? false,
+                          );
+                        },
+                        activeColor: Colors.blue[700],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
                         ),
-                      ],
-                      if (data['date']?.isNotEmpty ??
-                          false || data['time']?.isNotEmpty ??
-                          false) ...[
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            if (data['date']?.isNotEmpty ?? false)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue[50],
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.calendar_today,
-                                      size: 14,
-                                      color: Colors.blue[700],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      data['date'],
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        color: Colors.blue[700],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            if (data['time']?.isNotEmpty ?? false) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue[50],
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.access_time,
-                                      size: 14,
-                                      color: Colors.blue[700],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      data['time'],
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        color: Colors.blue[700],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
+                      ),
+                      // const SizedBox(width: 8),
+                      // Container(
+                      //   padding: const EdgeInsets.all(8),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.blue[50],
+                      //     borderRadius: BorderRadius.circular(8),
+                      //   ),
+                      //   child: Icon(
+                      //     _getCategoryIcon(data['category'] ?? 'default'),
+                      //     color: Colors.blue[700],
+                      //     size: 20,
+                      //   ),
+                      // ),
                     ],
                   ),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data['title'] ?? '',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          decoration: data['isDone'] == true
+                              ? TextDecoration.lineThrough
+                              : null,
+                          color: data['isDone'] == true
+                              ? Colors.grey[500]
+                              : Colors.grey[800],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.blue[50],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Icon(
+                              _getCategoryIcon(data['category'] ?? 'default'),
+                              color: Colors.blue[700],
+                              size: 15,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            data['category']?.toString().toUpperCase() ??
+                                'DEFAULT',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  subtitle: data['date']?.isNotEmpty ??
+                          false || data['time']?.isNotEmpty ??
+                          false
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            children: [
+                              if (data['date']?.isNotEmpty ?? false)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_today,
+                                        size: 14,
+                                        color: Colors.blue[700],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        data['date'],
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: Colors.blue[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              if (data['time']?.isNotEmpty ?? false) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.access_time,
+                                        size: 14,
+                                        color: Colors.blue[700],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        data['time'],
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: Colors.blue[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        )
+                      : null,
                 ),
               ),
             );
@@ -341,27 +397,27 @@ class _TodoBuilderState extends State<TodoBuilder> {
     Map<String, dynamic> data,
   ) async {
     final titleController = TextEditingController(text: data['title']);
-    final descriptionController =
-        TextEditingController(text: data['description']);
     DateTime? selectedDate;
-    try {
-      if (data['date'] != null && data['date'].toString().isNotEmpty) {
-        selectedDate =
-            DateFormat('MMM dd, yyyy').parse(data['date'].toString());
+    if (data['date'] != null && data['date'].toString().isNotEmpty) {
+      try {
+        selectedDate = DateFormat('MMM dd, yyyy').parse(data['date']);
+      } catch (e) {
+        try {
+          selectedDate = DateTime.parse(data['date']);
+        } catch (e) {
+          print('Error parsing date: $e');
+        }
       }
-    } catch (e) {
-      // ignore: avoid_print
-      print('Error parsing date: $e');
     }
+
     TimeOfDay? selectedTime;
-    try {
-      if (data['time'] != null && data['time'].toString().isNotEmpty) {
-        selectedTime = TimeOfDay.fromDateTime(
-            DateFormat('hh:mm a').parse(data['time'].toString()));
+    if (data['time'] != null && data['time'].toString().isNotEmpty) {
+      try {
+        selectedTime =
+            TimeOfDay.fromDateTime(DateFormat('hh:mm a').parse(data['time']));
+      } catch (e) {
+        print('Error parsing time: $e');
       }
-    } catch (e) {
-      // ignore: avoid_print
-      print('Error parsing time: $e');
     }
 
     return await showDialog(
@@ -376,10 +432,6 @@ class _TodoBuilderState extends State<TodoBuilder> {
               ),
               child: SingleChildScrollView(
                 child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -413,9 +465,9 @@ class _TodoBuilderState extends State<TodoBuilder> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Title Field
+                      // Task Field
                       Text(
-                        'Title (Optional)',
+                        'What to do?',
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -427,34 +479,7 @@ class _TodoBuilderState extends State<TodoBuilder> {
                         controller: titleController,
                         style: GoogleFonts.poppins(),
                         decoration: InputDecoration(
-                          hintText: 'Enter task title',
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.all(16),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Description Field
-                      Text(
-                        'Description',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: descriptionController,
-                        maxLines: 3,
-                        style: GoogleFonts.poppins(),
-                        decoration: InputDecoration(
-                          hintText: 'Enter task description',
+                          hintText: 'Enter your task',
                           filled: true,
                           fillColor: Colors.grey[100],
                           border: OutlineInputBorder(
@@ -534,10 +559,7 @@ class _TodoBuilderState extends State<TodoBuilder> {
                                 }
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 16,
-                                ),
+                                padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   color: Colors.grey[100],
                                   borderRadius: BorderRadius.circular(12),
@@ -575,13 +597,6 @@ class _TodoBuilderState extends State<TodoBuilder> {
                           Expanded(
                             child: TextButton(
                               onPressed: () => Navigator.pop(context, false),
-                              style: TextButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
                               child: Text(
                                 'Cancel',
                                 style: GoogleFonts.poppins(
@@ -606,105 +621,34 @@ class _TodoBuilderState extends State<TodoBuilder> {
                                 elevation: 0,
                               ),
                               onPressed: () async {
-                                // Show confirmation dialog
-                                final shouldUpdate = await showDialog<bool>(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    title: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.edit_outlined,
-                                          color: Colors.blue[700],
-                                          size: 24,
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Text(
-                                          'Update Task',
-                                          style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 20,
-                                            color: Colors.grey[800],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    content: Text(
-                                      'Are you sure you want to update this task?',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 15,
-                                        color: Colors.grey[600],
+                                if (titleController.text.trim().isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Please enter your task',
+                                        style: GoogleFonts.poppins(),
                                       ),
+                                      backgroundColor: Colors.red[400],
                                     ),
-                                    contentPadding: const EdgeInsets.fromLTRB(
-                                        24, 20, 24, 0),
-                                    actionsPadding: const EdgeInsets.fromLTRB(
-                                        24, 0, 24, 16),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, false),
-                                        style: TextButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 16, vertical: 12),
-                                        ),
-                                        child: Text(
-                                          'Cancel',
-                                          style: GoogleFonts.poppins(
-                                            color: Colors.grey[600],
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, true),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.blue[700],
-                                          elevation: 0,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          'Update',
-                                          style: GoogleFonts.poppins(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  );
+                                  return;
+                                }
+
+                                await _todoService.updateTodo(
+                                  todoId: docId,
+                                  title: titleController.text.trim(),
+                                  date: selectedDate == null
+                                      ? ''
+                                      : DateFormat('MMM dd, yyyy')
+                                          .format(selectedDate!),
+                                  time: selectedTime == null
+                                      ? ''
+                                      : selectedTime!.format(context),
                                 );
 
-                                if (shouldUpdate == true) {
-                                  await FirebaseFirestore.instance
-                                      .collection('todos')
-                                      .doc(docId)
-                                      .update({
-                                    'title': titleController.text.trim(),
-                                    'description':
-                                        descriptionController.text.trim(),
-                                    'date': selectedDate == null
-                                        ? ''
-                                        : DateFormat('MMM dd, yyyy')
-                                            .format(selectedDate!),
-                                    'time': selectedTime == null
-                                        ? ''
-                                        // ignore: use_build_context_synchronously
-                                        : selectedTime!.format(context),
-                                  });
-
-                                  if (!context.mounted) return;
-                                  Navigator.pop(context);
-                                  _showUpdateSuccessMessage(context);
-                                }
+                                if (!context.mounted) return;
+                                Navigator.pop(context);
+                                _showUpdateSuccessMessage(context);
                               },
                               child: Text(
                                 'Update',

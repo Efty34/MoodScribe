@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diary/services/todo_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -13,9 +13,10 @@ class AddTodoPage extends StatefulWidget {
 class _AddTodoPageState extends State<AddTodoPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
+  final TodoService _todoService = TodoService();
+  String? _category;
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +49,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title Field
+              // Todo Field
               Text(
-                'Title',
+                'What to do?',
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -61,36 +62,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
               TextFormField(
                 controller: _titleController,
                 style: GoogleFonts.poppins(),
+                maxLines: null,
                 decoration: InputDecoration(
-                  hintText: 'Enter task title(Optional)',
-                  hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.all(16),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Description Field
-              Text(
-                'Description',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _descriptionController,
-                maxLines: 5,
-                style: GoogleFonts.poppins(),
-                decoration: InputDecoration(
-                  hintText: 'Enter task description',
+                  hintText: 'Enter your task',
                   hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
                   filled: true,
                   fillColor: Colors.grey[100],
@@ -102,7 +76,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Description is required';
+                    return 'Please enter your task';
                   }
                   return null;
                 },
@@ -243,13 +217,66 @@ class _AddTodoPageState extends State<AddTodoPage> {
     }
   }
 
+  void _showCategorySnackbar(String category) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              _getCategoryIcon(category),
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Category: ${category.toUpperCase()}',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.grey[800],
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        duration: const Duration(seconds: 2),
+        elevation: 1,
+      ),
+    );
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'submission':
+        return Icons.assignment_outlined;
+      case 'shopping':
+        return Icons.shopping_bag_outlined;
+      case 'groceries':
+        return Icons.shopping_cart_outlined;
+      case 'fitness':
+        return Icons.fitness_center_outlined;
+      case 'self-care':
+        return Icons.spa_outlined;
+      case 'social':
+        return Icons.people_outline;
+      case 'medicine':
+        return Icons.medical_services_outlined;
+      default:
+        return Icons.check_circle_outline;
+    }
+  }
+
   void _saveTodo() {
     if (!_formKey.currentState!.validate()) {
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please fill in the required fields',
+            'Please enter your task',
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -264,27 +291,20 @@ class _AddTodoPageState extends State<AddTodoPage> {
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           duration: const Duration(seconds: 3),
           elevation: 1,
-          action: SnackBarAction(
-            label: 'OK',
-            textColor: Colors.red,
-            onPressed: () {},
-          ),
         ),
       );
       return;
     }
 
-    FirebaseFirestore.instance.collection('todos').add({
-      'title': _titleController.text.trim(),
-      'description': _descriptionController.text.trim(),
-      'date': _selectedDate == null
+    _todoService
+        .addTodo(
+      title: _titleController.text.trim(),
+      date: _selectedDate == null
           ? ''
           : DateFormat('MMM dd, yyyy').format(_selectedDate!),
-      'time': _selectedTime == null ? '' : _selectedTime!.format(context),
-      'isDone': false,
-      'created_at': FieldValue.serverTimestamp(),
-    }).then((_) {
-      // Show success message
+      time: _selectedTime == null ? '' : _selectedTime!.format(context),
+    )
+        .then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -317,7 +337,6 @@ class _AddTodoPageState extends State<AddTodoPage> {
       );
       Navigator.pop(context);
     }).catchError((error) {
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -338,7 +357,6 @@ class _AddTodoPageState extends State<AddTodoPage> {
   @override
   void dispose() {
     _titleController.dispose();
-    _descriptionController.dispose();
     super.dispose();
   }
 }

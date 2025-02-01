@@ -20,20 +20,21 @@ class CategoryPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Discover',
-                      style: GoogleFonts.poppins(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
+                    // Text(
+                    //   'Discover',
+                    //   style: GoogleFonts.poppins(
+                    //     fontSize: 28,
+                    //     fontWeight: FontWeight.bold,
+                    //     color: Colors.grey[800],
+                    //   ),
+                    // ),
                     const SizedBox(height: 8),
                     Text(
                       'Find what suits your mood',
                       style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: Colors.grey[600],
+                        fontSize: 24,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w200,
                       ),
                     ),
                   ],

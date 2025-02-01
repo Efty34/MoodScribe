@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/pages/add_todo_page.dart';
+import 'package:diary/services/todo_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -8,8 +9,10 @@ class TodoUpperSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TodoService _todoService = TodoService();
+
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('todos').snapshots(),
+      stream: _todoService.getTodos(),
       builder: (context, snapshot) {
         int totalTasks = 0;
         int completedTasks = 0;
@@ -35,8 +38,8 @@ class TodoUpperSection extends StatelessWidget {
                         'My Tasks',
                         style: GoogleFonts.poppins(
                           fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[800],
+                          color: Colors.black,
+                          fontWeight: FontWeight.w200,
                         ),
                       ),
                       const SizedBox(height: 8),
