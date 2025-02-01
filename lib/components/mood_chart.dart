@@ -1,4 +1,4 @@
-import 'package:diary/firebase/firebase.dart';
+import 'package:diary/services/diary_service.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,6 +12,7 @@ class MoodChart extends StatefulWidget {
 
 class _MoodChartState extends State<MoodChart>
     with SingleTickerProviderStateMixin {
+  final DiaryService _diaryService = DiaryService();
   int stressValue = 0;
   int nonStressValue = 0;
   bool isLoading = true;
@@ -43,104 +44,125 @@ class _MoodChartState extends State<MoodChart>
 
   Future<void> _fetchDiaryEntries() async {
     try {
-      // 1) Get the stream of diary entries
-      final snapshots = FirebaseOptions.getDiaryEntries();
+      // Get diary statistics
+      final diaryStats = await _diaryService.getDiaryStatistics();
+      final moodCounts = diaryStats['mood_counts'] as Map<String, dynamic>;
 
-      // 2) We only need the latest snapshot once
-      //    (If you want real-time updates, consider StreamBuilder)
-      final snapshot = await snapshots.first;
+      // Count stress vs no stress entries
+      final stressCount = moodCounts['stress'] ?? 0;
+      final nonStressCount = moodCounts['no stress'] ?? 0;
 
-      // 3) Convert to a list of maps
-      final entries = snapshot.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
-          .toList();
-
-      // 4) Count "stress" vs "no stress"
-      final stressCount =
-          entries.where((e) => e['prediction'] == 'stress').length;
-      final nonStressCount =
-          entries.where((e) => e['prediction'] == 'no stress').length;
-
-      // 5) Update state
+      // Update state
       setState(() {
         stressValue = stressCount;
         nonStressValue = nonStressCount;
         isLoading = false;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching diary entries: $e')),
-      );
+      debugPrint('Error fetching diary entries: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+        ),
+      );
+    }
+
     return AnimatedBuilder(
       animation: _animation,
-      builder: (context, child) {
+      builder: (context, _) {
         return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade200,
-                offset: const Offset(0, 4),
-                blurRadius: 12,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Mood Analysis',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      Text(
+                        'Your emotional journey',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.pie_chart_rounded,
+                      color: Colors.blue[700],
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 31),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 34),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: AspectRatio(
+                  aspectRatio: 1.3,
+                  child: PieChart(
+                    PieChartData(
+                      sections: _buildPieChartSections(),
+                      sectionsSpace: 2,
+                      centerSpaceRadius: 50,
+                      startDegreeOffset: -90 * _animation.value,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 31),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildLegendItem(
+                    Colors.green[400]!,
+                    'Positive',
+                    nonStressValue,
+                    Icons.sentiment_satisfied_rounded,
+                  ),
+                  const SizedBox(width: 24),
+                  _buildLegendItem(
+                    Colors.red[400]!,
+                    'Stressed',
+                    stressValue,
+                    Icons.sentiment_dissatisfied_rounded,
+                  ),
+                ],
               ),
             ],
           ),
-          child: isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Mood Analysis",
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      height: 250,
-                      child: Transform.scale(
-                        scale: _animation.value,
-                        child: PieChart(
-                          PieChartData(
-                            sections: _buildPieChartSections(),
-                            sectionsSpace: 2,
-                            centerSpaceRadius: 40,
-                            startDegreeOffset: -90 * _animation.value,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildLegendItem(
-                          const Color(0xFF4CAF50),
-                          'Positive',
-                          nonStressValue,
-                        ),
-                        const SizedBox(width: 24),
-                        _buildLegendItem(
-                          const Color(0xFFE57373),
-                          'Stressed',
-                          stressValue,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
         );
       },
     );
@@ -153,24 +175,24 @@ class _MoodChartState extends State<MoodChart>
 
     return [
       PieChartSectionData(
-        color: const Color(0xFFE57373),
+        color: Colors.red[500]!.withOpacity(0.8),
         value: stressPercentage * _animation.value,
         title: '${(stressPercentage * _animation.value).toStringAsFixed(1)}%',
-        radius: 60,
+        radius: 80,
         titleStyle: GoogleFonts.poppins(
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
       ),
       PieChartSectionData(
-        color: const Color(0xFF4CAF50),
+        color: Colors.green[500]!.withOpacity(0.8),
         value: nonStressPercentage * _animation.value,
         title:
             '${(nonStressPercentage * _animation.value).toStringAsFixed(1)}%',
-        radius: 60,
+        radius: 80,
         titleStyle: GoogleFonts.poppins(
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
@@ -178,39 +200,43 @@ class _MoodChartState extends State<MoodChart>
     ];
   }
 
-  Widget _buildLegendItem(Color color, String label, int value) {
-    return Row(
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
+  Widget _buildLegendItem(Color color, String label, int value, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  color: Colors.grey[700],
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                '$value entries',
+                style: GoogleFonts.poppins(
+                  color: Colors.grey[600],
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
-        ),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: GoogleFonts.poppins(
-                color: Colors.grey[700],
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Text(
-              '$value entries',
-              style: GoogleFonts.poppins(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

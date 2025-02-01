@@ -37,7 +37,7 @@ class TodoUpperSection extends StatelessWidget {
                       Text(
                         'My Tasks',
                         style: GoogleFonts.poppins(
-                          fontSize: 24,
+                          fontSize: 20,
                           color: Colors.black,
                           fontWeight: FontWeight.w200,
                         ),

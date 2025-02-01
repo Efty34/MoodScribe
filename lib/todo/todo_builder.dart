@@ -1,11 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/services/todo_service.dart';
+import 'package:diary/utils/search_state.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class TodoBuilder extends StatefulWidget {
-  const TodoBuilder({super.key});
+  final SearchState searchState;
+
+  const TodoBuilder({
+    super.key,
+    required this.searchState,
+  });
 
   @override
   State<TodoBuilder> createState() => _TodoBuilderState();
@@ -14,8 +20,26 @@ class TodoBuilder extends StatefulWidget {
 class _TodoBuilderState extends State<TodoBuilder> {
   final TodoService _todoService = TodoService();
 
+  @override
+  void initState() {
+    super.initState();
+    widget.searchState.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    widget.searchState.removeListener(_onSearchChanged);
+    super.dispose();
+  }
+
   IconData _getCategoryIcon(String category) {
     switch (category.toLowerCase()) {
+      case 'exam':
+        return Icons.school;
       case 'submission':
         return Icons.assignment;
       case 'shopping':
@@ -35,6 +59,66 @@ class _TodoBuilderState extends State<TodoBuilder> {
     }
   }
 
+  Widget _highlightText(String text, String query) {
+    if (query.isEmpty) {
+      return Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey[800],
+        ),
+      );
+    }
+
+    List<TextSpan> spans = [];
+    final String lowercaseText = text.toLowerCase();
+    final String lowercaseQuery = query.toLowerCase();
+    int start = 0;
+
+    while (true) {
+      final int index = lowercaseText.indexOf(lowercaseQuery, start);
+      if (index == -1) {
+        spans.add(TextSpan(
+          text: text.substring(start),
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[800],
+          ),
+        ));
+        break;
+      }
+
+      if (index > start) {
+        spans.add(TextSpan(
+          text: text.substring(start, index),
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[800],
+          ),
+        ));
+      }
+
+      spans.add(TextSpan(
+        text: text.substring(index, index + query.length),
+        style: GoogleFonts.poppins(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey[800],
+          backgroundColor: Colors.blue[100],
+        ),
+      ));
+
+      start = index + query.length;
+    }
+
+    return RichText(
+      text: TextSpan(children: spans),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -50,7 +134,39 @@ class _TodoBuilderState extends State<TodoBuilder> {
 
         final todos = snapshot.data!.docs;
 
-        if (todos.isEmpty) {
+        // Filter todos based on search query
+        final filteredTodos = widget.searchState.query.isEmpty
+            ? todos
+            : todos.where((doc) {
+                final data = doc.data() as Map<String, dynamic>;
+                final title = (data['title'] as String).toLowerCase();
+                final query = widget.searchState.query.toLowerCase();
+                return title.contains(query);
+              }).toList();
+
+        if (filteredTodos.isEmpty) {
+          if (widget.searchState.query.isNotEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.search_off_rounded,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No tasks found for "${widget.searchState.query}"',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -83,10 +199,10 @@ class _TodoBuilderState extends State<TodoBuilder> {
         }
 
         return ListView.builder(
-          itemCount: todos.length,
+          itemCount: filteredTodos.length,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           itemBuilder: (context, index) {
-            final todo = todos[index];
+            final todo = filteredTodos[index];
             final data = todo.data() as Map<String, dynamic>;
 
             return Dismissible(
@@ -236,19 +352,22 @@ class _TodoBuilderState extends State<TodoBuilder> {
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        data['title'] ?? '',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          decoration: data['isDone'] == true
-                              ? TextDecoration.lineThrough
-                              : null,
-                          color: data['isDone'] == true
-                              ? Colors.grey[500]
-                              : Colors.grey[800],
-                        ),
-                      ),
+                      widget.searchState.query.isNotEmpty
+                          ? _highlightText(
+                              data['title'] ?? '', widget.searchState.query)
+                          : Text(
+                              data['title'] ?? '',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                decoration: data['isDone'] == true
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                                color: data['isDone'] == true
+                                    ? Colors.grey[500]
+                                    : Colors.grey[800],
+                              ),
+                            ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
@@ -426,6 +545,7 @@ class _TodoBuilderState extends State<TodoBuilder> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return Dialog(
+              backgroundColor: Colors.white,
               insetPadding: const EdgeInsets.symmetric(horizontal: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),

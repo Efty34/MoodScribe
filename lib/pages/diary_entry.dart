@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:diary/firebase/firebase.dart';
 import 'package:diary/services/diary_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,35 +13,86 @@ class DiaryEntry extends StatefulWidget {
 }
 
 class _DiaryEntryState extends State<DiaryEntry> {
-  final TextEditingController _postController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
   final DiaryService _diaryService = DiaryService();
+  // String _selectedMood = 'neutral';
 
   void _saveEntry() async {
-    final text = _postController.text.trim();
-    if (text.isNotEmpty) {
+    final content = _contentController.text.trim();
+
+    if (content.isNotEmpty) {
       try {
-        // 1) Save to Firestore using DiaryService
-        await _diaryService.addEntry(text);
+        // Get prediction from Flask backend
+        final prediction = await _monitorStress(content);
 
-        // 2) Get prediction from Flask backend
-        final prediction = await _monitorStress(text);
+        // Save to Firestore using DiaryService
+        await _diaryService.addDiaryEntry(
+          content: content,
+          mood: prediction,
+          date: DateTime.now(),
+        );
 
-        // 3) Save to Firebase
-        await FirebaseOptions.saveDiaryEntry(text, prediction);
+        // Clear the TextField & show a SnackBar
+        _contentController.clear();
 
-        // 4) Clear the TextField & show a SnackBar
-        _postController.clear();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Your diary entry has been saved!')),
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Text(
+                  'Your diary entry has been saved!',
+                  style: GoogleFonts.poppins(),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green[600],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
         );
       } catch (e) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Text(
+                  'Error: Failed to save entry',
+                  style: GoogleFonts.poppins(),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red[400],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please write something before saving.')),
+        SnackBar(
+          content: Text(
+            'Please write something before saving.',
+            style: GoogleFonts.poppins(),
+          ),
+          backgroundColor: Colors.grey[800],
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
       );
     }
   }
@@ -77,54 +127,41 @@ class _DiaryEntryState extends State<DiaryEntry> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Inspirational Text
-              // Text(
-              //   'Ease Your Mind, \nLighten Your Heart.',
-              //   style: GoogleFonts.poppins(
-              //     fontSize: 24,
-              //     fontWeight: FontWeight.w600,
-              //     color: Colors.black,
-              //   ),
-              // ),
-              const SizedBox(height: 16),
-              Text('Every moment tells a story. What\'s yours today?',
-                  // style: GoogleFonts.dancingScript(
-                  //   fontSize: 26,
-                  //   fontWeight: FontWeight.bold,
-                  //   color: Colors.blue,
-                  // ),
-                  style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w200,
-                  )),
+              Text(
+                'Every moment tells a story. What\'s yours today?',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w200,
+                ),
+              ),
               const SizedBox(height: 24),
 
-              // TextField area
+              // Content TextField
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade500),
+                    border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: TextField(
-                    controller: _postController,
+                    controller: _contentController,
                     maxLines: null,
-                    expands: false,
+                    expands: true,
                     textAlignVertical: TextAlignVertical.top,
                     decoration: InputDecoration(
                       hintText: 'Chronicles of a Wandering Mind...',
-                      hintStyle: GoogleFonts.manrope(
+                      hintStyle: GoogleFonts.poppins(
                         color: Colors.grey.shade500,
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                     ),
-                    style: GoogleFonts.manrope(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.black87,
                     ),
@@ -149,18 +186,11 @@ class _DiaryEntryState extends State<DiaryEntry> {
                       ),
                       animationDuration: const Duration(milliseconds: 200),
                     ),
-                    onPressed: () {
-                      // Add button press animation
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      _saveEntry();
-                    },
-                    icon: const Icon(
-                      Icons.add,
-                      size: 20,
-                    ),
+                    onPressed: _saveEntry,
+                    icon: const Icon(Icons.add, size: 20),
                     label: Text(
                       "Save Entry",
-                      style: GoogleFonts.manrope(
+                      style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
@@ -178,7 +208,7 @@ class _DiaryEntryState extends State<DiaryEntry> {
 
   @override
   void dispose() {
-    _postController.dispose();
+    _contentController.dispose();
     super.dispose();
   }
 }

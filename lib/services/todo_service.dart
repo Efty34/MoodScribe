@@ -9,6 +9,7 @@ class TodoService {
 
   // Predefined categories
   static const List<String> categories = [
+    'exam',
     'submission',
     'shopping',
     'groceries',
@@ -35,12 +36,13 @@ class TodoService {
   Future<String> _determineCategory(String title) async {
     try {
       final prompt = '''
-Analyze this task and categorize it into one of these categories: submission, shopping, groceries, fitness, self-care, social, medicine, default.
+Analyze this task and categorize it into one of these categories: exam, submission, shopping, groceries, fitness, self-care, social, medicine, default.
 Only respond with one word (the category).
 
 Task: $title
 
 Rules:
+- exam: exams, quizzes, tests, studying, test preparation, exam dates, revision,
 - submission: assignments, homework, projects, deadlines
 - shopping: buying non-food items, clothes, electronics
 - groceries: food items, ingredients, kitchen supplies

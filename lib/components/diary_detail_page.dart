@@ -1,15 +1,20 @@
 import 'package:diary/services/diary_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class DiaryDetailPage extends StatefulWidget {
   final String entryId;
-  final String initialEntry;
+  final String initialContent;
+  final String initialMood;
+  final DateTime date;
 
   const DiaryDetailPage({
     super.key,
     required this.entryId,
-    required this.initialEntry,
+    required this.initialContent,
+    required this.initialMood,
+    required this.date,
   });
 
   @override
@@ -18,24 +23,24 @@ class DiaryDetailPage extends StatefulWidget {
 
 class _DiaryDetailPageState extends State<DiaryDetailPage> {
   final DiaryService _diaryService = DiaryService();
-  late String entry;
+  late String content;
+  late String mood;
 
   @override
   void initState() {
     super.initState();
-    entry = widget.initialEntry;
+    content = widget.initialContent;
+    mood = widget.initialMood;
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           'Diary Entry',
-          style: GoogleFonts.manrope(
+          style: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -43,8 +48,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new,
-              color: theme.colorScheme.onSurface),
+          icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -63,7 +67,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
           margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.grey.shade300),
             boxShadow: [
               BoxShadow(
@@ -75,12 +79,60 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text(
-              entry,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: Colors.black,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Date and Mood
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today,
+                        size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 8),
+                    Text(
+                      DateFormat('MMM dd, yyyy').format(widget.date),
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: mood == 'stress'
+                            ? Colors.red[50]
+                            : Colors.green[50],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        mood,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: mood == 'stress'
+                              ? Colors.red[700]
+                              : Colors.green[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 16),
+
+                // Content
+                Text(
+                  content,
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: Colors.black87,
+                    height: 1.5,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -89,123 +141,148 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   }
 
   void _showEditDialog() {
-    final controller = TextEditingController(text: entry);
-    Theme.of(context);
+    final contentController = TextEditingController(text: content);
 
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+      builder: (context) {
+        final size = MediaQuery.of(context).size;
+
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
+          // Make dialog bigger
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Container(
+            width: size.width,
+            height: size.height * 0.7, // 70% of screen height
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Edit Entry',
+                      style: GoogleFonts.poppins(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Date and Mood display
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today,
+                        size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 8),
+                    Text(
+                      DateFormat('MMM dd, yyyy').format(widget.date),
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: mood == 'stress'
+                            ? Colors.red[50]
+                            : Colors.green[50],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        mood,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: mood == 'stress'
+                              ? Colors.red[700]
+                              : Colors.green[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                // Content TextField
+                Expanded(
+                  child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
+                      color: Colors.grey[50],
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade200),
                     ),
-                    child: Icon(
-                      Icons.edit_note_rounded,
-                      color: Colors.blue[700],
-                      size: 30,
+                    child: TextField(
+                      controller: contentController,
+                      maxLines: null,
+                      expands: true,
+                      textAlignVertical: TextAlignVertical.top,
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        height: 1.5,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Write your thoughts...',
+                        hintStyle: GoogleFonts.poppins(
+                          color: Colors.grey[400],
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.all(16),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    'Edit Entry',
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Text Field
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: TextField(
-                  controller: controller,
-                  maxLines: 8,
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: Colors.grey[800],
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'Write your thoughts...',
-                    hintStyle: GoogleFonts.poppins(
-                      color: Colors.grey[400],
-                    ),
-                    contentPadding: const EdgeInsets.all(16),
-                    border: InputBorder.none,
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-
-              // Action Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
+                const SizedBox(height: 24),
+                // Action Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
                       onPressed: () => Navigator.pop(context),
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
                         ),
                       ),
                       child: Text(
                         'Cancel',
                         style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
                           color: Colors.grey[600],
+                          fontSize: 16,
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[700],
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 0,
-                      ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
                       onPressed: () async {
-                        final updatedText = controller.text.trim();
-                        if (updatedText.isNotEmpty) {
+                        final updatedContent = contentController.text.trim();
+                        if (updatedContent.isNotEmpty) {
                           try {
-                            await _diaryService.updateEntry(
-                                widget.entryId, updatedText);
+                            await _diaryService.updateDiaryEntry(
+                              entryId: widget.entryId,
+                              content: updatedContent,
+                              mood: mood,
+                              date: widget.date,
+                            );
                             setState(() {
-                              entry = updatedText;
+                              content = updatedContent;
                             });
-                            // ignore: use_build_context_synchronously
+                            if (!mounted) return;
                             Navigator.pop(context);
                             _showSuccessSnackBar('Entry updated successfully!');
                           } catch (e) {
@@ -213,21 +290,32 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                           }
                         }
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       child: Text(
-                        'Update',
+                        'Save Changes',
                         style: GoogleFonts.poppins(
+                          color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -299,11 +387,11 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                     ),
                     onPressed: () async {
                       try {
-                        await _diaryService.deleteEntry(widget.entryId);
-                        // ignore: use_build_context_synchronously
-                        Navigator.pop(context);
-                        // ignore: use_build_context_synchronously
-                        Navigator.pop(context);
+                        await _diaryService.deleteDiaryEntry(widget.entryId);
+                        if (!mounted) return;
+                        Navigator.pop(context); // Close dialog
+                        Navigator.pop(context); // Go back to previous screen
+                        _showSuccessSnackBar('Entry deleted successfully!');
                       } catch (e) {
                         _showSuccessSnackBar('Error deleting entry: $e');
                       }
@@ -326,9 +414,13 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   }
 
   void _showSuccessSnackBar(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(
+          message,
+          style: GoogleFonts.poppins(),
+        ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

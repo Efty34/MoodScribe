@@ -18,7 +18,8 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBar> {
   var currentIndex = 2;
-  late final SearchState _searchState;
+  late final SearchState _homeSearchState;
+  late final SearchState _todoSearchState;
   late final List<Widget> _pages;
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
@@ -26,14 +27,23 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   void initState() {
     super.initState();
-    _searchState = SearchState();
+    _homeSearchState = SearchState();
+    _todoSearchState = SearchState();
     _pages = [
-      HomePage(searchState: _searchState),
+      HomePage(searchState: _homeSearchState),
       const CategoryPage(),
       const DiaryEntry(),
-      const TodoPage(),
+      TodoPage(searchState: _todoSearchState),
       const ProfilePage(),
     ];
+
+    _searchController.addListener(() {
+      if (currentIndex == 0) {
+        _homeSearchState.updateQuery(_searchController.text);
+      } else if (currentIndex == 3) {
+        _todoSearchState.updateQuery(_searchController.text);
+      }
+    });
   }
 
   // List of titles for each page
@@ -57,13 +67,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             color: Colors.grey[800],
             size: 22,
           ),
-          onPressed: () {
-            setState(() {
-              _isSearching = false;
-              _searchController.clear();
-              _searchState.clearQuery();
-            });
-          },
+          onPressed: _exitSearchMode,
         ),
         title: Container(
           height: 40,
@@ -90,10 +94,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
               ),
               suffixIcon: _searchController.text.isNotEmpty
                   ? GestureDetector(
-                      onTap: () {
-                        _searchController.clear();
-                        _searchState.clearQuery();
-                      },
+                      onTap: _exitSearchMode,
                       child: Icon(
                         Icons.close_rounded,
                         color: Colors.grey[400],
@@ -113,9 +114,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
               ),
             ),
             onChanged: (value) {
-              setState(() {
-                _searchState.updateQuery(value);
-              });
+              if (currentIndex == 0) {
+                _todoSearchState.clearQuery();
+              } else if (currentIndex == 3) {
+                _homeSearchState.clearQuery();
+              }
             },
           ),
         ),
@@ -183,11 +186,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           scrollDirection: Axis.horizontal,
           padding: EdgeInsets.symmetric(horizontal: size.width * .024),
           itemBuilder: (context, index) => InkWell(
-            onTap: () {
-              setState(() {
-                currentIndex = index;
-              });
-            },
+            onTap: () => _onTabChanged(index),
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
             child: Column(
@@ -256,7 +255,29 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   void dispose() {
     _searchController.dispose();
-    _searchState.dispose();
+    _homeSearchState.dispose();
+    _todoSearchState.dispose();
     super.dispose();
+  }
+
+  void _exitSearchMode() {
+    setState(() {
+      _isSearching = false;
+      _searchController.clear();
+      if (currentIndex == 0) {
+        _homeSearchState.clearQuery();
+      } else if (currentIndex == 3) {
+        _todoSearchState.clearQuery();
+      }
+    });
+  }
+
+  void _onTabChanged(int index) {
+    if (_isSearching) {
+      _exitSearchMode();
+    }
+    setState(() {
+      currentIndex = index;
+    });
   }
 }
