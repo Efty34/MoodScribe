@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/services/todo_service.dart';
+import 'package:diary/utils/media.dart';
 import 'package:diary/utils/search_state.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
 class TodoBuilder extends StatefulWidget {
   final SearchState searchState;
@@ -150,10 +152,12 @@ class _TodoBuilderState extends State<TodoBuilder> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.search_off_rounded,
-                    size: 64,
-                    color: Colors.grey[400],
+                  Lottie.asset(
+                    AppMedia.notfound,
+                    width: 200,
+                    height: 200,
+                    repeat: true,
+                    animate: true,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -161,6 +165,15 @@ class _TodoBuilderState extends State<TodoBuilder> {
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.grey[600],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Try searching with different keywords',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: Colors.grey[500],
                     ),
                   ),
                 ],

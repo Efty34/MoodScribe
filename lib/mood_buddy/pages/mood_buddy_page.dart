@@ -1,8 +1,10 @@
 import 'package:diary/mood_buddy/services/gemini_service.dart';
 import 'package:diary/mood_buddy/widgets/chat_input.dart';
 import 'package:diary/mood_buddy/widgets/chat_message.dart';
+import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 
 class MoodBuddyPage extends StatefulWidget {
   const MoodBuddyPage({super.key});
@@ -65,6 +67,7 @@ class _MoodBuddyPageState extends State<MoodBuddyPage>
       const ChatMessage(
         text: "Hi! I'm your Mood Buddy. How are you feeling today?",
         isUser: false,
+        animate: false,
       ),
     );
   }
@@ -82,7 +85,11 @@ class _MoodBuddyPageState extends State<MoodBuddyPage>
       final response = await _geminiService.getResponse(text);
 
       setState(() {
-        _messages.add(ChatMessage(text: response, isUser: false));
+        _messages.add(ChatMessage(
+          text: response,
+          isUser: false,
+          animate: true,
+        ));
         _isTyping = false;
       });
       _scrollToBottom();
@@ -125,10 +132,12 @@ class _MoodBuddyPageState extends State<MoodBuddyPage>
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: Icon(
-                Icons.psychology_rounded,
-                color: Colors.blue[800],
-                size: 18,
+              child: Lottie.asset(
+                AppMedia.moodbubby,
+                fit: BoxFit.cover,
+                repeat: true,
+                animate: true,
+                reverse: true,
               ),
             ),
           ),

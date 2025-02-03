@@ -3,10 +3,12 @@ import 'package:diary/components/custom_app_drawer.dart';
 import 'package:diary/components/diary_detail_page.dart';
 import 'package:diary/components/diary_entry_card.dart';
 import 'package:diary/services/diary_service.dart';
+import 'package:diary/utils/media.dart';
 import 'package:diary/utils/search_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 
 class HomePage extends StatefulWidget {
   final SearchState searchState;
@@ -87,10 +89,12 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.search_off_rounded,
-                          size: 64,
-                          color: Colors.grey[400],
+                        Lottie.asset(
+                          AppMedia.notfound,
+                          width: 200,
+                          height: 200,
+                          repeat: true,
+                          animate: true,
                         ),
                         const SizedBox(height: 16),
                         Text(

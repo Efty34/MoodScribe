@@ -4,6 +4,7 @@ import 'package:diary/services/user_service.dart';
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 
 class BuildProfileSection extends StatefulWidget {
   const BuildProfileSection({super.key});
@@ -161,19 +162,19 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                       _buildStatItem(
                         'Total Entries',
                         _stats['total_entries'].toString(),
-                        Icons.book_outlined,
+                        AppMedia.diary,
                       ),
                       _buildDivider(),
                       _buildStatItem(
                         'Current Streak',
                         '${_stats['current_streak']} days',
-                        Icons.local_fire_department_outlined,
+                        AppMedia.fire,
                       ),
                       _buildDivider(),
                       _buildStatItem(
                         'Longest Streak',
                         '${_stats['longest_streak']} days',
-                        Icons.emoji_events_outlined,
+                        AppMedia.trophy,
                       ),
                     ],
                   ),
@@ -186,22 +187,20 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
+  Widget _buildStatItem(String label, String value, String animation) {
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: _getIconBackgroundColor(label),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: _getIconColor(label),
-            size: 24,
+        SizedBox(
+          width: 48,
+          height: 58,
+          child: Lottie.asset(
+            animation,
+            fit: BoxFit.cover,
+            repeat: true,
+            animate: true,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 2),
         Text(
           value,
           style: GoogleFonts.poppins(
@@ -219,32 +218,6 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
         ),
       ],
     );
-  }
-
-  Color _getIconBackgroundColor(String label) {
-    switch (label) {
-      case 'Total Entries':
-        return Colors.purple[50]!;
-      case 'Current Streak':
-        return Colors.orange[50]!;
-      case 'Longest Streak':
-        return Colors.green[50]!;
-      default:
-        return Colors.blue[50]!;
-    }
-  }
-
-  Color _getIconColor(String label) {
-    switch (label) {
-      case 'Total Entries':
-        return Colors.purple[700]!;
-      case 'Current Streak':
-        return Colors.orange[700]!;
-      case 'Longest Streak':
-        return Colors.green[700]!;
-      default:
-        return Colors.blue[700]!;
-    }
   }
 
   Widget _buildDivider() {

@@ -1,7 +1,9 @@
 import 'package:diary/auth/auth_service.dart';
 import 'package:diary/utils/app_routes.dart';
+import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 
 class CustomAppDrawer extends StatelessWidget {
   const CustomAppDrawer({super.key});
@@ -36,30 +38,13 @@ class CustomAppDrawer extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.red.shade400,
-                        Colors.red.shade600,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.red.withOpacity(0.3),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.logout_rounded,
-                    color: Colors.white,
-                    size: 32,
+                SizedBox(
+                  width: 120,
+                  height: 120,
+                  child: Lottie.asset(
+                    AppMedia.logout,
+                    repeat: true,
+                    animate: true,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -171,10 +156,134 @@ class CustomAppDrawer extends StatelessWidget {
     }
   }
 
+  Widget _buildMoodBuddyMenuItem({
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 120,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              child: Lottie.asset(
+                AppMedia.moodbubby,
+                fit: BoxFit.cover,
+                repeat: true,
+                animate: true,
+                reverse: true,
+                width: 64,
+                height: 64,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                color: Colors.grey[800],
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    String? showBadge,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 120,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: Colors.blue[700],
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                color: Colors.grey[800],
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            if (showBadge != null) ...[
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  showBadge,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       child: Column(
         children: [
           // App Logo Section
@@ -183,10 +292,7 @@ class CustomAppDrawer extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.blue.shade600,
-                  Colors.blue.shade800,
-                ],
+                colors: [Colors.blue.shade600, Colors.blue.shade800],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -195,7 +301,6 @@ class CustomAppDrawer extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Placeholder for app logo
                   Container(
                     width: 60,
                     height: 60,
@@ -230,61 +335,48 @@ class CustomAppDrawer extends StatelessWidget {
             ),
           ),
 
-          // Menu Items
+          // Menu Items Grid
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              children: [
-                _buildMenuItem(
-                  icon: Icons.home_rounded,
-                  title: 'Home',
-                  onTap: () => Navigator.pop(context),
-                ),
-                _buildMenuItem(
-                  icon: Icons.mood_rounded,
-                  title: 'Mood Buddy',
-                  onTap: () => Navigator.of(context)
-                    ..pop()
-                    ..pushNamed(AppRoutes.moodBuddyPage),
-                  showNew: true,
-                ),
-                _buildMenuItem(
-                  icon: Icons.calendar_month_rounded,
-                  title: 'Appointments',
-                  onTap: () {
-                    // Navigate to Appointments
-                    Navigator.pop(context);
-                  },
-                ),
-                _buildMenuItem(
-                  icon: Icons.games_rounded,
-                  title: 'Games',
-                  onTap: () {
-                    // Navigate to Games
-                    Navigator.pop(context);
-                  },
-                  showBadge: '3',
-                ),
-                _buildMenuItem(
-                  icon: Icons.settings_rounded,
-                  title: 'Settings',
-                  onTap: () {
-                    // Navigate to Settings
-                    Navigator.pop(context);
-                  },
-                ),
-                const Divider(height: 40),
-                _buildMenuItem(
-                  icon: Icons.logout_rounded,
-                  title: 'Logout',
-                  onTap: () => _handleLogout(context),
-                  isDestructive: true,
-                ),
-              ],
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                alignment: WrapAlignment.center,
+                children: [
+                  // _buildMenuItem(
+                  //   icon: Icons.home_rounded,
+                  //   title: 'Home',
+                  //   onTap: () => Navigator.pop(context),
+                  // ),
+                  _buildMoodBuddyMenuItem(
+                    title: 'MoodBuddy',
+                    onTap: () => Navigator.of(context)
+                      ..pop()
+                      ..pushNamed(AppRoutes.moodBuddyPage),
+                  ),
+                  _buildMenuItem(
+                    icon: Icons.calendar_month_rounded,
+                    title: 'Sessions',
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  _buildMenuItem(
+                    icon: Icons.games_rounded,
+                    title: 'Games',
+                    onTap: () => Navigator.pop(context),
+                    // showBadge: '3',
+                  ),
+                  _buildMenuItem(
+                    icon: Icons.settings_rounded,
+                    title: 'Settings',
+                    onTap: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
             ),
           ),
 
-          // Bottom Section
+          // Version text
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
@@ -295,77 +387,34 @@ class CustomAppDrawer extends StatelessWidget {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildMenuItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    bool isDestructive = false,
-    bool showNew = false,
-    String? showBadge,
-  }) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: isDestructive ? Colors.red : Colors.grey[700],
-        size: 22,
-      ),
-      title: Text(
-        title,
-        style: GoogleFonts.poppins(
-          color: isDestructive ? Colors.red : Colors.grey[800],
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (showNew)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(12),
+          // Full-width Logout Button
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            child: ElevatedButton.icon(
+              onPressed: () => _handleLogout(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[50],
+                foregroundColor: Colors.red,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
               ),
-              child: Text(
-                'NEW',
+              icon: const Icon(Icons.logout_rounded),
+              label: Text(
+                'Logout',
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
                 ),
               ),
             ),
-          if (showBadge != null)
-            Container(
-              margin: const EdgeInsets.only(left: 8),
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                showBadge,
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
+          ),
         ],
       ),
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      dense: true,
     );
   }
 }
