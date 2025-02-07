@@ -11,4 +11,7 @@ class AppMedia {
   static const diary = '$_baseImage/diary.json';
   static const fire = '$_baseImage/fire.json';
   static const trophy = '$_baseImage/trophy.json';
+  static const loading = '$_baseImage/loading.json';
+  static const error = '$_baseImage/error.json';
+  static const empty = '$_baseImage/empty.json';
 }

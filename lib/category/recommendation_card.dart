@@ -1,10 +1,10 @@
 import 'package:diary/services/favorites_service.dart';
+import 'package:diary/utils/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RecommendationCard extends StatefulWidget {
   final String title;
-  final String subtitle;
   final String imageUrl;
   final String category;
   final VoidCallback? onTap;
@@ -14,7 +14,6 @@ class RecommendationCard extends StatefulWidget {
   const RecommendationCard({
     super.key,
     required this.title,
-    required this.subtitle,
     required this.imageUrl,
     required this.category,
     this.onTap,
@@ -41,13 +40,23 @@ class _RecommendationCardState extends State<RecommendationCard> {
       if (_isFavorite) {
         if (widget.favoriteId != null) {
           await _favoritesService.removeFromFavorites(widget.favoriteId!);
+          showCustomSnackbar(
+            context,
+            message: 'Removed from favorites',
+            isAdded: false,
+          );
         }
       } else {
         await _favoritesService.addToFavorites(
           title: widget.title,
-          subtitle: widget.subtitle,
+          subtitle: '', // Empty for now
           imageUrl: widget.imageUrl,
           category: widget.category,
+        );
+        showCustomSnackbar(
+          context,
+          message: 'Added to favorites',
+          isAdded: true,
         );
       }
 
@@ -55,7 +64,11 @@ class _RecommendationCardState extends State<RecommendationCard> {
         _isFavorite = !_isFavorite;
       });
     } catch (e) {
-      // Handle error
+      showCustomSnackbar(
+        context,
+        message: 'Failed to update favorites',
+        isAdded: false,
+      );
     }
   }
 
@@ -64,12 +77,12 @@ class _RecommendationCardState extends State<RecommendationCard> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
-            offset: const Offset(0, 2),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -77,87 +90,88 @@ class _RecommendationCardState extends State<RecommendationCard> {
         color: Colors.transparent,
         child: InkWell(
           onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(8),
-                ),
-                child: Stack(
-                  children: [
-                    Image.network(
-                      widget.imageUrl,
-                      height: 140,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 140,
-                          color: Colors.grey[200],
-                          child: Icon(
-                            Icons.image_not_supported_rounded,
-                            size: 32,
-                            color: Colors.grey[400],
-                          ),
-                        );
-                      },
-                    ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: _toggleFavorite,
-                          customBorder: const CircleBorder(),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.5),
-                              shape: BoxShape.circle,
-                            ),
+              Stack(
+                children: [
+                  Hero(
+                    tag: 'image_${widget.title}',
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                      child: Image.network(
+                        widget.imageUrl,
+                        height: 160,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 160,
+                            color: Colors.grey[100],
                             child: Icon(
-                              _isFavorite
-                                  ? Icons.favorite_rounded
-                                  : Icons.favorite_border_rounded,
-                              color: _isFavorite ? Colors.red : Colors.white,
-                              size: 20,
+                              Icons.image_not_supported_rounded,
+                              size: 32,
+                              color: Colors.grey[400],
                             ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _toggleFavorite,
+                        customBorder: const CircleBorder(),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.3),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            _isFavorite
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            color: _isFavorite ? Colors.red : Colors.white,
+                            size: 20,
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+                padding: const EdgeInsets.all(12),
+                child: Hero(
+                  tag: 'title_${widget.title}',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Text(
                       widget.title,
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey[800],
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      widget.subtitle,
-                      style: GoogleFonts.poppins(
-                        fontSize: 10,
-                        color: Colors.grey[600],
-                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],

@@ -45,6 +45,7 @@ class CustomAppDrawer extends StatelessWidget {
                     AppMedia.logout,
                     repeat: true,
                     animate: true,
+                    reverse: true,
                   ),
                 ),
                 const SizedBox(height: 24),

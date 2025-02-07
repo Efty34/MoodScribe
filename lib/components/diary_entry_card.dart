@@ -20,9 +20,11 @@ class DiaryEntryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: Colors.grey[200]!),
       ),
       child: InkWell(
         onTap: onTap,
@@ -35,16 +37,9 @@ class DiaryEntryCard extends StatelessWidget {
             children: [
               content,
               const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    DateFormat('MMM dd, yyyy').format(date),
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
-                  ),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -53,7 +48,7 @@ class DiaryEntryCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color:
                           mood == 'stress' ? Colors.red[50] : Colors.green[50],
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       mood,
@@ -63,6 +58,14 @@ class DiaryEntryCard extends StatelessWidget {
                             : Colors.green[700],
                         fontSize: 10,
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    DateFormat('MMM dd, yyyy').format(date),
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
                     ),
                   ),
                 ],

@@ -42,7 +42,7 @@ class FavoritesService {
   // Get user's favorites
   Stream<QuerySnapshot> getFavorites() {
     if (userId == null) {
-      return Stream.empty();
+      return const Stream.empty();
     }
 
     return _firestore
@@ -51,5 +51,21 @@ class FavoritesService {
         .collection('favorites')
         .orderBy('timestamp', descending: true)
         .snapshots();
+  }
+
+  // Get all favorites as a Future (for one-time fetch)
+  Future<List<DocumentSnapshot>> getAllFavorites() async {
+    if (userId == null) {
+      return [];
+    }
+
+    final QuerySnapshot snapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('favorites')
+        .orderBy('timestamp', descending: true)
+        .get();
+
+    return snapshot.docs;
   }
 }
