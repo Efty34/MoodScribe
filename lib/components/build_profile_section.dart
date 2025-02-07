@@ -99,9 +99,22 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
         final username = userData?['username'] ?? 'User';
         final email = userData?['email'] ?? 'No email';
 
+        // ... existing code ...
         if (isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: SizedBox(
+              width: 200,
+              height: 200,
+              child: Lottie.asset(
+                AppMedia.loading,
+                fit: BoxFit.contain,
+                repeat: true,
+                animate: true,
+              ),
+            ),
+          );
         }
+// ... existing code ...
 
         return ScaleTransition(
           scale: _scaleAnimation,

@@ -25,33 +25,45 @@ class _FavoritesSection extends StatelessWidget {
         .toList();
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (musicFavorites.isNotEmpty) ...[
-          _buildCategoryHeader(
-              'Music', Icons.music_note_outlined, Colors.purple),
-          _buildFavoritesList(musicFavorites),
-          const SizedBox(height: 24),
-        ],
-        if (movieFavorites.isNotEmpty) ...[
-          _buildCategoryHeader('Movies', Icons.movie_outlined, Colors.indigo),
-          _buildFavoritesList(movieFavorites),
-          const SizedBox(height: 24),
-        ],
-        if (bookFavorites.isNotEmpty) ...[
-          _buildCategoryHeader('Books', Icons.book_outlined, Colors.teal),
-          _buildFavoritesList(bookFavorites),
-          const SizedBox(height: 24),
-        ],
+        if (musicFavorites.isNotEmpty)
+          _buildExpandableSection(
+            title: 'Music',
+            icon: Icons.music_note_outlined,
+            color: Colors.purple,
+            items: musicFavorites,
+            itemCount: musicFavorites.length,
+          ),
+        if (movieFavorites.isNotEmpty)
+          _buildExpandableSection(
+            title: 'Movies',
+            icon: Icons.movie_outlined,
+            color: Colors.indigo,
+            items: movieFavorites,
+            itemCount: movieFavorites.length,
+          ),
+        if (bookFavorites.isNotEmpty)
+          _buildExpandableSection(
+            title: 'Books',
+            icon: Icons.book_outlined,
+            color: Colors.teal,
+            items: bookFavorites,
+            itemCount: bookFavorites.length,
+          ),
       ],
     );
   }
 
-  Widget _buildCategoryHeader(
-      String title, IconData icon, MaterialColor color) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-      child: Row(
+  Widget _buildExpandableSection({
+    required String title,
+    required IconData icon,
+    required MaterialColor color,
+    required List<QueryDocumentSnapshot> items,
+    required int itemCount,
+  }) {
+    return ExpansionTile(
+      tilePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      title: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
@@ -66,45 +78,47 @@ class _FavoritesSection extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Text(
-            title,
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[800],
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+              ),
+              Text(
+                '$itemCount ${itemCount == 1 ? 'item' : 'items'}',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildFavoritesList(List<QueryDocumentSnapshot> categoryFavorites) {
-    return SizedBox(
-      height: 240,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: categoryFavorites.length,
-        itemBuilder: (context, index) {
-          final favorite =
-              categoryFavorites[index].data() as Map<String, dynamic>;
-          return Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: SizedBox(
-              width: 160,
-              child: RecommendationCard(
-                title: favorite['title'],
-                imageUrl: favorite['imageUrl'],
-                category: favorite['category'],
-                isFavorite: true,
-                favoriteId: categoryFavorites[index].id,
-              ),
-            ),
-          );
-        },
-      ),
+      children: [
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(top: 8, bottom: 16),
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final favorite = items[index].data() as Map<String, dynamic>;
+            return RecommendationCard(
+              title: favorite['title'],
+              imageUrl: favorite['imageUrl'],
+              category: favorite['category'],
+              isFavorite: true,
+              favoriteId: items[index].id,
+              genres: favorite['genres'] ?? favorite['categories'],
+            );
+          },
+        ),
+      ],
     );
   }
 }

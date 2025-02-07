@@ -10,6 +10,7 @@ class RecommendationCard extends StatefulWidget {
   final VoidCallback? onTap;
   final bool isFavorite;
   final String? favoriteId;
+  final List? genres;
 
   const RecommendationCard({
     super.key,
@@ -19,6 +20,7 @@ class RecommendationCard extends StatefulWidget {
     this.onTap,
     this.isFavorite = false,
     this.favoriteId,
+    this.genres,
   });
 
   @override
@@ -33,6 +35,214 @@ class _RecommendationCardState extends State<RecommendationCard> {
   void initState() {
     super.initState();
     _isFavorite = widget.isFavorite;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Hero(
+                        tag: 'title_${widget.title}',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Text(
+                            widget.title,
+                            style: GoogleFonts.playfairDisplay(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[900],
+                              height: 1.2,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      if (widget.genres != null && widget.genres!.isNotEmpty)
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: _buildGenreTags(),
+                        ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Icon(
+                            _getCategoryIcon(),
+                            size: 16,
+                            color: Colors.grey[600],
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            widget.category.toUpperCase(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Stack(
+                  children: [
+                    Hero(
+                      tag: 'image_${widget.title}',
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.network(
+                          widget.imageUrl,
+                          height: 140,
+                          width: 100,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: 140,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Icon(
+                                Icons.image_not_supported_rounded,
+                                size: 32,
+                                color: Colors.grey[400],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _toggleFavorite,
+                          customBorder: const CircleBorder(),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _isFavorite
+                                  ? Icons.favorite_rounded
+                                  : Icons.favorite_border_rounded,
+                              color: _isFavorite ? Colors.red : Colors.white,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildGenreTags() {
+    List<dynamic> genres = [];
+    if (widget.category == 'movies') {
+      genres = (widget.genres as List).map((g) => g['name']).toList();
+    } else if (widget.category == 'books') {
+      genres = widget.genres as List;
+    }
+
+    return genres
+        .take(2)
+        .map((genre) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: _getGenreColor(),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                genre.toString(),
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: _getGenreTextColor(),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ))
+        .toList();
+  }
+
+  Color _getGenreColor() {
+    switch (widget.category) {
+      case 'movies':
+        return Colors.indigo[50]!;
+      case 'books':
+        return Colors.teal[50]!;
+      case 'music':
+        return Colors.purple[50]!;
+      default:
+        return Colors.grey[50]!;
+    }
+  }
+
+  Color _getGenreTextColor() {
+    switch (widget.category) {
+      case 'movies':
+        return Colors.indigo[700]!;
+      case 'books':
+        return Colors.teal[700]!;
+      case 'music':
+        return Colors.purple[700]!;
+      default:
+        return Colors.grey[700]!;
+    }
+  }
+
+  IconData _getCategoryIcon() {
+    switch (widget.category) {
+      case 'movies':
+        return Icons.movie_outlined;
+      case 'books':
+        return Icons.book_outlined;
+      case 'music':
+        return Icons.music_note_outlined;
+      default:
+        return Icons.category_outlined;
+    }
   }
 
   Future<void> _toggleFavorite() async {
@@ -70,114 +280,5 @@ class _RecommendationCardState extends State<RecommendationCard> {
         isAdded: false,
       );
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  Hero(
-                    tag: 'image_${widget.title}',
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(16),
-                      ),
-                      child: Image.network(
-                        widget.imageUrl,
-                        height: 160,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 160,
-                            color: Colors.grey[100],
-                            child: Icon(
-                              Icons.image_not_supported_rounded,
-                              size: 32,
-                              color: Colors.grey[400],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _toggleFavorite,
-                        customBorder: const CircleBorder(),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.3),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            _isFavorite
-                                ? Icons.favorite_rounded
-                                : Icons.favorite_border_rounded,
-                            color: _isFavorite ? Colors.red : Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Hero(
-                  tag: 'title_${widget.title}',
-                  child: Material(
-                    color: Colors.transparent,
-                    child: Text(
-                      widget.title,
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[800],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

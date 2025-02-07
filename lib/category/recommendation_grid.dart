@@ -108,15 +108,9 @@ class _RecommendationGridState extends State<RecommendationGrid> {
             );
           }
 
-          return GridView.builder(
+          return ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(24),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.75,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             itemCount: recommendations.length,
             itemBuilder: (context, index) {
               final item = recommendations[index];
@@ -124,6 +118,11 @@ class _RecommendationGridState extends State<RecommendationGrid> {
                 title: item['title'],
                 imageUrl: item['imageUrl'] ?? '',
                 category: widget.type,
+                genres: widget.type == 'movies'
+                    ? item['genres']
+                    : widget.type == 'books'
+                        ? item['categories']
+                        : null,
                 onTap: () {
                   Navigator.push(
                     context,

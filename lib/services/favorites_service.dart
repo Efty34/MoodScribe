@@ -11,6 +11,7 @@ class FavoritesService {
     required String subtitle,
     required String imageUrl,
     required String category,
+    List? genres,
   }) async {
     if (userId == null) return;
 
@@ -23,6 +24,7 @@ class FavoritesService {
       'subtitle': subtitle,
       'imageUrl': imageUrl,
       'category': category,
+      'genres': genres,
       'timestamp': FieldValue.serverTimestamp(),
     });
   }
