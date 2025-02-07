@@ -16,7 +16,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   final TodoService _todoService = TodoService();
-  String? _category;
+  // String? _category;
 
   @override
   Widget build(BuildContext context) {
@@ -217,38 +217,38 @@ class _AddTodoPageState extends State<AddTodoPage> {
     }
   }
 
-  void _showCategorySnackbar(String category) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              _getCategoryIcon(category),
-              color: Colors.white,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              'Category: ${category.toUpperCase()}',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.grey[800],
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        duration: const Duration(seconds: 2),
-        elevation: 1,
-      ),
-    );
-  }
+  // void _showCategorySnackbar(String category) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Row(
+  //         children: [
+  //           Icon(
+  //             _getCategoryIcon(category),
+  //             color: Colors.white,
+  //             size: 20,
+  //           ),
+  //           const SizedBox(width: 12),
+  //           Text(
+  //             'Category: ${category.toUpperCase()}',
+  //             style: GoogleFonts.poppins(
+  //               fontSize: 14,
+  //               fontWeight: FontWeight.w500,
+  //               color: Colors.white,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       backgroundColor: Colors.grey[800],
+  //       behavior: SnackBarBehavior.floating,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  //       duration: const Duration(seconds: 2),
+  //       elevation: 1,
+  //     ),
+  //   );
+  // }
 
   IconData _getCategoryIcon(String category) {
     switch (category.toLowerCase()) {
@@ -305,6 +305,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
       time: _selectedTime == null ? '' : _selectedTime!.format(context),
     )
         .then((_) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -335,8 +336,10 @@ class _AddTodoPageState extends State<AddTodoPage> {
           elevation: 1,
         ),
       );
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     }).catchError((error) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

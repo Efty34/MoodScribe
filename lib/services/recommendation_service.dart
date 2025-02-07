@@ -9,7 +9,7 @@ class RecommendationService {
   final DiaryService _diaryService = DiaryService();
   final FavoritesService _favoritesService = FavoritesService();
   final String baseUrl =
-      'http://10.0.2.2:3000/api/recommendations/combined'; // Replace with your server URL
+      'https://mood-scribe-recommendation-ai-agent.vercel.app/api/recommendations/combined';
 
   Future<Map<String, dynamic>> _prepareRecommendationData() async {
     // Get stress percentage from diary entries
