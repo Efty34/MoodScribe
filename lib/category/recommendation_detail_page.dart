@@ -27,10 +27,53 @@ class RecommendationDetailPage extends StatelessWidget {
                 children: [
                   Hero(
                     tag: 'image_${recommendation['title']}',
-                    child: Image.network(
-                      recommendation['imageUrl'],
-                      fit: BoxFit.cover,
-                    ),
+                    child: recommendation['category'] == 'exercise'
+                        ? Container(
+                            height: 300,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.orange[300]!,
+                                  Colors.orange[700]!,
+                                ],
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.fitness_center_rounded,
+                                  size: 80,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(height: 16),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    recommendation['type'] ?? 'Exercise',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Image.network(
+                            recommendation['imageUrl'],
+                            fit: BoxFit.cover,
+                          ),
                   ),
                   // Gradient overlay
                   Container(
@@ -267,6 +310,133 @@ class RecommendationDetailPage extends StatelessWidget {
                 ],
               ),
             ),
+          ],
+        );
+
+      case 'exercise':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildInfoCard(
+              title: 'Exercise Details',
+              content: Column(
+                children: [
+                  _buildDetailRow('Type', recommendation['type']),
+                  _buildDetailRow(
+                      'Duration', '${recommendation['duration']} minutes'),
+                  _buildDetailRow(
+                      'Intensity', recommendation['intensity'].toUpperCase()),
+                  _buildDetailRow('Location', recommendation['location']),
+                  _buildDetailRow('Calories/Hour',
+                      '${recommendation['caloriesBurnedPerHour']} kcal'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildInfoCard(
+              title: 'Benefits',
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ...(recommendation['benefits'] as List)
+                      .map((benefit) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(Icons.check_circle_outline,
+                                    size: 20, color: Colors.green[600]),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    benefit,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      color: Colors.grey[800],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildInfoCard(
+              title: 'Instructions',
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ...(recommendation['instructions'] as List)
+                      .asMap()
+                      .entries
+                      .map((entry) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange[100],
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '${entry.key + 1}',
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.orange[700],
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    entry.value,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      color: Colors.grey[800],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                ],
+              ),
+            ),
+            if (recommendation['equipment'] != null &&
+                (recommendation['equipment'] as List).isNotEmpty) ...[
+              const SizedBox(height: 20),
+              _buildInfoCard(
+                title: 'Equipment Needed',
+                content: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: (recommendation['equipment'] as List)
+                      .map((item) => Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.orange[50],
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              item,
+                              style: GoogleFonts.poppins(
+                                color: Colors.orange[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                ),
+              ),
+            ],
           ],
         );
 

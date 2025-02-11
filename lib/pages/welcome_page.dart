@@ -159,7 +159,7 @@ class _WelcomePageState extends State<WelcomePage>
                               ],
                             ).createShader(bounds),
                             child: Text(
-                              "Mind's Whispers",
+                              "MoodScribe",
                               style: GoogleFonts.dancingScript(
                                 fontSize: 48,
                                 fontWeight: FontWeight.bold,
@@ -172,7 +172,7 @@ class _WelcomePageState extends State<WelcomePage>
                             opacity: _writeAnimation.value,
                             duration: Duration.zero,
                             child: Text(
-                              "Your Personal Diary",
+                              "Track, Reflect, Thrive",
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 color: Colors.white.withOpacity(0.9),
@@ -207,7 +207,7 @@ class _WelcomePageState extends State<WelcomePage>
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          "Opening your diary...",
+                          "Unfolding your thoughts...",
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: Colors.white.withOpacity(1),

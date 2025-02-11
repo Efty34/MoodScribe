@@ -125,6 +125,24 @@ class RecommendationService {
           });
         }
 
+        // Format exercises with all details
+        for (var exercise in responseData['exercises'] ?? []) {
+          formattedData.add({
+            'title': exercise['name'],
+            'category': 'exercise',
+            'type': exercise['type'],
+            'duration': exercise['duration'],
+            'intensity': exercise['intensity'],
+            'description': exercise['description'],
+            'benefits': exercise['benefits'],
+            'equipment': exercise['equipment'],
+            'instructions': exercise['instructions'],
+            'caloriesBurnedPerHour': exercise['caloriesBurnedPerHour'],
+            'suitable': exercise['suitable'],
+            'location': exercise['location'],
+          });
+        }
+
         // Cache the formatted data
         _cachedRecommendations = formattedData;
         return formattedData;

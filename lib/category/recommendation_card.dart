@@ -118,30 +118,70 @@ class _RecommendationCardState extends State<RecommendationCard> {
                   children: [
                     Hero(
                       tag: 'image_${widget.title}',
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.network(
-                          widget.imageUrl,
-                          height: 140,
-                          width: 100,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
+                      child: widget.category == 'exercise'
+                          ? Container(
                               height: 140,
                               width: 100,
                               decoration: BoxDecoration(
-                                color: Colors.grey[100],
+                                color: Colors.orange[50],
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: Icon(
-                                Icons.image_not_supported_rounded,
-                                size: 32,
-                                color: Colors.grey[400],
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.fitness_center_rounded,
+                                    size: 40,
+                                    color: Colors.orange[700],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange[100],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      (widget.genres as Map?)?['type']
+                                              ?.toString() ??
+                                          'Exercise',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        color: Colors.orange[700],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                        ),
-                      ),
+                            )
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Image.network(
+                                widget.imageUrl,
+                                height: 140,
+                                width: 100,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 140,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[100],
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Icon(
+                                      Icons.image_not_supported_rounded,
+                                      size: 32,
+                                      color: Colors.grey[400],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                     ),
                     Positioned(
                       top: 4,
@@ -181,9 +221,15 @@ class _RecommendationCardState extends State<RecommendationCard> {
   List<Widget> _buildGenreTags() {
     List<dynamic> genres = [];
     if (widget.category == 'movies') {
-      genres = (widget.genres as List).map((g) => g['name']).toList();
+      genres = (widget.genres as List?)?.map((g) => g['name']).toList() ?? [];
     } else if (widget.category == 'books') {
-      genres = widget.genres as List;
+      genres = widget.genres as List? ?? [];
+    } else if (widget.category == 'exercise') {
+      final Map<dynamic, dynamic>? exerciseData = widget.genres as Map?;
+      genres = [
+        exerciseData?['type']?.toString() ?? 'Exercise',
+        exerciseData?['intensity']?.toString() ?? 'Medium'
+      ];
     }
 
     return genres
@@ -195,7 +241,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                genre.toString(),
+                genre.toString().toUpperCase(),
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   color: _getGenreTextColor(),
@@ -214,6 +260,8 @@ class _RecommendationCardState extends State<RecommendationCard> {
         return Colors.teal[50]!;
       case 'music':
         return Colors.purple[50]!;
+      case 'exercise':
+        return Colors.orange[50]!;
       default:
         return Colors.grey[50]!;
     }
@@ -227,6 +275,8 @@ class _RecommendationCardState extends State<RecommendationCard> {
         return Colors.teal[700]!;
       case 'music':
         return Colors.purple[700]!;
+      case 'exercise':
+        return Colors.orange[700]!;
       default:
         return Colors.grey[700]!;
     }
@@ -240,6 +290,8 @@ class _RecommendationCardState extends State<RecommendationCard> {
         return Icons.book_outlined;
       case 'music':
         return Icons.music_note_outlined;
+      case 'exercise':
+        return Icons.fitness_center_outlined;
       default:
         return Icons.category_outlined;
     }
@@ -262,6 +314,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
           subtitle: '', // Empty for now
           imageUrl: widget.imageUrl,
           category: widget.category,
+          genres: widget.genres,
         );
         showCustomSnackbar(
           context,

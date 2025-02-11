@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> {
 
               if (filteredEntries.isEmpty) {
                 if (widget.searchState.query.isNotEmpty) {
-                  return Center(
+                return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

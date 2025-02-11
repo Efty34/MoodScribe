@@ -23,6 +23,9 @@ class _FavoritesSection extends StatelessWidget {
     final musicFavorites = favorites
         .where((f) => (f.data() as Map)['category'] == 'music')
         .toList();
+    final exerciseFavorites = favorites
+        .where((f) => (f.data() as Map)['category'] == 'exercise')
+        .toList();
 
     return Column(
       children: [
@@ -50,6 +53,14 @@ class _FavoritesSection extends StatelessWidget {
             items: bookFavorites,
             itemCount: bookFavorites.length,
           ),
+        if (exerciseFavorites.isNotEmpty)
+          _buildExpandableSection(
+            title: 'Exercise',
+            icon: Icons.fitness_center_outlined,
+            color: Colors.orange,
+            items: exerciseFavorites,
+            itemCount: exerciseFavorites.length,
+          )
       ],
     );
   }
