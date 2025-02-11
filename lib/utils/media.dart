@@ -1,8 +1,6 @@
 class AppMedia {
   static const _baseImage = "assets/images";
-  static const bg = '$_baseImage/bg.jpg';
   static const dp = '$_baseImage/robot.png';
-  static const coverImg = '$_baseImage/new.gif';
   static const bg2 = '$_baseImage/new.jpg';
   static const bot = '$_baseImage/bot.png';
   static const notfound = '$_baseImage/notfound.json';
@@ -14,4 +12,6 @@ class AppMedia {
   static const loading = '$_baseImage/loading.json';
   static const error = '$_baseImage/error.json';
   static const empty = '$_baseImage/empty.json';
+  static const loginbg = '$_baseImage/login.gif';
+  static const registerbg = '$_baseImage/regi.gif';
 }

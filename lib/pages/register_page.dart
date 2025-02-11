@@ -101,42 +101,81 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       resizeToAvoidBottomInset: false,
-      body: Stack(
+      body: Column(
         children: [
+          // Top Image and Welcome Section
           Container(
+            height: MediaQuery.of(context).size.height *
+                0.35, // Slightly smaller than login
+            width: double.infinity,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(AppMedia.bg), // Path to background image
+                image: AssetImage(AppMedia.registerbg),
                 fit: BoxFit.cover,
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(60),
+                bottomRight: Radius.circular(60),
+              ),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(60),
+                  bottomRight: Radius.circular(60),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.1),
+                    Colors.black.withOpacity(0.5),
+                  ],
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'Create Account',
+                    style: GoogleFonts.poppins(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Start your journey with us',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
               ),
             ),
           ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 80),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(150),
-                bottomRight: Radius.circular(150),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Center(
+
+          // Registration Form Section
+          Expanded(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(24),
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.face, size: 100, color: Colors.white),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 20),
                       ModernTextField(
                         controller: userNameController,
                         hintText: 'Username',
                         prefixIcon: Icon(
                           Icons.person_outline_rounded,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.blue[900],
                           size: 20,
                         ),
                         validator: (value) {
@@ -153,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icon(
                           Icons.email_outlined,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.blue[900],
                           size: 20,
                         ),
                         validator: (value) {
@@ -173,7 +212,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         obscureText: true,
                         prefixIcon: Icon(
                           Icons.lock_outline_rounded,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.blue[900],
                           size: 20,
                         ),
                         validator: (value) {
@@ -193,7 +232,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         obscureText: true,
                         prefixIcon: Icon(
                           Icons.lock_outline_rounded,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.blue[900],
                           size: 20,
                         ),
                         validator: (value) {
@@ -206,7 +245,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       MyButton(
                         text: _isLoading ? "Signing Up..." : "Sign Up",
                         onTap: _isLoading ? null : () => _signUp(),
@@ -216,86 +255,52 @@ class _RegisterPageState extends State<RegisterPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Alrady a member? ",
-                            style: GoogleFonts.poppins(color: Colors.white),
+                            "Already a member? ",
+                            style: GoogleFonts.poppins(
+                              color: Colors.grey[700],
+                              fontSize: 14,
+                            ),
                           ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () {
-                              // Get the current scaffold background
-                              final container = Container(
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  // Your existing background decoration
-                                  color: Colors.black.withOpacity(0.5),
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(150),
-                                    bottomRight: Radius.circular(150),
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.blue.withOpacity(0.3),
+                                    width: 1.5,
                                   ),
                                 ),
-                              );
-
-                              Navigator.of(context).push(
-                                PageRouteBuilder(
-                                  transitionDuration:
-                                      const Duration(milliseconds: 600),
-                                  reverseTransitionDuration:
-                                      const Duration(milliseconds: 600),
-                                  pageBuilder:
-                                      (context, animation, secondaryAnimation) {
-                                    return Stack(
-                                      children: [
-                                        // Keep the background constant
-                                        container,
-                                        // Animate only the content
-                                        AnimatedBuilder(
-                                          animation: animation,
-                                          builder: (context, child) {
-                                            return FadeTransition(
-                                              opacity: Tween<double>(
-                                                begin: 0.0,
-                                                end: 1.0,
-                                              ).animate(
-                                                CurvedAnimation(
-                                                  parent: animation,
-                                                  curve: Curves.easeOut,
-                                                ),
-                                              ),
-                                              child: SlideTransition(
-                                                position: Tween<Offset>(
-                                                  begin: const Offset(0, 0.1),
-                                                  end: Offset.zero,
-                                                ).animate(
-                                                  CurvedAnimation(
-                                                    parent: animation,
-                                                    curve: Curves.easeOutCubic,
-                                                  ),
-                                                ),
-                                                child: const LoginPage(),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    return child;
-                                  },
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "Login",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.blue[700],
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      Icons.arrow_back_rounded,
+                                      color: Colors.blue[700],
+                                      size: 16,
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                            child: Text(
-                              "Login",
-                              style: GoogleFonts.poppins(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
                               ),
                             ),
                           ),
                         ],
-                      )
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
