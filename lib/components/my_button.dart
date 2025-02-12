@@ -10,7 +10,7 @@ class MyButton extends StatelessWidget {
     super.key,
     required this.text,
     this.onTap,
-    this.isSecondary = false,
+    this.isSecondary = false, required bool isLoading,
   });
 
   @override

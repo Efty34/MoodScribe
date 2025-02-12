@@ -1,6 +1,6 @@
 import 'package:diary/auth/auth_service.dart';
+import 'package:diary/components/animate_button.dart';
 import 'package:diary/components/modern_text_field.dart';
-import 'package:diary/components/my_button.dart';
 import 'package:diary/pages/register_page.dart';
 import 'package:diary/utils/app_routes.dart';
 import 'package:diary/utils/media.dart';
@@ -231,9 +231,9 @@ class _LoginPageState extends State<LoginPage>
                         controller: emailController,
                         hintText: 'Enter Email',
                         keyboardType: TextInputType.emailAddress,
-                        prefixIcon: Icon(
+                        prefixIcon: const Icon(
                           Icons.email_outlined,
-                          color: Colors.blue[900],
+                          color: Colors.blue,
                           size: 20,
                         ),
                         validator: (value) {
@@ -251,9 +251,9 @@ class _LoginPageState extends State<LoginPage>
                         controller: passwordController,
                         hintText: 'Enter Password',
                         obscureText: true,
-                        prefixIcon: Icon(
+                        prefixIcon: const Icon(
                           Icons.lock_outline_rounded,
-                          color: Colors.blue[900],
+                          color: Colors.blue,
                           size: 20,
                         ),
                         validator: (value) {
@@ -264,9 +264,11 @@ class _LoginPageState extends State<LoginPage>
                         },
                       ),
                       const SizedBox(height: 24),
-                      MyButton(
-                        text: _isLoading ? "Signing In..." : "Sign In",
+                      // Replace the MyButton with AnimatedButton
+                      AnimatedButton(
+                        text: "Sign In",
                         onTap: _isLoading ? null : () => _signIn(),
+                        isLoading: _isLoading,
                       ),
                       // const Spacer(),
                       const SizedBox(height: 20),

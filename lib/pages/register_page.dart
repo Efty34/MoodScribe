@@ -1,6 +1,6 @@
 import 'package:diary/auth/auth_service.dart';
+import 'package:diary/components/animate_button.dart';
 import 'package:diary/components/modern_text_field.dart';
-import 'package:diary/components/my_button.dart';
 import 'package:diary/pages/login_page.dart';
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
@@ -173,9 +173,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       ModernTextField(
                         controller: userNameController,
                         hintText: 'Username',
-                        prefixIcon: Icon(
+                        prefixIcon: const Icon(
                           Icons.person_outline_rounded,
-                          color: Colors.blue[900],
+                          color: Colors.blue,
                           size: 20,
                         ),
                         validator: (value) {
@@ -190,9 +190,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         controller: emailController,
                         hintText: 'Enter Email',
                         keyboardType: TextInputType.emailAddress,
-                        prefixIcon: Icon(
+                        prefixIcon: const Icon(
                           Icons.email_outlined,
-                          color: Colors.blue[900],
+                          color: Colors.blue,
                           size: 20,
                         ),
                         validator: (value) {
@@ -210,9 +210,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         controller: passwordController,
                         hintText: 'Enter Password',
                         obscureText: true,
-                        prefixIcon: Icon(
+                        prefixIcon: const Icon(
                           Icons.lock_outline_rounded,
-                          color: Colors.blue[900],
+                          color: Colors.blue,
                           size: 20,
                         ),
                         validator: (value) {
@@ -230,9 +230,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         controller: confirmPasswordController,
                         hintText: 'Confirm Password',
                         obscureText: true,
-                        prefixIcon: Icon(
+                        prefixIcon: const Icon(
                           Icons.lock_outline_rounded,
-                          color: Colors.blue[900],
+                          color: Colors.blue,
                           size: 20,
                         ),
                         validator: (value) {
@@ -246,9 +246,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                       ),
                       const SizedBox(height: 24),
-                      MyButton(
-                        text: _isLoading ? "Signing Up..." : "Sign Up",
+                      AnimatedButton(
+                        text: "Sign Up",
                         onTap: _isLoading ? null : () => _signUp(),
+                        isLoading: _isLoading,
                       ),
                       const SizedBox(height: 20),
                       Row(

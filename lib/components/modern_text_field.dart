@@ -76,7 +76,7 @@ class _ModernTextFieldState extends State<ModernTextField> {
             : null,
         prefixIconConstraints: const BoxConstraints(minWidth: 56),
         filled: true,
-        fillColor: Colors.grey[200],
+        fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
