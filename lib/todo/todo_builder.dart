@@ -9,10 +9,12 @@ import 'package:lottie/lottie.dart';
 
 class TodoBuilder extends StatefulWidget {
   final SearchState searchState;
+  final bool isDone;
 
   const TodoBuilder({
     super.key,
     required this.searchState,
+    required this.isDone,
   });
 
   @override
@@ -52,6 +54,8 @@ class _TodoBuilderState extends State<TodoBuilder> {
         return Icons.fitness_center;
       case 'self-care':
         return Icons.spa_outlined;
+      case 'food':
+        return Icons.restaurant;
       case 'social':
         return Icons.people_outline;
       case 'medicine':
@@ -124,7 +128,7 @@ class _TodoBuilderState extends State<TodoBuilder> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _todoService.getTodos(),
+      stream: _todoService.getTodosByStatus(isDone: widget.isDone),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(
@@ -185,13 +189,15 @@ class _TodoBuilderState extends State<TodoBuilder> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.task_outlined,
+                  widget.isDone
+                      ? Icons.task_alt_rounded
+                      : Icons.pending_actions_rounded,
                   size: 64,
                   color: Colors.grey[400],
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'No tasks yet',
+                  widget.isDone ? 'No completed tasks' : 'No pending tasks',
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     color: Colors.grey[600],
@@ -200,7 +206,9 @@ class _TodoBuilderState extends State<TodoBuilder> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Add your first task!',
+                  widget.isDone
+                      ? 'Complete some tasks to see them here'
+                      : 'Add your first task!',
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     color: Colors.grey[500],
@@ -335,18 +343,18 @@ class _TodoBuilderState extends State<TodoBuilder> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Checkbox(
-                    value: data['isDone'] ?? false,
-                    onChanged: (value) async {
-                      await _todoService.toggleTodoStatus(
-                        todoId: todo.id,
-                        isDone: value ?? false,
-                      );
-                    },
-                    activeColor: Colors.blue[700],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
+                        value: data['isDone'] ?? false,
+                        onChanged: (value) async {
+                          await _todoService.toggleTodoStatus(
+                            todoId: todo.id,
+                            isDone: value ?? false,
+                          );
+                        },
+                        activeColor: Colors.blue[700],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
                       // const SizedBox(width: 8),
                       // Container(
                       //   padding: const EdgeInsets.all(8),
@@ -369,19 +377,19 @@ class _TodoBuilderState extends State<TodoBuilder> {
                           ? _highlightText(
                               data['title'] ?? '', widget.searchState.query)
                           : Text(
-                    data['title'] ?? '',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      decoration: data['isDone'] == true
-                          ? TextDecoration.lineThrough
-                          : null,
-                      color: data['isDone'] == true
-                          ? Colors.grey[500]
-                          : Colors.grey[800],
-                    ),
-                  ),
-                        const SizedBox(height: 4),
+                              data['title'] ?? '',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                decoration: data['isDone'] == true
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                                color: data['isDone'] == true
+                                    ? Colors.grey[500]
+                                    : Colors.grey[800],
+                              ),
+                            ),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
                           Container(
@@ -397,16 +405,16 @@ class _TodoBuilderState extends State<TodoBuilder> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                        Text(
+                          Text(
                             data['category']?.toString().toUpperCase() ??
                                 'DEFAULT',
-                          style: GoogleFonts.poppins(
+                            style: GoogleFonts.poppins(
                               fontSize: 12,
-                            color: Colors.grey[600],
+                              color: Colors.grey[600],
                               fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
                       )
                     ],
                   ),
@@ -416,69 +424,69 @@ class _TodoBuilderState extends State<TodoBuilder> {
                       ? Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Row(
-                          children: [
-                            if (data['date']?.isNotEmpty ?? false)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue[50],
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.calendar_today,
-                                      size: 14,
-                                      color: Colors.blue[700],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      data['date'],
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
+                            children: [
+                              if (data['date']?.isNotEmpty ?? false)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_today,
+                                        size: 14,
                                         color: Colors.blue[700],
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        data['date'],
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: Colors.blue[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            if (data['time']?.isNotEmpty ?? false) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue[50],
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.access_time,
-                                      size: 14,
-                                      color: Colors.blue[700],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      data['time'],
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
+                              if (data['time']?.isNotEmpty ?? false) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.access_time,
+                                        size: 14,
                                         color: Colors.blue[700],
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        data['time'],
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: Colors.blue[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
+                              ],
                             ],
-                          ],
-                        ),
+                          ),
                         )
                       : null,
                 ),
@@ -530,25 +538,25 @@ class _TodoBuilderState extends State<TodoBuilder> {
   ) async {
     final titleController = TextEditingController(text: data['title']);
     DateTime? selectedDate;
-      if (data['date'] != null && data['date'].toString().isNotEmpty) {
+    if (data['date'] != null && data['date'].toString().isNotEmpty) {
       try {
         selectedDate = DateFormat('MMM dd, yyyy').parse(data['date']);
-    } catch (e) {
+      } catch (e) {
         try {
           selectedDate = DateTime.parse(data['date']);
         } catch (e) {
-      print('Error parsing date: $e');
-    }
+          print('Error parsing date: $e');
+        }
       }
     }
 
     TimeOfDay? selectedTime;
-      if (data['time'] != null && data['time'].toString().isNotEmpty) {
+    if (data['time'] != null && data['time'].toString().isNotEmpty) {
       try {
         selectedTime =
             TimeOfDay.fromDateTime(DateFormat('hh:mm a').parse(data['time']));
-    } catch (e) {
-      print('Error parsing time: $e');
+      } catch (e) {
+        print('Error parsing time: $e');
       }
     }
 
@@ -757,7 +765,7 @@ class _TodoBuilderState extends State<TodoBuilder> {
                                 if (titleController.text.trim().isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                    content: Text(
+                                      content: Text(
                                         'Please enter your task',
                                         style: GoogleFonts.poppins(),
                                       ),
@@ -767,21 +775,21 @@ class _TodoBuilderState extends State<TodoBuilder> {
                                   return;
                                 }
 
-                                  await _todoService.updateTodo(
-                                    todoId: docId,
-                                    title: titleController.text.trim(),
-                                    date: selectedDate == null
-                                        ? ''
-                                        : DateFormat('MMM dd, yyyy')
-                                            .format(selectedDate!),
-                                    time: selectedTime == null
-                                        ? ''
-                                        : selectedTime!.format(context),
-                                  );
+                                await _todoService.updateTodo(
+                                  todoId: docId,
+                                  title: titleController.text.trim(),
+                                  date: selectedDate == null
+                                      ? ''
+                                      : DateFormat('MMM dd, yyyy')
+                                          .format(selectedDate!),
+                                  time: selectedTime == null
+                                      ? ''
+                                      : selectedTime!.format(context),
+                                );
 
-                                  if (!context.mounted) return;
-                                  Navigator.pop(context);
-                                  _showUpdateSuccessMessage(context);
+                                if (!context.mounted) return;
+                                Navigator.pop(context);
+                                _showUpdateSuccessMessage(context);
                               },
                               child: Text(
                                 'Update',

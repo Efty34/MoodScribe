@@ -15,6 +15,7 @@ class TodoService {
     'groceries',
     'fitness',
     'self-care',
+    'food',
     'social',
     'medicine',
     'default'
@@ -36,34 +37,43 @@ class TodoService {
   Future<String> _determineCategory(String title) async {
     try {
       final prompt = '''
-Analyze this task and categorize it into one of these categories: exam, submission, shopping, groceries, fitness, self-care, social, medicine, default.
-Only respond with one word (the category).
+Analyze this task title and categorize it into one of these categories. Only respond with a single word (the category name in lowercase).
 
-Task: $title
+Task: "$title"
 
-Rules:
-- exam: exams, quizzes, tests, studying, test preparation, exam dates, revision,
-- submission: assignments, homework, projects, deadlines
-- shopping: buying non-food items, clothes, electronics
-- groceries: food items, ingredients, kitchen supplies
-- fitness: exercise, workout, sports, physical activities
-- self-care: meditation, relaxation, personal care
-- social: meetings, gatherings, calls, events
-- medicine: medications, doctor appointments, health-related
-- default: if it doesn't fit in any other category
+Categories and their contexts:
+- exam: Academic tests, exams, quizzes, studying, test preparation, exam dates, revision
+- submission: Academic assignments, homework, projects, deadlines, papers, reports
+- shopping: Non-food items, clothes, electronics, accessories, household items
+- groceries: Food items, ingredients, kitchen supplies, fruits, vegetables
+- fitness: Exercise, workout, sports, physical activities, gym, running, yoga
+- self-care: Meditation, relaxation, personal care, mental health, skincare
+- food: Cooking, eating out, food orders, dining, meal preparation, restaurants
+- social: Meetings, gatherings, calls, events, parties, social activities
+- medicine: Medications, doctor appointments, health-related tasks, medical checkups
+- default: Tasks that don't clearly fit into any other category
 
-Category:''';
+Response format: Only the category name in lowercase, nothing else.
+''';
 
       String response = await _geminiService.getResponse(prompt);
       response = response.toLowerCase().trim();
 
-      // Check if the response is a valid category
+      // Remove any punctuation or extra text
+      response = response.replaceAll(RegExp(r'[^\w\s]'), '');
+
+      // Extract just the first word
+      response = response.split(' ').first;
+
+      // Validate the category
       if (categories.contains(response)) {
         return response;
       }
+
+      print('Invalid category from Gemini: $response for task: $title');
       return 'default';
     } catch (e) {
-      print('Error determining category: $e');
+      print('Error determining category: $e for task: $title');
       return 'default';
     }
   }
@@ -154,5 +164,18 @@ Category:''';
         .collection('todos')
         .doc(todoId)
         .delete();
+  }
+
+  // Get todos by completion status
+  Stream<QuerySnapshot> getTodosByStatus({required bool isDone}) {
+    if (userId == null) return Stream.empty();
+
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('todos')
+        .where('isDone', isEqualTo: isDone)
+        .orderBy('created_at', descending: true)
+        .snapshots();
   }
 }
