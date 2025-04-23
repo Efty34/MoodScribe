@@ -1,4 +1,3 @@
-import 'package:diary/components/diary_streak_calendar.dart';
 import 'package:diary/components/mood_chart.dart';
 import 'package:diary/components/profilepage/chart_container.dart';
 import 'package:flutter/material.dart';
@@ -48,23 +47,12 @@ class StatsSection extends StatelessWidget {
 
         const SizedBox(height: 20),
 
-        // Charts Section with enhanced scrolling
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            children: [
-              ChartContainer(
-                shadowColor: isDark ? Colors.blueGrey : Colors.blue,
-                child: const MoodChart(),
-              ),
-              const SizedBox(width: 16),
-              ChartContainer(
-                shadowColor: Colors.green[700]!,
-                child: const DiaryStreakCalendar(),
-              ),
-            ],
+        // Charts Section - Now with only MoodChart
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 26),
+          child: ChartContainer(
+            shadowColor: isDark ? Colors.blueGrey : Colors.blue,
+            child: const MoodChart(),
           ),
         ),
       ],

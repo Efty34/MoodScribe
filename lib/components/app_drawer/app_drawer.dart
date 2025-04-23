@@ -131,14 +131,17 @@ class CustomAppDrawer extends StatelessWidget {
                   const SizedBox(height: 12),
                   DrawerMenuItem(
                     title: 'Stats',
-                    icon: AppMedia.trophy,
+                    icon: AppMedia.graph,
                     isLottie: true,
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.of(context)
+                      ..pop()
+                      ..pushNamed(AppRoutes.statsPage),
                   ),
                   const SizedBox(height: 12),
                   DrawerMenuItem(
                     title: 'Settings',
-                    icon: Icons.settings_rounded,
+                    icon: AppMedia.settings,
+                    isLottie: true,
                     onTap: () => Navigator.of(context)
                       ..pop()
                       ..pushNamed(AppRoutes.settingsPage),

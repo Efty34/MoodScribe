@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final TextEditingController searchController;
-  final Function(String) onSearchChanged;
+  final TextEditingController? searchController;
+  final Function(String)? onSearchChanged;
   final bool isSearching;
-  final VoidCallback onSearchToggle;
+  final VoidCallback? onSearchToggle;
+  final String? title;
 
   const CustomAppBar({
     super.key,
-    required this.searchController,
-    required this.onSearchChanged,
-    required this.isSearching,
-    required this.onSearchToggle,
+    this.searchController,
+    this.onSearchChanged,
+    this.isSearching = false,
+    this.onSearchToggle,
+    this.title,
   });
 
   @override
@@ -25,7 +27,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: theme.scaffoldBackgroundColor,
       elevation: 0,
-      title: isSearching
+      title: isSearching && searchController != null
           ? TextField(
               controller: searchController,
               onChanged: onSearchChanged,
@@ -44,20 +46,21 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             )
           : Text(
-              'Mind Journal',
+              title ?? 'Mind Journal',
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.onSurface,
               ),
             ),
       actions: [
-        IconButton(
-          icon: Icon(
-            isSearching ? Icons.close : Icons.search,
-            color: theme.colorScheme.primary,
+        if (onSearchToggle != null)
+          IconButton(
+            icon: Icon(
+              isSearching ? Icons.close : Icons.search,
+              color: theme.colorScheme.primary,
+            ),
+            onPressed: onSearchToggle,
           ),
-          onPressed: onSearchToggle,
-        ),
       ],
     );
   }

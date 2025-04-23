@@ -4,6 +4,7 @@ import 'package:diary/mood_buddy/pages/mood_buddy_page.dart';
 import 'package:diary/pages/login_page.dart';
 import 'package:diary/pages/register_page.dart';
 import 'package:diary/pages/settings_page.dart';
+import 'package:diary/pages/stats_page.dart';
 import 'package:diary/utils/app_routes.dart';
 import 'package:diary/utils/bottom_nav_bar.dart';
 import 'package:diary/utils/monochrome_theme.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.bottomNavBar: (context) => const BottomNavBar(),
         AppRoutes.moodBuddyPage: (context) => const MoodBuddyPage(),
         AppRoutes.settingsPage: (context) => const SettingsPage(),
+        AppRoutes.statsPage: (context) => const StatsPage(),
       },
     );
   }

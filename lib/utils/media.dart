@@ -12,6 +12,8 @@ class AppMedia {
   static const loading = '$_baseImage/loading.json';
   static const error = '$_baseImage/error.json';
   static const empty = '$_baseImage/empty.json';
+  static const settings = '$_baseImage/settings.json';
+  static const graph = '$_baseImage/graph.json';
   static const loginbg = '$_baseImage/login.gif';
   static const registerbg = '$_baseImage/regi.gif';
 }
