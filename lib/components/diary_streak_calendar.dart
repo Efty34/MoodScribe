@@ -75,12 +75,13 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     if (isLoading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
         ),
       );
     }
@@ -92,18 +93,18 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(isDarkMode),
+            _buildHeader(theme, isDark),
             const SizedBox(height: 24),
-            _buildCalendarCard(isDarkMode),
+            _buildCalendarCard(theme, isDark),
             const SizedBox(height: 16),
-            _buildColorLegend(isDarkMode),
+            _buildColorLegend(theme, isDark),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader(bool isDarkMode) {
+  Widget _buildHeader(ThemeData theme, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -115,7 +116,7 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
               style: GoogleFonts.nunito(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: isDarkMode ? Colors.white : Colors.grey[800],
+                color: theme.colorScheme.onSurface,
                 letterSpacing: 0.5,
               ),
             ),
@@ -123,7 +124,7 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
               'Your daily writing journey',
               style: GoogleFonts.nunito(
                 fontSize: 14,
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                color: theme.hintColor,
                 letterSpacing: 0.2,
               ),
             ),
@@ -132,14 +133,14 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: isDarkMode
-                ? Colors.green[900]!.withOpacity(0.3)
-                : Colors.green[50],
+            color: isDark
+                ? theme.colorScheme.primary.withOpacity(0.2)
+                : theme.colorScheme.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             Icons.calendar_month_rounded,
-            color: isDarkMode ? Colors.green[400] : Colors.green[700],
+            color: theme.colorScheme.primary,
             size: 22,
           ),
         ),
@@ -147,23 +148,28 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
     );
   }
 
-  Widget _buildCalendarCard(bool isDarkMode) {
+  Widget _buildCalendarCard(ThemeData theme, bool isDark) {
+    // Define green color for both themes
+    const Color greenColor = Colors.green;
+
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.7) : Colors.white,
+        color: isDark
+            ? theme.colorScheme.surface.withOpacity(0.7)
+            : theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode
+            color: isDark
                 ? Colors.black.withOpacity(0.2)
-                : Colors.grey.withOpacity(0.1),
+                : Colors.black.withOpacity(0.05),
             blurRadius: 15,
             offset: const Offset(0, 5),
             spreadRadius: -3,
           ),
         ],
         border: Border.all(
-          color: isDarkMode ? Colors.grey[700]! : Colors.grey[200]!,
+          color: theme.dividerColor,
           width: 1,
         ),
       ),
@@ -179,28 +185,28 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
             child: HeatMap(
               datasets: datasets,
               colorMode: ColorMode.color,
-              defaultColor: isDarkMode ? Colors.grey[700] : Colors.grey[200],
-              textColor: isDarkMode ? Colors.grey[300]! : Colors.grey[800]!,
+              defaultColor: isDark
+                  ? theme.dividerColor
+                  : theme.colorScheme.surfaceContainerHighest,
+              textColor: theme.colorScheme.onSurface,
               showColorTip: false,
               showText: true,
               scrollable: true,
               size: 30,
-              colorsets: isDarkMode
+              colorsets: isDark
                   ? {
-                      1: const Color(0xFF184E24)
-                          .withOpacity(0.8), // Darker green for dark mode
-                      2: const Color(0xFF236C32).withOpacity(0.8),
-                      3: const Color(0xFF2EA043).withOpacity(0.8),
-                      4: const Color(0xFF39D353).withOpacity(0.8),
-                      5: const Color(0xFF56F07B).withOpacity(0.8),
+                      1: greenColor.withOpacity(0.2),
+                      2: greenColor.withOpacity(0.4),
+                      3: greenColor.withOpacity(0.6),
+                      4: greenColor.withOpacity(0.8),
+                      5: greenColor,
                     }
                   : {
-                      1: const Color(0xFFADF5BD)
-                          .withOpacity(0.8), // GitHub-like greens
-                      2: const Color(0xFF7EE787).withOpacity(0.8),
-                      3: const Color(0xFF4AC26B).withOpacity(0.8),
-                      4: const Color(0xFF2EA043).withOpacity(0.8),
-                      5: const Color(0xFF216E39).withOpacity(0.8),
+                      1: greenColor.withOpacity(0.1),
+                      2: greenColor.withOpacity(0.3),
+                      3: greenColor.withOpacity(0.5),
+                      4: greenColor.withOpacity(0.7),
+                      5: greenColor.withOpacity(0.9),
                     },
               onClick: (value) => _showEntryDetailsBottomSheet(context, value),
               margin: const EdgeInsets.symmetric(vertical: 3),
@@ -211,7 +217,10 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
     );
   }
 
-  Widget _buildColorLegend(bool isDarkMode) {
+  Widget _buildColorLegend(ThemeData theme, bool isDark) {
+    // Use the same green color as used in the calendar
+    const Color greenColor = Colors.green;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -219,7 +228,7 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
           'Less',
           style: GoogleFonts.nunito(
             fontSize: 12,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: theme.hintColor,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.2,
           ),
@@ -232,21 +241,9 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
             height: 8,
             margin: const EdgeInsets.symmetric(horizontal: 3),
             decoration: BoxDecoration(
-              color: isDarkMode
-                  ? [
-                      const Color(0xFF184E24),
-                      const Color(0xFF236C32),
-                      const Color(0xFF2EA043),
-                      const Color(0xFF39D353),
-                      const Color(0xFF56F07B),
-                    ][index]
-                  : [
-                      const Color(0xFFADF5BD),
-                      const Color(0xFF7EE787),
-                      const Color(0xFF4AC26B),
-                      const Color(0xFF2EA043),
-                      const Color(0xFF216E39),
-                    ][index],
+              color: isDark
+                  ? greenColor.withOpacity((index + 1) * 0.2)
+                  : greenColor.withOpacity(0.1 + index * 0.2),
               borderRadius: BorderRadius.circular(4),
             ),
           ),
@@ -256,7 +253,7 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
           'More',
           style: GoogleFonts.nunito(
             fontSize: 12,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: theme.hintColor,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.2,
           ),
@@ -269,7 +266,8 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
     final normalizedDate = DateTime(date.year, date.month, date.day);
     final entries = datasets[normalizedDate] ?? 0;
     final formattedDate = DateFormat('EEEE, MMMM d, yyyy').format(date);
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
@@ -279,7 +277,7 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
       builder: (context) {
         return Container(
           decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[850] : Colors.white,
+            color: isDark ? theme.colorScheme.surface : theme.cardColor,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(24),
               topRight: Radius.circular(24),
@@ -296,7 +294,7 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[600] : Colors.grey[300],
+                    color: theme.dividerColor,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -313,7 +311,7 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
                       style: GoogleFonts.nunito(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        color: isDarkMode ? Colors.white : Colors.grey[800],
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -323,12 +321,12 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: entries > 0
-                                ? (isDarkMode
-                                    ? Colors.green[900]!.withOpacity(0.3)
-                                    : Colors.green[50])
-                                : (isDarkMode
-                                    ? Colors.grey[800]!.withOpacity(0.5)
-                                    : Colors.grey[100]),
+                                ? (isDark
+                                    ? theme.colorScheme.primary.withOpacity(0.2)
+                                    : theme.colorScheme.primary
+                                        .withOpacity(0.1))
+                                : theme.colorScheme.surfaceContainerHighest
+                                    .withOpacity(isDark ? 0.5 : 1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
@@ -336,12 +334,8 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
                                 ? Icons.edit_note_rounded
                                 : Icons.notes_rounded,
                             color: entries > 0
-                                ? (isDarkMode
-                                    ? Colors.green[400]
-                                    : Colors.green[700])
-                                : (isDarkMode
-                                    ? Colors.grey[400]
-                                    : Colors.grey[600]),
+                                ? theme.colorScheme.primary
+                                : theme.hintColor,
                             size: 22,
                           ),
                         ),
@@ -354,9 +348,7 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
                             style: GoogleFonts.nunito(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: isDarkMode
-                                  ? Colors.grey[300]
-                                  : Colors.grey[700],
+                              color: theme.colorScheme.onSurface,
                             ),
                           ),
                         ),

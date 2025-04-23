@@ -123,8 +123,11 @@ class _DiaryEntryState extends State<DiaryEntry> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -135,7 +138,7 @@ class _DiaryEntryState extends State<DiaryEntry> {
                 'Every moment tells a story. What\'s yours today?',
                 style: GoogleFonts.poppins(
                   fontSize: 20,
-                  color: Colors.black,
+                  color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w200,
                 ),
               ),
@@ -145,8 +148,26 @@ class _DiaryEntryState extends State<DiaryEntry> {
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(6),
+                    color: isDark
+                        ? theme.colorScheme.surface.withOpacity(0.7)
+                        : theme.colorScheme.surface,
+                    border: Border.all(color: theme.dividerColor),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: isDark
+                        ? [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                   ),
                   child: TextField(
                     controller: _contentController,
@@ -156,14 +177,14 @@ class _DiaryEntryState extends State<DiaryEntry> {
                     decoration: InputDecoration(
                       hintText: 'Chronicles of a Wandering Mind...',
                       hintStyle: GoogleFonts.poppins(
-                        color: Colors.grey.shade500,
+                        color: theme.hintColor,
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                     ),
                     style: GoogleFonts.poppins(
                       fontSize: 16,
-                      color: Colors.black87,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -177,10 +198,10 @@ class _DiaryEntryState extends State<DiaryEntry> {
                   width: 250,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
                       elevation: 3,
-                      shadowColor: Colors.black.withOpacity(0.3),
+                      shadowColor: Colors.black.withOpacity(isDark ? 0.5 : 0.3),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

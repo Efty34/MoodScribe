@@ -28,9 +28,8 @@ class _MoodChartCardState extends State<MoodChartCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = MoodChartUtils.getCardColor(isDarkMode);
-    final borderColor = MoodChartUtils.getBorderColor(isDarkMode);
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     final total = widget.stressValue + widget.nonStressValue;
 
     // Get available width to make chart responsive
@@ -39,20 +38,20 @@ class _MoodChartCardState extends State<MoodChartCard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: isDarkMode ? theme.colorScheme.surface : theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: isDarkMode
                 ? Colors.black.withOpacity(0.2)
-                : Colors.grey.withOpacity(0.1),
+                : Colors.black.withOpacity(0.05),
             blurRadius: 15,
             offset: const Offset(0, 5),
             spreadRadius: -2,
           ),
         ],
         border: Border.all(
-          color: borderColor,
+          color: theme.dividerColor,
           width: 1,
         ),
       ),
@@ -77,8 +76,8 @@ class _MoodChartCardState extends State<MoodChartCard> {
                         aspectRatio: 1.0,
                         child: PieChart(
                           PieChartData(
-                            sections:
-                                _buildPieChartSections(isDarkMode, chartSize),
+                            sections: _buildPieChartSections(
+                                isDarkMode, chartSize, theme),
                             sectionsSpace: 2,
                             centerSpaceRadius: chartSize * 0.25,
                             startDegreeOffset: -90 * widget.animation.value,
@@ -113,22 +112,22 @@ class _MoodChartCardState extends State<MoodChartCard> {
                                     : Icons.sentiment_dissatisfied_rounded)
                                 : Icons.sentiment_neutral_rounded,
                             size: 32,
-                            color: isDarkMode
-                                ? Colors.grey[300]
-                                : Colors.grey[700],
+                            color: theme.colorScheme.onSurface.withOpacity(0.7),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             '$total',
-                            style: MoodChartUtils.getNumberStyle(isDarkMode),
+                            style: GoogleFonts.nunito(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface,
+                            ),
                           ),
                           Text(
                             'Entries',
                             style: GoogleFonts.nunito(
                               fontSize: 14,
-                              color: isDarkMode
-                                  ? Colors.grey[400]
-                                  : Colors.grey[600],
+                              color: theme.hintColor,
                             ),
                           ),
                         ],
@@ -145,16 +144,18 @@ class _MoodChartCardState extends State<MoodChartCard> {
   }
 
   List<PieChartSectionData> _buildPieChartSections(
-      bool isDarkMode, double chartSize) {
+      bool isDarkMode, double chartSize, ThemeData theme) {
     final total = widget.stressValue + widget.nonStressValue;
     final stressPercentage =
         MoodChartUtils.calculatePercentage(widget.stressValue, total);
     final nonStressPercentage =
         MoodChartUtils.calculatePercentage(widget.nonStressValue, total);
 
-    // Get colors from utilities
-    final positiveColor = MoodChartUtils.getPositiveColor(isDarkMode);
-    final stressedColor = MoodChartUtils.getStressedColor(isDarkMode);
+    // Using red color for stress and green color for non-stress
+    final positiveColor =
+        MoodChartUtils.getPositiveColor(isDarkMode); // Green for non-stress
+    final stressedColor =
+        MoodChartUtils.getStressedColor(isDarkMode); // Red for stress
 
     // Calculate radius based on chart size
     final baseRadius = chartSize * 0.32;
@@ -179,7 +180,7 @@ class _MoodChartCardState extends State<MoodChartCard> {
           ],
         ),
         badgeWidget: touchedIndex == 0
-            ? _buildBadge(stressPercentage.toStringAsFixed(1))
+            ? _buildBadge(stressPercentage.toStringAsFixed(1), theme)
             : null,
         badgePositionPercentageOffset: 0.5,
       ),
@@ -202,22 +203,24 @@ class _MoodChartCardState extends State<MoodChartCard> {
           ],
         ),
         badgeWidget: touchedIndex == 1
-            ? _buildBadge(nonStressPercentage.toStringAsFixed(1))
+            ? _buildBadge(nonStressPercentage.toStringAsFixed(1), theme)
             : null,
         badgePositionPercentageOffset: 0.5,
       ),
     ];
   }
 
-  Widget _buildBadge(String percentage) {
+  Widget _buildBadge(String percentage, ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? theme.colorScheme.surface : theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.2),
             blurRadius: 6,
             spreadRadius: 1,
           )
@@ -229,7 +232,7 @@ class _MoodChartCardState extends State<MoodChartCard> {
         style: GoogleFonts.nunito(
           fontSize: 14,
           fontWeight: FontWeight.w700,
-          color: Colors.grey[800],
+          color: theme.colorScheme.onSurface,
         ),
       ),
     );

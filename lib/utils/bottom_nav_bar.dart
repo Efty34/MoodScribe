@@ -56,15 +56,18 @@ class _BottomNavBarState extends State<BottomNavBar> {
   ];
 
   PreferredSizeWidget _buildAppBar() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     if (_isSearching && (currentIndex == 0 || currentIndex == 3)) {
       return AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.grey[800],
+            color: theme.colorScheme.onBackground,
             size: 22,
           ),
           onPressed: _exitSearchMode,
@@ -73,10 +76,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
           height: 40,
           margin: const EdgeInsets.only(right: 16),
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: theme.colorScheme.secondary,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey.withOpacity(0.1),
+              color: theme.dividerColor,
             ),
           ),
           child: TextField(
@@ -84,12 +87,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
             autofocus: true,
             style: GoogleFonts.poppins(
               fontSize: 15,
-              color: Colors.grey[800],
+              color: theme.colorScheme.onBackground,
             ),
             decoration: InputDecoration(
               prefixIcon: Icon(
                 Icons.search_rounded,
-                color: Colors.grey[400],
+                color: theme.hintColor,
                 size: 22,
               ),
               suffixIcon: _searchController.text.isNotEmpty
@@ -97,14 +100,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
                       onTap: _exitSearchMode,
                       child: Icon(
                         Icons.close_rounded,
-                        color: Colors.grey[400],
+                        color: theme.hintColor,
                         size: 22,
                       ),
                     )
                   : null,
               hintText: 'Search...',
               hintStyle: GoogleFonts.poppins(
-                color: Colors.grey[400],
+                color: theme.hintColor,
                 fontSize: 15,
               ),
               border: InputBorder.none,
@@ -126,13 +129,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
     }
 
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       elevation: 0,
       leading: Builder(
         builder: (context) => IconButton(
           icon: Icon(
             Icons.menu_rounded,
-            color: Colors.grey[800],
+            color: theme.colorScheme.onBackground,
             size: 28,
           ),
           onPressed: () => Scaffold.of(context).openDrawer(),
@@ -143,7 +146,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         style: GoogleFonts.poppins(
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          color: Colors.grey[800],
+          color: theme.colorScheme.onBackground,
         ),
       ),
       actions: _buildActions(),
@@ -153,6 +156,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       drawer: const CustomAppDrawer(),
       appBar: _buildAppBar(),
@@ -171,10 +177,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
         margin: const EdgeInsets.all(20),
         height: size.width * .155,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? theme.colorScheme.surface : theme.cardColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(.15),
+              color: Colors.black.withOpacity(isDark ? 0.3 : 0.15),
               blurRadius: 30,
               offset: const Offset(0, 10),
             ),
@@ -202,9 +208,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   ),
                   width: size.width * .085,
                   height: index == currentIndex ? size.width * .014 : 0,
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.vertical(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    borderRadius: const BorderRadius.vertical(
                       bottom: Radius.circular(10),
                     ),
                   ),
@@ -212,7 +218,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 Icon(
                   listOfIcons[index],
                   size: size.width * .076,
-                  color: index == currentIndex ? Colors.blue : Colors.black38,
+                  color: index == currentIndex
+                      ? theme.colorScheme.primary
+                      : theme.hintColor,
                 ),
                 SizedBox(height: size.width * .03),
               ],
@@ -224,12 +232,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
   }
 
   List<Widget>? _buildActions() {
+    final theme = Theme.of(context);
+
     if (currentIndex == 0 || currentIndex == 3) {
       return [
         IconButton(
           icon: Icon(
             Icons.search_rounded,
-            color: Colors.grey[800],
+            color: theme.colorScheme.onBackground,
             size: 28,
           ),
           onPressed: () {

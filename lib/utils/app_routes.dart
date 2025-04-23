@@ -6,4 +6,5 @@ class AppRoutes {
   static const String moodBuddyPage = '/mood-buddy';
   static const bottomNavBar = '/bottom_nav_bar';
   static const addtodo = '/add_todo';
+  static const settingsPage = '/settings';
 }

@@ -11,8 +11,11 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -26,7 +29,9 @@ class ProfilePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: isDark
+                          ? Colors.black.withOpacity(0.15)
+                          : Colors.black.withOpacity(0.05),
                       blurRadius: 20,
                       offset: const Offset(0, 4),
                     ),
@@ -47,11 +52,11 @@ class ProfilePage extends StatelessWidget {
                 stream: FavoritesService().getFavorites(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
-                    return _buildErrorState(snapshot.error.toString());
+                    return _buildErrorState(snapshot.error.toString(), theme);
                   }
 
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return _buildLoadingState();
+                    return _buildLoadingState(theme);
                   }
 
                   final favorites = snapshot.data?.docs ?? [];
@@ -67,16 +72,18 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingState() {
-    return const Center(
+  Widget _buildLoadingState(ThemeData theme) {
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(32.0),
-        child: CircularProgressIndicator(),
+        padding: const EdgeInsets.all(32.0),
+        child: CircularProgressIndicator(
+          color: theme.colorScheme.primary,
+        ),
       ),
     );
   }
 
-  Widget _buildErrorState(String error) {
+  Widget _buildErrorState(String error, ThemeData theme) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -86,13 +93,13 @@ class ProfilePage extends StatelessWidget {
             Icon(
               Icons.error_outline_rounded,
               size: 48,
-              color: Colors.red[400],
+              color: theme.colorScheme.error,
             ),
             const SizedBox(height: 16),
             Text(
               'Error: $error',
               style: GoogleFonts.poppins(
-                color: Colors.grey[600],
+                color: theme.colorScheme.onBackground.withOpacity(0.7),
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,

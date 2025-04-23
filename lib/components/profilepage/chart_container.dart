@@ -12,14 +12,19 @@ class ChartContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: MediaQuery.of(context).size.width * 0.85,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? theme.colorScheme.surface : theme.cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: shadowColor.withOpacity(0.1),
+            color: isDark
+                ? shadowColor.withOpacity(0.15)
+                : shadowColor.withOpacity(0.1),
             blurRadius: 20,
             offset: const Offset(0, 4),
             spreadRadius: -2,

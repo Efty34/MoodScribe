@@ -4,11 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 /// Theme-aware color and style utilities for the mood chart components
 class MoodChartUtils {
   // Color utilities
-  static Color getPositiveColor(bool isDarkMode) =>
-      isDarkMode ? const Color(0xFF7ECFFF) : const Color(0xFF70D6FF);
+  static Color getPositiveColor(bool isDarkMode) => isDarkMode
+      ? const Color(0xFF4CAF50)
+      : const Color(0xFF8BC34A); // Green colors for non-stress
 
-  static Color getStressedColor(bool isDarkMode) =>
-      isDarkMode ? const Color(0xFFFF9E9E) : const Color(0xFFFF8080);
+  static Color getStressedColor(bool isDarkMode) => isDarkMode
+      ? const Color(0xFFE53935)
+      : const Color(0xFFFF5252); // Red colors for stress
 
   static Color? getTextColor(bool isDarkMode) =>
       isDarkMode ? Colors.white : Colors.grey[800];

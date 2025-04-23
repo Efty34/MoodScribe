@@ -9,6 +9,9 @@ class StatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -35,7 +38,7 @@ class StatsSection extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey[800],
+                  color: theme.colorScheme.onBackground,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -53,7 +56,7 @@ class StatsSection extends StatelessWidget {
           child: Row(
             children: [
               ChartContainer(
-                shadowColor: Colors.blue[700]!,
+                shadowColor: isDark ? Colors.blueGrey : Colors.blue,
                 child: const MoodChart(),
               ),
               const SizedBox(width: 16),

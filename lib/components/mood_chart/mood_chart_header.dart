@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'mood_chart_utils.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Header section for the mood chart
 class MoodChartHeader extends StatelessWidget {
@@ -8,7 +7,8 @@ class MoodChartHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -18,11 +18,20 @@ class MoodChartHeader extends StatelessWidget {
           children: [
             Text(
               'Mood Analysis',
-              style: MoodChartUtils.getTitleStyle(isDarkMode),
+              style: GoogleFonts.nunito(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onBackground,
+                letterSpacing: 0.5,
+              ),
             ),
             Text(
               'Your emotional journey',
-              style: MoodChartUtils.getSubtitleStyle(isDarkMode),
+              style: GoogleFonts.nunito(
+                fontSize: 14,
+                color: theme.hintColor,
+                letterSpacing: 0.2,
+              ),
             ),
           ],
         ),
@@ -30,13 +39,13 @@ class MoodChartHeader extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: isDarkMode
-                ? Colors.blue[900]!.withOpacity(0.3)
-                : Colors.blue[50],
+                ? theme.colorScheme.primary.withOpacity(0.2)
+                : theme.colorScheme.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             Icons.pie_chart_rounded,
-            color: isDarkMode ? Colors.blue[300] : Colors.blue[700],
+            color: theme.colorScheme.primary,
             size: 22,
           ),
         ),

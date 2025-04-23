@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diary/components/profilepage/expandable_category.dart';
+import 'package:diary/components/animation_widget.dart';
+import 'package:diary/components/diary_entry_card.dart';
+import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -7,27 +9,17 @@ class CollectionSection extends StatelessWidget {
   final List<QueryDocumentSnapshot> favorites;
 
   const CollectionSection({
-    Key? key,
+    super.key,
     required this.favorites,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Group favorites by category
-    final movieFavorites = favorites
-        .where((f) => (f.data() as Map)['category'] == 'movies')
-        .toList();
-    final bookFavorites = favorites
-        .where((f) => (f.data() as Map)['category'] == 'books')
-        .toList();
-    final musicFavorites = favorites
-        .where((f) => (f.data() as Map)['category'] == 'music')
-        .toList();
-    final exerciseFavorites = favorites
-        .where((f) => (f.data() as Map)['category'] == 'exercise')
-        .toList();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Section header
         Padding(
@@ -41,105 +33,103 @@ class CollectionSection extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.red[400]!, Colors.red[700]!],
+                    colors: [Colors.pink[300]!, Colors.pink[600]!],
                   ),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
               const SizedBox(width: 12),
               Text(
-                'My Collection',
+                'Favorites',
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey[800],
+                  color: theme.colorScheme.onBackground,
                   letterSpacing: 0.5,
                 ),
               ),
             ],
           ),
         ),
-
         const SizedBox(height: 20),
 
-        // Categories
-        if (musicFavorites.isNotEmpty)
-          ExpandableCategory(
-            title: 'Music',
-            icon: Icons.music_note_outlined,
-            color: Colors.purple,
-            items: musicFavorites,
-            itemCount: musicFavorites.length,
-          ),
-        if (movieFavorites.isNotEmpty)
-          ExpandableCategory(
-            title: 'Movies',
-            icon: Icons.movie_outlined,
-            color: Colors.indigo,
-            items: movieFavorites,
-            itemCount: movieFavorites.length,
-          ),
-        if (bookFavorites.isNotEmpty)
-          ExpandableCategory(
-            title: 'Books',
-            icon: Icons.book_outlined,
-            color: Colors.teal,
-            items: bookFavorites,
-            itemCount: bookFavorites.length,
-          ),
-        if (exerciseFavorites.isNotEmpty)
-          ExpandableCategory(
-            title: 'Exercise',
-            icon: Icons.fitness_center_outlined,
-            color: Colors.orange,
-            items: exerciseFavorites,
-            itemCount: exerciseFavorites.length,
-          ),
-
-        if (favorites.isEmpty) _buildEmptyState(),
+        // Collection content
+        favorites.isEmpty
+            ? _buildEmptyState(theme)
+            : _buildCollectionGrid(favorites, isDark),
       ],
     );
   }
 
-  Widget _buildEmptyState() {
-    return Container(
-      margin: const EdgeInsets.all(24),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.grey[200]!,
-          width: 1,
+  Widget _buildEmptyState(ThemeData theme) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 30),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 120,
+              width: 120,
+              child: AnimationWidget(
+                animationPath: AppMedia.notfound,
+                repeat: true,
+                animate: true,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No favorites yet',
+              style: GoogleFonts.poppins(
+                color: theme.hintColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            SizedBox(
+              width: 280,
+              child: Text(
+                'Add entries to your favorites to see them here',
+                style: GoogleFonts.poppins(
+                  color: theme.hintColor.withOpacity(0.8),
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.favorite_border_rounded,
-            size: 48,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No favorites yet',
-            style: GoogleFonts.poppins(
-              color: Colors.grey[600],
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Explore recommendations and add them to your collection!',
-            style: GoogleFonts.poppins(
-              color: Colors.grey[500],
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+    );
+  }
+
+  Widget _buildCollectionGrid(
+      List<QueryDocumentSnapshot> favorites, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.85,
+        ),
+        itemCount: favorites.length,
+        itemBuilder: (context, index) {
+          final entryData = favorites[index].data() as Map<String, dynamic>;
+          final entryId = favorites[index].id;
+
+          return DiaryEntryCard(
+            entryId: entryId,
+            entryData: entryData,
+            isFavorited: true,
+          );
+        },
       ),
     );
   }

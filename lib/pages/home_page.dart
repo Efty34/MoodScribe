@@ -43,8 +43,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       drawer: const CustomAppDrawer(),
       body: SafeArea(
         child: Padding(
@@ -54,21 +56,29 @@ class _HomePageState extends State<HomePage> {
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Center(
-                  child: Text('Error: ${snapshot.error}'),
+                  child: Text(
+                    'Error: ${snapshot.error}',
+                    style: TextStyle(color: theme.colorScheme.error),
+                  ),
                 );
               }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
+                return Center(
+                  child: CircularProgressIndicator(
+                    color: theme.colorScheme.primary,
+                  ),
                 );
               }
 
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Center(
+                return Center(
                   child: Text(
                     'No diary entries yet. Add some thoughts!',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: theme.hintColor,
+                    ),
                   ),
                 );
               }
@@ -85,7 +95,7 @@ class _HomePageState extends State<HomePage> {
 
               if (filteredEntries.isEmpty) {
                 if (widget.searchState.query.isNotEmpty) {
-                return Center(
+                  return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -101,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                           'No entries found for "${widget.searchState.query}"',
                           style: GoogleFonts.poppins(
                             fontSize: 16,
-                            color: Colors.grey[600],
+                            color: theme.hintColor,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -110,17 +120,20 @@ class _HomePageState extends State<HomePage> {
                           'Try searching with different keywords',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
-                            color: Colors.grey[500],
+                            color: theme.hintColor.withOpacity(0.8),
                           ),
                         ),
                       ],
                     ),
                   );
                 }
-                return const Center(
+                return Center(
                   child: Text(
                     'No diary entries yet. Add some thoughts!',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: theme.hintColor,
+                    ),
                   ),
                 );
               }
@@ -149,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                             truncatedContent,
                             style: GoogleFonts.poppins(
                               fontSize: 14,
-                              color: Colors.grey[800],
+                              color: theme.colorScheme.onSurface,
                             ),
                           ),
                     mood: mood,
@@ -179,7 +192,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _highlightText(String text, String query) {
-    if (query.isEmpty) return Text(text);
+    final theme = Theme.of(context);
+
+    if (query.isEmpty) {
+      return Text(
+        text,
+        style: TextStyle(color: theme.colorScheme.onSurface),
+      );
+    }
 
     List<TextSpan> spans = [];
     final String lowercaseText = text.toLowerCase();
@@ -201,8 +221,9 @@ class _HomePageState extends State<HomePage> {
         TextSpan(
           text: text.substring(index, index + query.length),
           style: TextStyle(
-            backgroundColor: Colors.blue[100],
+            backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
             fontWeight: FontWeight.bold,
+            color: theme.colorScheme.primary,
           ),
         ),
       );
@@ -211,7 +232,10 @@ class _HomePageState extends State<HomePage> {
     }
 
     return RichText(
-        text: TextSpan(
-            children: spans, style: const TextStyle(color: Colors.black)));
+      text: TextSpan(
+        children: spans,
+        style: TextStyle(color: theme.colorScheme.onSurface),
+      ),
+    );
   }
 }

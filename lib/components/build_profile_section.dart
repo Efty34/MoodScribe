@@ -80,21 +80,19 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDarkMode ? const Color(0xFF2A2D3E) : Colors.white;
-    final textColor = isDarkMode ? Colors.white : const Color(0xFF2E3A59);
-    final subtleTextColor =
-        isDarkMode ? Colors.white70 : const Color(0xFF8D97B5);
-    final shadowColor = isDarkMode
-        ? Colors.black.withOpacity(0.15)
-        : const Color(0xFF8E9FBF).withOpacity(0.08);
-    final dividerColor = isDarkMode ? Colors.white24 : const Color(0xFFECEFF5);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return StreamBuilder<DocumentSnapshot>(
       stream: _userService.getUserProfile(),
       builder: (context, userSnapshot) {
         if (userSnapshot.hasError) {
-          return Center(child: Text('Error: ${userSnapshot.error}'));
+          return Center(
+            child: Text(
+              'Error: ${userSnapshot.error}',
+              style: TextStyle(color: theme.colorScheme.error),
+            ),
+          );
         }
 
         final userData = userSnapshot.data?.data() as Map<String, dynamic>?;
@@ -107,7 +105,7 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
               width: 50,
               height: 50,
               child: CircularProgressIndicator(
-                color: isDarkMode ? Colors.blue[300] : Colors.blue[400],
+                color: theme.colorScheme.primary,
                 strokeWidth: 3,
               ),
             ),
@@ -120,31 +118,33 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
             margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: backgroundColor,
+              color: isDark ? theme.colorScheme.surface : theme.cardColor,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: shadowColor,
+                  color: isDark
+                      ? Colors.black.withOpacity(0.15)
+                      : Colors.black.withOpacity(0.05),
                   offset: const Offset(0, 3),
                   blurRadius: 10,
                   spreadRadius: 0,
                 ),
               ],
-              gradient: isDarkMode
-                  ? const LinearGradient(
+              gradient: isDark
+                  ? LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xFF2A2D3E),
-                        Color(0xFF343A50),
+                        theme.colorScheme.surface,
+                        theme.colorScheme.surface.withOpacity(0.9),
                       ],
                     )
-                  : const LinearGradient(
+                  : LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Colors.white,
-                        Color(0xFFF8FAFF),
+                        theme.cardColor,
+                        theme.cardColor.withOpacity(0.95),
                       ],
                     ),
             ),
@@ -158,16 +158,14 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isDarkMode
-                              ? Colors.blue[700]!
-                              : Colors.blue[100]!,
+                          color: theme.colorScheme.primary
+                              .withOpacity(isDark ? 0.8 : 0.2),
                           width: 2,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: isDarkMode
-                                ? Colors.black.withOpacity(0.2)
-                                : Colors.blue.withOpacity(0.1),
+                            color: theme.colorScheme.primary
+                                .withOpacity(isDark ? 0.2 : 0.1),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -176,8 +174,9 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                       child: CircleAvatar(
                         radius: 26,
                         backgroundImage: const AssetImage(AppMedia.dp),
-                        backgroundColor:
-                            isDarkMode ? Colors.grey[700] : Colors.grey[200],
+                        backgroundColor: isDark
+                            ? theme.colorScheme.surface.withOpacity(0.7)
+                            : theme.colorScheme.secondary.withOpacity(0.2),
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -190,7 +189,7 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                             style: GoogleFonts.nunito(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: textColor,
+                              color: theme.colorScheme.onSurface,
                               letterSpacing: -0.2,
                             ),
                           ),
@@ -198,7 +197,7 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                             email,
                             style: GoogleFonts.nunito(
                               fontSize: 13,
-                              color: subtleTextColor,
+                              color: theme.hintColor,
                               fontWeight: FontWeight.w500,
                               letterSpacing: -0.1,
                             ),
@@ -217,20 +216,23 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                         'Entries',
                         _stats['total_entries'].toString(),
                         AppMedia.diary,
-                        isDarkMode,
+                        isDark,
+                        theme,
                       ),
                       _buildStatCard(
                         'Current',
                         '${_stats['current_streak']} days',
                         AppMedia.fire,
-                        isDarkMode,
+                        isDark,
+                        theme,
                         isHighlighted: true,
                       ),
                       _buildStatCard(
                         'Longest',
                         '${_stats['longest_streak']} days',
                         AppMedia.trophy,
-                        isDarkMode,
+                        isDark,
+                        theme,
                       ),
                     ],
                   ),
@@ -243,12 +245,16 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
     );
   }
 
-  Widget _buildStatCard(
-      String label, String value, String animationPath, bool isDarkMode,
+  Widget _buildStatCard(String label, String value, String animationPath,
+      bool isDark, ThemeData theme,
       {bool isHighlighted = false}) {
-    final Color bgColor = isDarkMode
-        ? (isHighlighted ? const Color(0xFF394263) : const Color(0xFF343A50))
-        : (isHighlighted ? const Color(0xFFF0F5FF) : Colors.white);
+    final Color bgColor = isDark
+        ? (isHighlighted
+            ? theme.colorScheme.primary.withOpacity(0.15)
+            : theme.colorScheme.surface.withOpacity(0.7))
+        : (isHighlighted
+            ? theme.colorScheme.primary.withOpacity(0.05)
+            : theme.cardColor);
 
     return Container(
       width: 90,
@@ -259,9 +265,8 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
         boxShadow: isHighlighted
             ? [
                 BoxShadow(
-                  color: isDarkMode
-                      ? Colors.black.withOpacity(0.15)
-                      : Colors.blue.withOpacity(0.08),
+                  color: theme.colorScheme.primary
+                      .withOpacity(isDark ? 0.15 : 0.08),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -287,14 +292,14 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
             style: GoogleFonts.nunito(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: isDarkMode ? Colors.white : const Color(0xFF2E3A59),
+              color: theme.colorScheme.onSurface,
             ),
           ),
           Text(
             label,
             style: GoogleFonts.nunito(
               fontSize: 12,
-              color: isDarkMode ? Colors.white60 : const Color(0xFF8D97B5),
+              color: theme.hintColor,
               fontWeight: FontWeight.w500,
             ),
           ),

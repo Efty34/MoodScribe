@@ -71,14 +71,12 @@ class _MoodChartState extends State<MoodChart>
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
 
     if (isLoading) {
       return Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(
-            isDarkMode ? Colors.blue[300]! : Colors.blue,
-          ),
+          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
         ),
       );
     }

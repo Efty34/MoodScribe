@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'mood_chart_utils.dart';
-
-/// Legend section that displays percentages and counts for the mood categories
+/// The legend component explaining what the chart colors represent
 class MoodChartLegend extends StatelessWidget {
   final int stressValue;
   final int nonStressValue;
@@ -16,142 +14,110 @@ class MoodChartLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final total = stressValue + nonStressValue;
-    final positivePercentage =
-        MoodChartUtils.calculatePercentage(nonStressValue, total);
-    final stressedPercentage =
-        MoodChartUtils.calculatePercentage(stressValue, total);
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    // Using only monochrome colors (black, white, and grayscale)
+    final positiveColor = isDarkMode
+        ? const Color(0xFF4CAF50)
+        : const Color(0xFF8BC34A); // Green colors for non-stress
+    final stressedColor = isDarkMode
+        ? const Color(0xFFE53935)
+        : const Color(0xFFFF5252); // Red colors for stress
 
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color:
-            isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.grey[50],
+        color: isDarkMode
+            ? theme.colorScheme.surface.withOpacity(0.7)
+            : theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDarkMode ? Colors.grey[700]! : Colors.grey[200]!,
+          color: theme.dividerColor,
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: isDarkMode
-                ? Colors.black.withOpacity(0.1)
-                : Colors.grey.withOpacity(0.05),
-            blurRadius: 10,
-            spreadRadius: -2,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Mood Distribution',
+            style: GoogleFonts.nunito(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onBackground,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildLegendItem(
+            context: context,
+            color: stressedColor,
+            label: 'Stressed',
+            value: stressValue,
+          ),
+          const SizedBox(height: 12),
+          _buildLegendItem(
+            context: context,
+            color: positiveColor,
+            label: 'Not Stressed',
+            value: nonStressValue,
           ),
         ],
       ),
-      child: LayoutBuilder(builder: (context, constraints) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: _buildLegendItem(
-                MoodChartUtils.getPositiveColor(isDarkMode),
-                'Positive',
-                nonStressValue,
-                positivePercentage,
-                MoodChartUtils.getSubTextColor(isDarkMode),
-                isDarkMode,
-                constraints.maxWidth < 300,
-              ),
-            ),
-            Container(
-              height: 40,
-              width: 1,
-              color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
-            ),
-            Expanded(
-              child: _buildLegendItem(
-                MoodChartUtils.getStressedColor(isDarkMode),
-                'Stressed',
-                stressValue,
-                stressedPercentage,
-                MoodChartUtils.getSubTextColor(isDarkMode),
-                isDarkMode,
-                constraints.maxWidth < 300,
-              ),
-            ),
-          ],
-        );
-      }),
     );
   }
 
-  Widget _buildLegendItem(
-    Color color,
-    String label,
-    int value,
-    double percentage,
-    Color? textColor,
-    bool isDarkMode,
-    bool isSmallScreen,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.3),
-                  blurRadius: 4,
-                  spreadRadius: 1,
-                ),
-              ],
+  Widget _buildLegendItem({
+    required BuildContext context,
+    required Color color,
+    required String label,
+    required int value,
+  }) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    return Row(
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: GoogleFonts.nunito(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: theme.colorScheme.onBackground,
+          ),
+        ),
+        const Spacer(),
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 4,
+          ),
+          decoration: BoxDecoration(
+            color: isDarkMode
+                ? Colors.white.withOpacity(0.1)
+                : Colors.black.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Text(
+            '$value',
+            style: GoogleFonts.nunito(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.nunito(
-                    color: textColor,
-                    fontSize: isSmallScreen ? 13 : 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '$value',
-                      style: GoogleFonts.nunito(
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
-                        fontSize: isSmallScreen ? 12 : 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      ' • ${percentage.toStringAsFixed(1)}%',
-                      style: GoogleFonts.nunito(
-                        color: isDarkMode ? Colors.grey[500] : Colors.grey[500],
-                        fontSize: isSmallScreen ? 12 : 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -20,8 +20,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       elevation: 0,
       title: isSearching
           ? TextField(
@@ -31,26 +33,28 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               decoration: InputDecoration(
                 hintText: 'Search entries...',
                 hintStyle: GoogleFonts.poppins(
-                  color: Colors.grey[400],
+                  color: theme.hintColor,
                   fontSize: 16,
                 ),
                 border: InputBorder.none,
               ),
               style: GoogleFonts.poppins(
                 fontSize: 16,
+                color: theme.colorScheme.onSurface,
               ),
             )
           : Text(
               'Mind Journal',
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
               ),
             ),
       actions: [
         IconButton(
           icon: Icon(
             isSearching ? Icons.close : Icons.search,
-            color: Colors.blue,
+            color: theme.colorScheme.primary,
           ),
           onPressed: onSearchToggle,
         ),
