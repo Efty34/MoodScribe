@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diary/components/animation_widget.dart';
 import 'package:diary/services/diary_service.dart';
 import 'package:diary/services/user_service.dart';
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
 
 class BuildProfileSection extends StatefulWidget {
   const BuildProfileSection({super.key});
@@ -16,7 +16,6 @@ class BuildProfileSection extends StatefulWidget {
 class _BuildProfileSectionState extends State<BuildProfileSection>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   final DiaryService _diaryService = DiaryService();
   final UserService _userService = UserService();
@@ -33,21 +32,14 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
-    );
-
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutBack,
-      ),
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeOut,
+        curve: Curves.easeIn,
       ),
     );
 
@@ -88,6 +80,16 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDarkMode ? const Color(0xFF2A2D3E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : const Color(0xFF2E3A59);
+    final subtleTextColor =
+        isDarkMode ? Colors.white70 : const Color(0xFF8D97B5);
+    final shadowColor = isDarkMode
+        ? Colors.black.withOpacity(0.15)
+        : const Color(0xFF8E9FBF).withOpacity(0.08);
+    final dividerColor = isDarkMode ? Colors.white24 : const Color(0xFFECEFF5);
+
     return StreamBuilder<DocumentSnapshot>(
       stream: _userService.getUserProfile(),
       builder: (context, userSnapshot) {
@@ -99,100 +101,141 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
         final username = userData?['username'] ?? 'User';
         final email = userData?['email'] ?? 'No email';
 
-        // ... existing code ...
         if (isLoading) {
           return Center(
             child: SizedBox(
-              width: 200,
-              height: 200,
-              child: Lottie.asset(
-                AppMedia.loading,
-                fit: BoxFit.contain,
-                repeat: true,
-                animate: true,
+              width: 50,
+              height: 50,
+              child: CircularProgressIndicator(
+                color: isDarkMode ? Colors.blue[300] : Colors.blue[400],
+                strokeWidth: 3,
               ),
             ),
           );
         }
-// ... existing code ...
 
-        return ScaleTransition(
-          scale: _scaleAnimation,
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: Container(
-              margin: const EdgeInsets.only(top: 12, left: 12, right: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade200,
-                    offset: const Offset(0, 4),
-                    blurRadius: 12,
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundImage: const AssetImage(AppMedia.dp),
-                        backgroundColor: Colors.grey.shade300,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              username,
-                              style: GoogleFonts.poppins(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[800],
-                              ),
-                            ),
-                            Text(
-                              email,
-                              style: GoogleFonts.poppins(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
+        return FadeTransition(
+          opacity: _fadeAnimation,
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: shadowColor,
+                  offset: const Offset(0, 3),
+                  blurRadius: 10,
+                  spreadRadius: 0,
+                ),
+              ],
+              gradient: isDarkMode
+                  ? const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF2A2D3E),
+                        Color(0xFF343A50),
+                      ],
+                    )
+                  : const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white,
+                        Color(0xFFF8FAFF),
+                      ],
+                    ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      height: 56,
+                      width: 56,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDarkMode
+                              ? Colors.blue[700]!
+                              : Colors.blue[100]!,
+                          width: 2,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDarkMode
+                                ? Colors.black.withOpacity(0.2)
+                                : Colors.blue.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
+                      child: CircleAvatar(
+                        radius: 26,
+                        backgroundImage: const AssetImage(AppMedia.dp),
+                        backgroundColor:
+                            isDarkMode ? Colors.grey[700] : Colors.grey[200],
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            username,
+                            style: GoogleFonts.nunito(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: textColor,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                          Text(
+                            email,
+                            style: GoogleFonts.nunito(
+                              fontSize: 13,
+                              color: subtleTextColor,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: -0.1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 18, bottom: 6),
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildStatItem(
-                        'Total Entries',
+                      _buildStatCard(
+                        'Entries',
                         _stats['total_entries'].toString(),
                         AppMedia.diary,
+                        isDarkMode,
                       ),
-                      _buildDivider(),
-                      _buildStatItem(
-                        'Current Streak',
+                      _buildStatCard(
+                        'Current',
                         '${_stats['current_streak']} days',
                         AppMedia.fire,
+                        isDarkMode,
+                        isHighlighted: true,
                       ),
-                      _buildDivider(),
-                      _buildStatItem(
-                        'Longest Streak',
+                      _buildStatCard(
+                        'Longest',
                         '${_stats['longest_streak']} days',
                         AppMedia.trophy,
+                        isDarkMode,
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -200,44 +243,63 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
     );
   }
 
-  Widget _buildStatItem(String label, String value, String animation) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 48,
-          height: 58,
-          child: Lottie.asset(
-            animation,
-            fit: BoxFit.cover,
-            repeat: true,
-            animate: true,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[800],
-          ),
-        ),
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
-    );
-  }
+  Widget _buildStatCard(
+      String label, String value, String animationPath, bool isDarkMode,
+      {bool isHighlighted = false}) {
+    final Color bgColor = isDarkMode
+        ? (isHighlighted ? const Color(0xFF394263) : const Color(0xFF343A50))
+        : (isHighlighted ? const Color(0xFFF0F5FF) : Colors.white);
 
-  Widget _buildDivider() {
     return Container(
-      height: 40,
-      width: 1,
-      color: Colors.grey[300],
+      width: 90,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: isHighlighted
+            ? [
+                BoxShadow(
+                  color: isDarkMode
+                      ? Colors.black.withOpacity(0.15)
+                      : Colors.blue.withOpacity(0.08),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 40,
+            width: 40,
+            child: AnimationWidget(
+              animationPath: animationPath,
+              fit: BoxFit.contain,
+              repeat: true,
+              animate: true,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: GoogleFonts.nunito(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: isDarkMode ? Colors.white : const Color(0xFF2E3A59),
+            ),
+          ),
+          Text(
+            label,
+            style: GoogleFonts.nunito(
+              fontSize: 12,
+              color: isDarkMode ? Colors.white60 : const Color(0xFF8D97B5),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
