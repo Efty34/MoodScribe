@@ -5,10 +5,10 @@ class ChartContainer extends StatelessWidget {
   final Color shadowColor;
 
   const ChartContainer({
-    Key? key,
+    super.key,
     required this.child,
     required this.shadowColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

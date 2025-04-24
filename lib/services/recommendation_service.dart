@@ -23,7 +23,8 @@ class RecommendationService {
         totalEntries > 0 ? (stressCount / totalEntries) * 100 : 0;
 
     // Get user's favorites
-    final favorites = await _favoritesService.getAllFavorites();
+    final snapshot = await _favoritesService.getFavoritesOnce();
+    final favorites = snapshot.docs;
 
     // Group favorites by category
     final Map<String, List<String>> pastLikings = {

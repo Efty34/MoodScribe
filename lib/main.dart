@@ -5,6 +5,10 @@ import 'package:diary/pages/login_page.dart';
 import 'package:diary/pages/register_page.dart';
 import 'package:diary/pages/settings_page.dart';
 import 'package:diary/pages/stats_page.dart';
+import 'package:diary/services/mood_chart_provider.dart';
+import 'package:diary/services/profile_provider.dart';
+import 'package:diary/services/streak_calendar_provider.dart';
+import 'package:diary/services/stress_chart_provider.dart';
 import 'package:diary/utils/app_routes.dart';
 import 'package:diary/utils/bottom_nav_bar.dart';
 import 'package:diary/utils/monochrome_theme.dart';
@@ -21,8 +25,14 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox<String>('diaryBox');
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
+        ChangeNotifierProvider(create: (_) => MoodChartProvider()),
+        ChangeNotifierProvider(create: (_) => StreakCalendarProvider()),
+        ChangeNotifierProvider(create: (_) => StressChartProvider()),
+      ],
       child: const MyApp(),
     ),
   );

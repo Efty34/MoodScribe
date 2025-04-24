@@ -55,19 +55,17 @@ class FavoritesService {
         .snapshots();
   }
 
-  // Get all favorites as a Future (for one-time fetch)
-  Future<List<DocumentSnapshot>> getAllFavorites() async {
+  // Get favorites as a one-time fetch (for caching)
+  Future<QuerySnapshot> getFavoritesOnce() async {
     if (userId == null) {
-      return [];
+      throw Exception('User not authenticated');
     }
 
-    final QuerySnapshot snapshot = await _firestore
+    return await _firestore
         .collection('users')
         .doc(userId)
         .collection('favorites')
         .orderBy('timestamp', descending: true)
         .get();
-
-    return snapshot.docs;
   }
 }

@@ -1,10 +1,11 @@
 import 'dart:ui';
 
-import 'package:diary/services/diary_service.dart';
+import 'package:diary/services/streak_calendar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class DiaryStreakCalendar extends StatefulWidget {
   const DiaryStreakCalendar({super.key});
@@ -15,11 +16,7 @@ class DiaryStreakCalendar extends StatefulWidget {
 
 class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
     with SingleTickerProviderStateMixin {
-  final DiaryService _diaryService = DiaryService();
-  Map<DateTime, int> datasets = {};
-  int currentStreak = 0;
-  int longestStreak = 0;
-  bool isLoading = true;
+  bool _isRefreshing = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -39,7 +36,15 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
       curve: Curves.easeOut,
     ));
 
-    _loadData();
+    _animationController.forward();
+
+    // Initialize streak data via provider if not already loaded
+    // and setup real-time listeners
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider =
+          Provider.of<StreakCalendarProvider>(context, listen: false);
+      provider.fetchCalendarData();
+    });
   }
 
   @override
@@ -48,80 +53,164 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
     super.dispose();
   }
 
-  Future<void> _loadData() async {
-    try {
-      final heatmapData = await _diaryService.getEntriesForHeatmap();
-      final streakInfo = await _diaryService.getStreakInfo();
+  // Manual refresh function
+  Future<void> _refreshCalendarData() async {
+    setState(() {
+      _isRefreshing = true;
+    });
 
-      if (mounted) {
-        setState(() {
-          datasets = heatmapData;
-          currentStreak = streakInfo['current'] ?? 0;
-          longestStreak = streakInfo['longest'] ?? 0;
-          isLoading = false;
-        });
-        _animationController.forward();
-      }
-    } catch (e) {
-      debugPrint('Error loading data: $e');
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-        _animationController.forward();
-      }
-    }
+    final provider =
+        Provider.of<StreakCalendarProvider>(context, listen: false);
+    await provider.refreshData();
+
+    setState(() {
+      _isRefreshing = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    return Consumer<StreakCalendarProvider>(
+      builder: (context, calendarProvider, _) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
 
-    if (isLoading) {
-      return Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-        ),
-      );
-    }
+        // Show loading state
+        if (calendarProvider.isLoading && !calendarProvider.hasData) {
+          return Center(
+            child: CircularProgressIndicator(
+              valueColor:
+                  AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+            ),
+          );
+        }
 
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(theme, isDark),
-            const SizedBox(height: 24),
-            _buildCalendarCard(theme, isDark),
-            const SizedBox(height: 16),
-            _buildColorLegend(theme, isDark),
-          ],
-        ),
-      ),
+        // Show error state
+        if (calendarProvider.error != null) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: theme.colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    calendarProvider.error!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _refreshCalendarData,
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Use cached data from provider
+        final calendarData = calendarProvider.calendarData;
+        final datasets = calendarData?.datasets ?? {};
+        final currentStreak = calendarData?.currentStreak ?? 0;
+        final longestStreak = calendarData?.longestStreak ?? 0;
+
+        return FadeTransition(
+          opacity: _fadeAnimation,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(theme, isDark, currentStreak, longestStreak,
+                    calendarProvider.isLoading),
+                const SizedBox(height: 24),
+
+                // Show loading indicator during refresh
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    _buildCalendarCard(theme, isDark, datasets),
+
+                    // Show a subtle loading indicator when refreshing
+                    if (calendarProvider.isLoading && calendarProvider.hasData)
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+                _buildColorLegend(theme, isDark),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildHeader(ThemeData theme, bool isDark) {
+  Widget _buildHeader(ThemeData theme, bool isDark, int currentStreak,
+      int longestStreak, bool isLoading) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Writing Streak',
-              style: GoogleFonts.nunito(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.onSurface,
-                letterSpacing: 0.5,
-              ),
+            Row(
+              children: [
+                Text(
+                  'Writing Streak',
+                  style: GoogleFonts.nunito(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? theme.colorScheme.primary.withOpacity(0.15)
+                        : theme.colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$currentStreak days',
+                    style: GoogleFonts.nunito(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ],
             ),
             Text(
-              'Your daily writing journey',
+              'Best: $longestStreak days',
               style: GoogleFonts.nunito(
                 fontSize: 14,
                 color: theme.hintColor,
@@ -130,25 +219,31 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
             ),
           ],
         ),
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: isDark
-                ? theme.colorScheme.primary.withOpacity(0.2)
-                : theme.colorScheme.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            Icons.calendar_month_rounded,
-            color: theme.colorScheme.primary,
-            size: 22,
-          ),
+
+        // Refresh button
+        IconButton(
+          icon: _isRefreshing
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: theme.colorScheme.primary,
+                  ),
+                )
+              : Icon(
+                  Icons.refresh_rounded,
+                  color: theme.colorScheme.primary.withOpacity(0.8),
+                ),
+          onPressed: _isRefreshing ? null : _refreshCalendarData,
+          tooltip: 'Refresh calendar',
         ),
       ],
     );
   }
 
-  Widget _buildCalendarCard(ThemeData theme, bool isDark) {
+  Widget _buildCalendarCard(
+      ThemeData theme, bool isDark, Map<DateTime, int> datasets) {
     // Define green color for both themes
     const Color greenColor = Colors.green;
 
@@ -208,7 +303,8 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
                       4: greenColor.withOpacity(0.7),
                       5: greenColor.withOpacity(0.9),
                     },
-              onClick: (value) => _showEntryDetailsBottomSheet(context, value),
+              onClick: (value) =>
+                  _showEntryDetailsBottomSheet(context, value, datasets),
               margin: const EdgeInsets.symmetric(vertical: 3),
             ),
           ),
@@ -262,7 +358,8 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
     );
   }
 
-  void _showEntryDetailsBottomSheet(BuildContext context, DateTime date) {
+  void _showEntryDetailsBottomSheet(
+      BuildContext context, DateTime date, Map<DateTime, int> datasets) {
     final normalizedDate = DateTime(date.year, date.month, date.day);
     final entries = datasets[normalizedDate] ?? 0;
     final formattedDate = DateFormat('EEEE, MMMM d, yyyy').format(date);
