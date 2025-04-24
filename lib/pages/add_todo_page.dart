@@ -1,3 +1,8 @@
+import 'package:diary/components/todo/action_button.dart';
+import 'package:diary/components/todo/schedule_card.dart';
+import 'package:diary/components/todo/task_input_card.dart';
+import 'package:diary/components/todo/todo_date_time_pickers.dart';
+import 'package:diary/components/todo/todo_feedback.dart';
 import 'package:diary/services/todo_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,30 +21,40 @@ class _AddTodoPageState extends State<AddTodoPage> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   final TodoService _todoService = TodoService();
-  // String? _category;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          'Add New Task',
+          'New Task',
           style: GoogleFonts.poppins(
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,
           ),
         ),
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.colorScheme.onSurface,
-            size: 22,
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? theme.colorScheme.surfaceContainerHighest.withOpacity(0.7)
+                  : theme.colorScheme.surfaceContainerLowest,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: theme.colorScheme.onSurface,
+              size: 18,
+            ),
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -51,255 +66,89 @@ class _AddTodoPageState extends State<AddTodoPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Todo Field
-              Text(
-                'What to do?',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
+              // Task input card
+              TaskInputCard(
                 controller: _titleController,
-                style: theme.textTheme.bodyLarge,
-                maxLines: null,
-                decoration: InputDecoration(
-                  hintText: 'Enter your task',
-                  hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
-                  ),
-                  filled: true,
-                  fillColor: theme.colorScheme.surface,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.all(16),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter your task';
-                  }
-                  return null;
-                },
+                isDark: isDark,
+                theme: theme,
               ),
+
               const SizedBox(height: 24),
 
-              // Date & Time Section
-              Text(
-                'Schedule',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
+              // Schedule card
+              ScheduleCard(
+                theme: theme,
+                isDark: isDark,
+                selectedDate: _selectedDate,
+                selectedTime: _selectedTime,
+                onPickDate: _pickDate,
+                onPickTime: _pickTime,
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      onTap: _pickDate,
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          border: Border.all(
-                              color: theme.colorScheme.primary.withOpacity(0.1),
-                              width: 1.5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.calendar_today,
-                                color: theme.colorScheme.primary, size: 20),
-                            const SizedBox(width: 12),
-                            Text(
-                              _selectedDate == null
-                                  ? 'Select Date'
-                                  : DateFormat('MMM dd, yyyy')
-                                      .format(_selectedDate!),
-                              style: GoogleFonts.poppins(
-                                color: _selectedDate == null
-                                    ? theme.colorScheme.onSurface
-                                        .withOpacity(0.5)
-                                    : theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ],
+
+              const SizedBox(height: 12),
+
+              // Hint about categories
+              Padding(
+                padding: const EdgeInsets.only(left: 8, top: 16),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      size: 16,
+                      color: theme.colorScheme.primary.withOpacity(0.7),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Categories will be automatically assigned based on your task description',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          fontStyle: FontStyle.italic,
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: InkWell(
-                      onTap: _pickTime,
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          border: Border.all(
-                              color: theme.colorScheme.primary.withOpacity(0.1),
-                              width: 1.5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.access_time,
-                                color: theme.colorScheme.primary, size: 20),
-                            const SizedBox(width: 12),
-                            Text(
-                              _selectedTime == null
-                                  ? 'Select Time'
-                                  : _selectedTime!.format(context),
-                              style: GoogleFonts.poppins(
-                                color: _selectedTime == null
-                                    ? theme.colorScheme.onSurface
-                                        .withOpacity(0.5)
-                                    : theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.onSurface.withOpacity(0.1),
-              offset: const Offset(0, -2),
-              blurRadius: 6,
-            ),
-          ],
-        ),
-        child: ElevatedButton(
-          onPressed: _saveTodo,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          child: Text(
-            'Add Task',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onPrimary,
-            ),
-          ),
-        ),
+      bottomNavigationBar: ActionButton(
+        label: 'Create Task',
+        icon: Icons.add_task_rounded,
+        onPressed: _saveTodo,
+        theme: theme,
       ),
     );
   }
 
   void _pickDate() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2101),
+    final date = await TodoDateTimePickers.pickDate(
+      context,
+      initialDate: _selectedDate,
     );
+
     if (date != null) {
       setState(() => _selectedDate = date);
     }
   }
 
   void _pickTime() async {
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
+    final time = await TodoDateTimePickers.pickTime(
+      context,
+      initialTime: _selectedTime,
     );
+
     if (time != null) {
       setState(() => _selectedTime = time);
     }
   }
 
-  // void _showCategorySnackbar(String category) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content: Row(
-  //         children: [
-  //           Icon(
-  //             _getCategoryIcon(category),
-  //             color: Colors.white,
-  //             size: 20,
-  //           ),
-  //           const SizedBox(width: 12),
-  //           Text(
-  //             'Category: ${category.toUpperCase()}',
-  //             style: GoogleFonts.poppins(
-  //               fontSize: 14,
-  //               fontWeight: FontWeight.w500,
-  //               color: Colors.white,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //       backgroundColor: Colors.grey[800],
-  //       behavior: SnackBarBehavior.floating,
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(12),
-  //       ),
-  //       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-  //       duration: const Duration(seconds: 2),
-  //       elevation: 1,
-  //     ),
-  //   );
-  // }
-
-  IconData _getCategoryIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'submission':
-        return Icons.assignment_outlined;
-      case 'shopping':
-        return Icons.shopping_bag_outlined;
-      case 'groceries':
-        return Icons.shopping_cart_outlined;
-      case 'fitness':
-        return Icons.fitness_center_outlined;
-      case 'self-care':
-        return Icons.spa_outlined;
-      case 'social':
-        return Icons.people_outline;
-      case 'medicine':
-        return Icons.medical_services_outlined;
-      default:
-        return Icons.check_circle_outline;
-    }
-  }
-
   void _saveTodo() {
-    final theme = Theme.of(context);
     if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Please enter your task',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onError,
-            ),
-          ),
-          backgroundColor: theme.colorScheme.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          duration: const Duration(seconds: 3),
-          elevation: 1,
-        ),
-      );
+      TodoFeedback.showErrorMessage(context, 'Please enter your task');
       return;
     }
 
@@ -312,55 +161,10 @@ class _AddTodoPageState extends State<AddTodoPage> {
       time: _selectedTime == null ? '' : _selectedTime!.format(context),
     )
         .then((_) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                Icons.check_circle_outline,
-                color: theme.colorScheme.onPrimary,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Task added successfully',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onPrimary,
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: theme.colorScheme.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          duration: const Duration(seconds: 2),
-          elevation: 1,
-        ),
-      );
-      // ignore: use_build_context_synchronously
+      TodoFeedback.showSuccessMessage(context, 'Task added successfully');
       Navigator.pop(context);
     }).catchError((error) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to add task',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onError,
-            ),
-          ),
-          backgroundColor: theme.colorScheme.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
+      TodoFeedback.showErrorMessage(context, 'Failed to add task');
     });
   }
 

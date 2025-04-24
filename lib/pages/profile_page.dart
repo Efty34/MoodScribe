@@ -99,7 +99,7 @@ class ProfilePage extends StatelessWidget {
             Text(
               'Error: $error',
               style: GoogleFonts.poppins(
-                color: theme.colorScheme.onBackground.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,

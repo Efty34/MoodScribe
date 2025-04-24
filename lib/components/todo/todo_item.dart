@@ -108,6 +108,8 @@ class TodoItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TodoService todoService = TodoService();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Dismissible(
       key: Key(todoId),
@@ -115,19 +117,19 @@ class TodoItem extends StatelessWidget {
       background: Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
         decoration: BoxDecoration(
-          color: Colors.blue[600],
-          borderRadius: BorderRadius.circular(12),
+          color: theme.colorScheme.primary.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(16),
         ),
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Row(
           children: [
-            const Icon(Icons.edit_outlined, color: Colors.white),
+            Icon(Icons.edit_outlined, color: theme.colorScheme.secondary),
             const SizedBox(width: 8),
             Text(
               'Edit',
               style: GoogleFonts.poppins(
-                color: Colors.white,
+                color: theme.colorScheme.secondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -137,8 +139,8 @@ class TodoItem extends StatelessWidget {
       secondaryBackground: Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
         decoration: BoxDecoration(
-          color: Colors.red[400],
-          borderRadius: BorderRadius.circular(12),
+          color: theme.colorScheme.error.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(16),
         ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -148,12 +150,12 @@ class TodoItem extends StatelessWidget {
             Text(
               'Delete',
               style: GoogleFonts.poppins(
-                color: Colors.white,
+                color: theme.colorScheme.secondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.delete_outline, color: Colors.white),
+            Icon(Icons.delete_outline, color: theme.colorScheme.secondary),
           ],
         ),
       ),
@@ -172,25 +174,37 @@ class TodoItem extends StatelessWidget {
         }
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 5),
+        margin: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).colorScheme.outline),
+          color: isDark
+              ? theme.colorScheme.surfaceContainerHigh.withOpacity(0.8)
+              : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark
+                ? theme.colorScheme.outline.withOpacity(0.6)
+                : theme.colorScheme.outline.withOpacity(0.6),
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).shadowColor.withOpacity(0.1),
+              color: isDark
+                  ? Colors.black.withOpacity(0.2)
+                  : Colors.black.withOpacity(0.05),
               offset: const Offset(0, 2),
-              blurRadius: 6,
+              blurRadius: 8,
+              spreadRadius: 0,
             ),
           ],
         ),
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(16),
-          leading: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Checkbox(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+            leading: SizedBox(
+              width: 32,
+              height: 32,
+              child: Checkbox(
                 value: data['isDone'] ?? false,
                 onChanged: (value) async {
                   await todoService.toggleTodoStatus(
@@ -198,137 +212,130 @@ class TodoItem extends StatelessWidget {
                     isDone: value ?? false,
                   );
                 },
-                activeColor: Theme.of(context).colorScheme.primary,
+                activeColor: theme.colorScheme.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                side: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.5),
+                  width: 1.5,
                 ),
               ),
-            ],
-          ),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              searchQuery.isNotEmpty
-                  ? _highlightText(data['title'] ?? '', searchQuery, context)
-                  : Text(
-                      data['title'] ?? '',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        decoration: data['isDone'] == true
-                            ? TextDecoration.lineThrough
-                            : null,
-                        color: data['isDone'] == true
-                            ? Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withOpacity(0.6)
-                            : Theme.of(context).colorScheme.onSurface,
+            ),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                searchQuery.isNotEmpty
+                    ? _highlightText(data['title'] ?? '', searchQuery, context)
+                    : Text(
+                        data['title'] ?? '',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          decoration: data['isDone'] == true
+                              ? TextDecoration.lineThrough
+                              : null,
+                          color: data['isDone'] == true
+                              ? theme.colorScheme.onSurface.withOpacity(0.5)
+                              : theme.colorScheme.onSurface,
+                        ),
+                      ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color:
+                            theme.colorScheme.primaryContainer.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Icon(
+                        _getCategoryIcon(data['category'] ?? 'default'),
+                        color: theme.colorScheme.primary,
+                        size: 14,
                       ),
                     ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(4),
+                    const SizedBox(width: 8),
+                    Text(
+                      data['category']?.toString().toUpperCase() ?? 'DEFAULT',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.5,
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
                     ),
-                    child: Icon(
-                      _getCategoryIcon(data['category'] ?? 'default'),
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 15,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    data['category']?.toString().toUpperCase() ?? 'DEFAULT',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.7),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-          subtitle: data['date']?.isNotEmpty ??
-                  false || data['time']?.isNotEmpty ??
-                  false
-              ? Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Row(
-                    children: [
-                      if (data['date']?.isNotEmpty ?? false)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.blue[50],
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                size: 14,
-                                color: Colors.blue[700],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                data['date'],
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: Colors.blue[700],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (data['time']?.isNotEmpty ?? false) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.blue[50],
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.access_time,
-                                size: 14,
-                                color: Colors.blue[700],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                data['time'],
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: Colors.blue[700],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+                  ],
                 )
-              : null,
+              ],
+            ),
+            subtitle: (data['date']?.isNotEmpty ?? false) ||
+                    (data['time']?.isNotEmpty ?? false)
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Row(
+                      children: [
+                        if (data['date']?.isNotEmpty ?? false)
+                          _buildChip(
+                            context: context,
+                            icon: Icons.calendar_today,
+                            label: data['date'],
+                            isDark: isDark,
+                          ),
+                        if (data['time']?.isNotEmpty ?? false) ...[
+                          const SizedBox(width: 8),
+                          _buildChip(
+                            context: context,
+                            icon: Icons.access_time,
+                            label: data['time'],
+                            isDark: isDark,
+                          ),
+                        ],
+                      ],
+                    ),
+                  )
+                : null,
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildChip({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required bool isDark,
+  }) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: isDark
+            ? theme.colorScheme.primaryContainer.withOpacity(0.4)
+            : theme.colorScheme.primaryContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 12,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: theme.colorScheme.primary.withOpacity(0.9),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
