@@ -21,6 +21,8 @@ class _TodoUpperSectionState extends State<TodoUpperSection> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return StreamBuilder<QuerySnapshot>(
       stream: _todoService.getTodos(),
       builder: (context, snapshot) {
@@ -50,7 +52,7 @@ class _TodoUpperSectionState extends State<TodoUpperSection> {
                             'My Tasks',
                             style: GoogleFonts.poppins(
                               fontSize: 20,
-                              color: Colors.black,
+                              color: theme.colorScheme.onBackground,
                               fontWeight: FontWeight.w200,
                             ),
                           ),
@@ -59,7 +61,7 @@ class _TodoUpperSectionState extends State<TodoUpperSection> {
                             '$completedTasks of $totalTasks tasks completed',
                             style: GoogleFonts.poppins(
                               fontSize: 16,
-                              color: Colors.blue,
+                              color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -67,15 +69,15 @@ class _TodoUpperSectionState extends State<TodoUpperSection> {
                       ),
                       FloatingActionButton(
                         onPressed: () => _showAddTodoPage(context),
-                        backgroundColor: Colors.blue,
+                        backgroundColor: theme.colorScheme.primary,
                         elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.add_rounded,
                           size: 30,
-                          color: Colors.white,
+                          color: theme.colorScheme.onPrimary,
                         ),
                       ),
                     ],
@@ -83,9 +85,9 @@ class _TodoUpperSectionState extends State<TodoUpperSection> {
                   const SizedBox(height: 24),
                   LinearProgressIndicator(
                     value: totalTasks == 0 ? 0 : completedTasks / totalTasks,
-                    backgroundColor: Colors.blue[100],
+                    backgroundColor: theme.colorScheme.secondaryContainer,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.blue[700] ?? Colors.blue,
+                      theme.colorScheme.primary,
                     ),
                     borderRadius: BorderRadius.circular(10),
                     minHeight: 10,
@@ -97,35 +99,29 @@ class _TodoUpperSectionState extends State<TodoUpperSection> {
               margin: const EdgeInsets.symmetric(horizontal: 20),
               height: 52,
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: theme.colorScheme.secondaryContainer,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: Colors.blue[200]!,
+                  color: theme.colorScheme.outline,
                   width: 1,
                 ),
               ),
               child: TabBar(
                 dividerColor: Colors.transparent,
                 controller: widget.tabController,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.grey[600],
+                labelColor: theme.colorScheme.onPrimary,
+                unselectedLabelColor:
+                    theme.colorScheme.onSurface.withOpacity(0.7),
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicatorPadding: const EdgeInsets.all(4),
                 padding: const EdgeInsets.all(4),
                 splashBorderRadius: BorderRadius.circular(8),
                 indicator: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.blue[400]!,
-                      Colors.blue[600]!,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: theme.colorScheme.primary,
                   borderRadius: BorderRadius.circular(6),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.blue.withOpacity(0.3),
+                      color: theme.colorScheme.primary.withOpacity(0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),

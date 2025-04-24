@@ -7,10 +7,13 @@ class CategoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +36,7 @@ class CategoryPage extends StatelessWidget {
                       'Find what suits your mood',
                       style: GoogleFonts.poppins(
                         fontSize: 20,
-                        color: Colors.black,
+                        color: theme.colorScheme.onBackground,
                         fontWeight: FontWeight.w200,
                       ),
                     ),
@@ -43,12 +46,11 @@ class CategoryPage extends StatelessWidget {
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  // border: Border.all(color: Colors.blue, width: 1),
-                  color: Colors.white,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.shade200,
+                      color: isDark ? Colors.black12 : Colors.grey.shade200,
                       offset: const Offset(0, 2),
                       blurRadius: 8,
                     ),
@@ -56,10 +58,11 @@ class CategoryPage extends StatelessWidget {
                 ),
                 child: TabBar(
                   dividerColor: Colors.transparent,
-                  labelColor: Colors.blue,
-                  unselectedLabelColor: Colors.grey[400],
+                  labelColor: theme.colorScheme.primary,
+                  unselectedLabelColor:
+                      theme.colorScheme.onSurface.withOpacity(0.5),
                   indicatorSize: TabBarIndicatorSize.label,
-                  indicatorColor: Colors.blue,
+                  indicatorColor: theme.colorScheme.primary,
                   labelStyle: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

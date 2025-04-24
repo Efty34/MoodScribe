@@ -34,6 +34,8 @@ class _RecommendationGridState extends State<RecommendationGrid> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return RefreshIndicator(
       onRefresh: _refreshRecommendations,
       child: FutureBuilder<List<Map<String, dynamic>>>(
@@ -53,7 +55,7 @@ class _RecommendationGridState extends State<RecommendationGrid> {
                   Text(
                     'Finding the best recommendations for you...',
                     style: GoogleFonts.poppins(
-                      color: Colors.grey[600],
+                      color: theme.colorScheme.onBackground.withOpacity(0.6),
                       fontSize: 14,
                     ),
                   ),
@@ -67,12 +69,16 @@ class _RecommendationGridState extends State<RecommendationGrid> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: theme.colorScheme.error,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Error loading recommendations',
                     style: GoogleFonts.poppins(
-                      color: Colors.grey[600],
+                      color: theme.colorScheme.onBackground.withOpacity(0.6),
                       fontSize: 14,
                     ),
                   ),
@@ -99,7 +105,7 @@ class _RecommendationGridState extends State<RecommendationGrid> {
                   Text(
                     'No recommendations found',
                     style: GoogleFonts.poppins(
-                      color: Colors.grey[600],
+                      color: theme.colorScheme.onBackground.withOpacity(0.6),
                       fontSize: 14,
                     ),
                   ),

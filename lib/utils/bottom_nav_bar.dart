@@ -178,13 +178,19 @@ class _BottomNavBarState extends State<BottomNavBar> {
         height: size.width * .155,
         decoration: BoxDecoration(
           color: isDark ? theme.colorScheme.surface : theme.cardColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.3 : 0.15),
-              blurRadius: 30,
-              offset: const Offset(0, 10),
-            ),
-          ],
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.black.withOpacity(isDark ? 0.3 : 0.15),
+          //     blurRadius: 30,
+          //     offset: const Offset(0, 10),
+          //   ),
+          // ],
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.black12.withOpacity(0.1),
+            width: 1,
+          ),
           borderRadius: BorderRadius.circular(50),
         ),
         child: ListView.builder(

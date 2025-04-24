@@ -39,14 +39,19 @@ class _RecommendationCardState extends State<RecommendationCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.black.withOpacity(0.2)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -75,7 +80,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
                             style: GoogleFonts.playfairDisplay(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.grey[900],
+                              color: theme.colorScheme.onSurface,
                               height: 1.2,
                             ),
                             maxLines: 2,
@@ -88,7 +93,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
                         Wrap(
                           spacing: 6,
                           runSpacing: 6,
-                          children: _buildGenreTags(),
+                          children: _buildGenreTags(isDark),
                         ),
                       const SizedBox(height: 12),
                       Row(
@@ -96,7 +101,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
                           Icon(
                             _getCategoryIcon(),
                             size: 16,
-                            color: Colors.grey[600],
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -104,7 +109,8 @@ class _RecommendationCardState extends State<RecommendationCard> {
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.6),
                               letterSpacing: 1,
                             ),
                           ),
@@ -123,7 +129,9 @@ class _RecommendationCardState extends State<RecommendationCard> {
                               height: 140,
                               width: 100,
                               decoration: BoxDecoration(
-                                color: Colors.orange[50],
+                                color: isDark
+                                    ? Colors.orange.withOpacity(0.2)
+                                    : Colors.orange[50],
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Column(
@@ -132,7 +140,9 @@ class _RecommendationCardState extends State<RecommendationCard> {
                                   Icon(
                                     Icons.fitness_center_rounded,
                                     size: 40,
-                                    color: Colors.orange[700],
+                                    color: isDark
+                                        ? Colors.orange[300]
+                                        : Colors.orange[700],
                                   ),
                                   const SizedBox(height: 8),
                                   Container(
@@ -141,7 +151,9 @@ class _RecommendationCardState extends State<RecommendationCard> {
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.orange[100],
+                                      color: isDark
+                                          ? Colors.orange.withOpacity(0.3)
+                                          : Colors.orange[100],
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -150,7 +162,9 @@ class _RecommendationCardState extends State<RecommendationCard> {
                                           'Exercise',
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
-                                        color: Colors.orange[700],
+                                        color: isDark
+                                            ? Colors.orange[100]
+                                            : Colors.orange[700],
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -170,13 +184,18 @@ class _RecommendationCardState extends State<RecommendationCard> {
                                     height: 140,
                                     width: 100,
                                     decoration: BoxDecoration(
-                                      color: Colors.grey[100],
+                                      color: isDark
+                                          ? theme.colorScheme.surface
+                                          : Colors.grey[100],
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: Icon(
                                       Icons.image_not_supported_rounded,
                                       size: 32,
-                                      color: Colors.grey[400],
+                                      color: isDark
+                                          ? theme.colorScheme.onSurface
+                                              .withOpacity(0.3)
+                                          : Colors.grey[400],
                                     ),
                                   );
                                 },
@@ -194,7 +213,9 @@ class _RecommendationCardState extends State<RecommendationCard> {
                           child: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.3),
+                              color: isDark
+                                  ? Colors.black.withOpacity(0.5)
+                                  : Colors.black.withOpacity(0.3),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -218,7 +239,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
     );
   }
 
-  List<Widget> _buildGenreTags() {
+  List<Widget> _buildGenreTags(bool isDark) {
     List<dynamic> genres = [];
     if (widget.category == 'movies') {
       genres = (widget.genres as List?)?.map((g) => g['name']).toList() ?? [];
@@ -237,14 +258,14 @@ class _RecommendationCardState extends State<RecommendationCard> {
         .map((genre) => Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: _getGenreColor(),
+                color: _getGenreColor(isDark),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 genre.toString().toUpperCase(),
                 style: GoogleFonts.poppins(
                   fontSize: 12,
-                  color: _getGenreTextColor(),
+                  color: _getGenreTextColor(isDark),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -252,33 +273,33 @@ class _RecommendationCardState extends State<RecommendationCard> {
         .toList();
   }
 
-  Color _getGenreColor() {
+  Color _getGenreColor(bool isDark) {
     switch (widget.category) {
       case 'movies':
-        return Colors.indigo[50]!;
+        return isDark ? Colors.indigo[900]! : Colors.indigo[50]!;
       case 'books':
-        return Colors.teal[50]!;
+        return isDark ? Colors.teal[900]! : Colors.teal[50]!;
       case 'music':
-        return Colors.purple[50]!;
+        return isDark ? Colors.purple[900]! : Colors.purple[50]!;
       case 'exercise':
-        return Colors.orange[50]!;
+        return isDark ? Colors.orange[900]! : Colors.orange[50]!;
       default:
-        return Colors.grey[50]!;
+        return isDark ? Colors.grey[900]! : Colors.grey[50]!;
     }
   }
 
-  Color _getGenreTextColor() {
+  Color _getGenreTextColor(bool isDark) {
     switch (widget.category) {
       case 'movies':
-        return Colors.indigo[700]!;
+        return isDark ? Colors.indigo[100]! : Colors.indigo[700]!;
       case 'books':
-        return Colors.teal[700]!;
+        return isDark ? Colors.teal[100]! : Colors.teal[700]!;
       case 'music':
-        return Colors.purple[700]!;
+        return isDark ? Colors.purple[100]! : Colors.purple[700]!;
       case 'exercise':
-        return Colors.orange[700]!;
+        return isDark ? Colors.orange[100]! : Colors.orange[700]!;
       default:
-        return Colors.grey[700]!;
+        return isDark ? Colors.grey[100]! : Colors.grey[700]!;
     }
   }
 

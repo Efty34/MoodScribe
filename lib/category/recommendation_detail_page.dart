@@ -11,8 +11,12 @@ class RecommendationDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the current theme and check if it's dark mode
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -35,8 +39,12 @@ class RecommendationDetailPage extends StatelessWidget {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Colors.orange[300]!,
-                                  Colors.orange[700]!,
+                                  isDark
+                                      ? Colors.grey[700]!
+                                      : Colors.orange[300]!,
+                                  isDark
+                                      ? Colors.grey[900]!
+                                      : Colors.orange[700]!,
                                 ],
                               ),
                             ),
@@ -46,7 +54,7 @@ class RecommendationDetailPage extends StatelessWidget {
                                 Icon(
                                   Icons.fitness_center_rounded,
                                   size: 80,
-                                  color: Colors.white,
+                                  color: theme.colorScheme.onPrimary,
                                 ),
                                 const SizedBox(height: 16),
                                 Container(
@@ -55,14 +63,15 @@ class RecommendationDetailPage extends StatelessWidget {
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
+                                    color: theme.colorScheme.onPrimary
+                                        .withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
                                     recommendation['type'] ?? 'Exercise',
                                     style: GoogleFonts.poppins(
                                       fontSize: 18,
-                                      color: Colors.white,
+                                      color: theme.colorScheme.onPrimary,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -83,7 +92,9 @@ class RecommendationDetailPage extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.7),
+                          isDark
+                              ? Colors.black.withOpacity(0.8)
+                              : Colors.black.withOpacity(0.7),
                         ],
                       ),
                     ),
@@ -94,12 +105,12 @@ class RecommendationDetailPage extends StatelessWidget {
             leading: Container(
               margin: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
+                color: theme.colorScheme.background.withOpacity(0.3),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                color: Colors.white,
+                color: theme.colorScheme.onPrimary,
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -108,9 +119,10 @@ class RecommendationDetailPage extends StatelessWidget {
             child: Transform.translate(
               offset: const Offset(0, -60),
               child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(30)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(24, 70, 24, 24),
@@ -126,7 +138,7 @@ class RecommendationDetailPage extends StatelessWidget {
                             style: GoogleFonts.poppins(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: Colors.grey[900],
+                              color: theme.colorScheme.onBackground,
                             ),
                           ),
                         ),
@@ -137,7 +149,9 @@ class RecommendationDetailPage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.blue[50],
+                            color: isDark
+                                ? theme.colorScheme.primaryContainer
+                                : Colors.blue[50],
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -145,14 +159,14 @@ class RecommendationDetailPage extends StatelessWidget {
                                 recommendation['description'],
                             style: GoogleFonts.poppins(
                               fontSize: 16,
-                              color: Colors.grey[800],
+                              color: theme.colorScheme.onSurface,
                               height: 1.6,
                             ),
                           ),
                         ),
                         const SizedBox(height: 24),
                       ],
-                      _buildCategorySpecificDetails(),
+                      _buildCategorySpecificDetails(context),
                     ],
                   ),
                 ),
@@ -164,29 +178,35 @@ class RecommendationDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCategorySpecificDetails() {
+  Widget _buildCategorySpecificDetails(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     switch (recommendation['category']) {
       case 'movies':
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildInfoCard(
+              context: context,
               title: 'Movie Details',
               content: Column(
                 children: [
-                  _buildDetailRow('Director', recommendation['director']),
                   _buildDetailRow(
-                      'Release Date', recommendation['releaseDate']),
+                      context, 'Director', recommendation['director']),
                   _buildDetailRow(
-                      'Rating', '${recommendation['voteAverage']}/10'),
+                      context, 'Release Date', recommendation['releaseDate']),
                   _buildDetailRow(
-                      'Runtime', '${recommendation['runtime']} minutes'),
+                      context, 'Rating', '${recommendation['voteAverage']}/10'),
+                  _buildDetailRow(context, 'Runtime',
+                      '${recommendation['runtime']} minutes'),
                 ],
               ),
             ),
             const SizedBox(height: 20),
             if (recommendation['genres'] != null)
               _buildInfoCard(
+                context: context,
                 title: 'Genres',
                 content: Wrap(
                   spacing: 8,
@@ -196,13 +216,17 @@ class RecommendationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.indigo[50],
+                              color: isDark
+                                  ? theme.colorScheme.secondary
+                                  : Colors.indigo[50],
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               genre['name'],
                               style: GoogleFonts.poppins(
-                                color: Colors.indigo[700],
+                                color: isDark
+                                    ? theme.colorScheme.onSecondary
+                                    : Colors.indigo[700],
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -213,6 +237,7 @@ class RecommendationDetailPage extends StatelessWidget {
             const SizedBox(height: 20),
             if (recommendation['cast'] != null)
               _buildInfoCard(
+                context: context,
                 title: 'Cast',
                 content: Wrap(
                   spacing: 8,
@@ -222,13 +247,17 @@ class RecommendationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.purple[50],
+                              color: isDark
+                                  ? theme.colorScheme.primaryContainer
+                                  : Colors.purple[50],
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               actor,
                               style: GoogleFonts.poppins(
-                                color: Colors.purple[700],
+                                color: isDark
+                                    ? theme.colorScheme.onSurface
+                                    : Colors.purple[700],
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -244,18 +273,20 @@ class RecommendationDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildInfoCard(
+              context: context,
               title: 'Book Details',
               content: Column(
                 children: [
                   if (recommendation['authors'] != null)
-                    _buildDetailRow('Author',
+                    _buildDetailRow(context, 'Author',
                         (recommendation['authors'] as List).join(', ')),
-                  _buildDetailRow('Published', recommendation['publishedDate']),
-                  _buildDetailRow('Pages',
+                  _buildDetailRow(
+                      context, 'Published', recommendation['publishedDate']),
+                  _buildDetailRow(context, 'Pages',
                       recommendation['pageCount']?.toString() ?? 'Unknown'),
                   if (recommendation['averageRating'] != null)
-                    _buildDetailRow(
-                        'Rating', '${recommendation['averageRating']}/5 stars'),
+                    _buildDetailRow(context, 'Rating',
+                        '${recommendation['averageRating']}/5 stars'),
                 ],
               ),
             ),
@@ -263,6 +294,7 @@ class RecommendationDetailPage extends StatelessWidget {
             if (recommendation['categories'] != null &&
                 (recommendation['categories'] as List).isNotEmpty)
               _buildInfoCard(
+                context: context,
                 title: 'Genres',
                 content: Wrap(
                   spacing: 8,
@@ -272,13 +304,17 @@ class RecommendationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.teal[50],
+                              color: isDark
+                                  ? theme.colorScheme.secondary
+                                  : Colors.teal[50],
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               category,
                               style: GoogleFonts.poppins(
-                                color: Colors.teal[700],
+                                color: isDark
+                                    ? theme.colorScheme.onSecondary
+                                    : Colors.teal[700],
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -294,19 +330,22 @@ class RecommendationDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildInfoCard(
+              context: context,
               title: 'Track Details',
               content: Column(
                 children: [
-                  _buildDetailRow('Artist', recommendation['artist']),
-                  _buildDetailRow('Album', recommendation['album']),
+                  _buildDetailRow(context, 'Artist', recommendation['artist']),
+                  _buildDetailRow(context, 'Album', recommendation['album']),
                   _buildDetailRow(
-                      'Release Date', recommendation['releaseDate']),
+                      context, 'Release Date', recommendation['releaseDate']),
                   _buildDetailRow(
+                    context,
                     'Duration',
                     _formatDuration(recommendation['duration']),
                   ),
                   if (recommendation['popularity'] != null)
-                    _buildPopularityIndicator(recommendation['popularity']),
+                    _buildPopularityIndicator(
+                        context, recommendation['popularity']),
                 ],
               ),
             ),
@@ -318,22 +357,25 @@ class RecommendationDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildInfoCard(
+              context: context,
               title: 'Exercise Details',
               content: Column(
                 children: [
-                  _buildDetailRow('Type', recommendation['type']),
+                  _buildDetailRow(context, 'Type', recommendation['type']),
+                  _buildDetailRow(context, 'Duration',
+                      '${recommendation['duration']} minutes'),
+                  _buildDetailRow(context, 'Intensity',
+                      recommendation['intensity'].toUpperCase()),
                   _buildDetailRow(
-                      'Duration', '${recommendation['duration']} minutes'),
-                  _buildDetailRow(
-                      'Intensity', recommendation['intensity'].toUpperCase()),
-                  _buildDetailRow('Location', recommendation['location']),
-                  _buildDetailRow('Calories/Hour',
+                      context, 'Location', recommendation['location']),
+                  _buildDetailRow(context, 'Calories/Hour',
                       '${recommendation['caloriesBurnedPerHour']} kcal'),
                 ],
               ),
             ),
             const SizedBox(height: 20),
             _buildInfoCard(
+              context: context,
               title: 'Benefits',
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,14 +387,17 @@ class RecommendationDetailPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Icon(Icons.check_circle_outline,
-                                    size: 20, color: Colors.green[600]),
+                                    size: 20,
+                                    color: isDark
+                                        ? theme.colorScheme.primary
+                                        : Colors.green[600]),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     benefit,
                                     style: GoogleFonts.poppins(
                                       fontSize: 14,
-                                      color: Colors.grey[800],
+                                      color: theme.colorScheme.onSurface,
                                     ),
                                   ),
                                 ),
@@ -364,6 +409,7 @@ class RecommendationDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             _buildInfoCard(
+              context: context,
               title: 'Instructions',
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,14 +426,18 @@ class RecommendationDetailPage extends StatelessWidget {
                                   width: 24,
                                   height: 24,
                                   decoration: BoxDecoration(
-                                    color: Colors.orange[100],
+                                    color: isDark
+                                        ? theme.colorScheme.secondaryContainer
+                                        : Colors.orange[100],
                                     shape: BoxShape.circle,
                                   ),
                                   child: Center(
                                     child: Text(
                                       '${entry.key + 1}',
                                       style: GoogleFonts.poppins(
-                                        color: Colors.orange[700],
+                                        color: isDark
+                                            ? theme.colorScheme.onSecondary
+                                            : Colors.orange[700],
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -399,7 +449,7 @@ class RecommendationDetailPage extends StatelessWidget {
                                     entry.value,
                                     style: GoogleFonts.poppins(
                                       fontSize: 14,
-                                      color: Colors.grey[800],
+                                      color: theme.colorScheme.onSurface,
                                     ),
                                   ),
                                 ),
@@ -413,6 +463,7 @@ class RecommendationDetailPage extends StatelessWidget {
                 (recommendation['equipment'] as List).isNotEmpty) ...[
               const SizedBox(height: 20),
               _buildInfoCard(
+                context: context,
                 title: 'Equipment Needed',
                 content: Wrap(
                   spacing: 8,
@@ -422,13 +473,17 @@ class RecommendationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.orange[50],
+                              color: isDark
+                                  ? theme.colorScheme.secondary
+                                  : Colors.orange[50],
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               item,
                               style: GoogleFonts.poppins(
-                                color: Colors.orange[700],
+                                color: isDark
+                                    ? theme.colorScheme.onSecondary
+                                    : Colors.orange[700],
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -445,16 +500,24 @@ class RecommendationDetailPage extends StatelessWidget {
     }
   }
 
-  Widget _buildInfoCard({required String title, required Widget content}) {
+  Widget _buildInfoCard(
+      {required BuildContext context,
+      required String title,
+      required Widget content}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: isDark ? theme.cardColor : Colors.grey[50],
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: isDark
+                ? Colors.black.withOpacity(0.2)
+                : Colors.black.withOpacity(0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -468,7 +531,7 @@ class RecommendationDetailPage extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[800],
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 16),
@@ -478,7 +541,10 @@ class RecommendationDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPopularityIndicator(int popularity) {
+  Widget _buildPopularityIndicator(BuildContext context, int popularity) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -487,7 +553,7 @@ class RecommendationDetailPage extends StatelessWidget {
           'Popularity',
           style: GoogleFonts.poppins(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: theme.hintColor,
           ),
         ),
         const SizedBox(height: 8),
@@ -495,13 +561,15 @@ class RecommendationDetailPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           child: LinearProgressIndicator(
             value: popularity / 100,
-            backgroundColor: Colors.grey[200],
+            backgroundColor: isDark ? theme.dividerColor : Colors.grey[200],
             valueColor: AlwaysStoppedAnimation<Color>(
-              popularity > 70
-                  ? Colors.green[400]!
-                  : popularity > 40
-                      ? Colors.orange[400]!
-                      : Colors.red[400]!,
+              isDark
+                  ? theme.colorScheme.primary
+                  : popularity > 70
+                      ? Colors.green[400]!
+                      : popularity > 40
+                          ? Colors.orange[400]!
+                          : Colors.red[400]!,
             ),
             minHeight: 8,
           ),
@@ -510,7 +578,9 @@ class RecommendationDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String? value) {
+  Widget _buildDetailRow(BuildContext context, String label, String? value) {
+    final theme = Theme.of(context);
+
     if (value == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -521,7 +591,7 @@ class RecommendationDetailPage extends StatelessWidget {
             label,
             style: GoogleFonts.poppins(
               fontSize: 14,
-              color: Colors.grey[600],
+              color: theme.hintColor,
             ),
           ),
           const SizedBox(width: 8),
@@ -530,7 +600,7 @@ class RecommendationDetailPage extends StatelessWidget {
               value,
               style: GoogleFonts.poppins(
                 fontSize: 14,
-                color: Colors.grey[800],
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.right,

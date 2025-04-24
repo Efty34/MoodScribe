@@ -23,7 +23,7 @@ class TodoService {
 
   // Get todos for current user
   Stream<QuerySnapshot> getTodos() {
-    if (userId == null) return Stream.empty();
+    if (userId == null) return const Stream.empty();
 
     return _firestore
         .collection('users')
@@ -105,11 +105,14 @@ Response format: Only the category name in lowercase, nothing else.
     required String title,
     String? date,
     String? time,
+    String? category,
   }) async {
     if (userId == null) return;
 
-    // Determine new category using Gemini
-    final category = await _determineCategory(title);
+    // Use provided category or determine new category using Gemini
+    final todoCategory = category != null && category.isNotEmpty
+        ? category.toLowerCase()
+        : await _determineCategory(title);
 
     await _firestore
         .collection('users')
@@ -120,13 +123,13 @@ Response format: Only the category name in lowercase, nothing else.
       'title': title,
       'date': date ?? '',
       'time': time ?? '',
-      'category': category,
+      'category': todoCategory,
     });
   }
 
   // Get todos by category
   Stream<QuerySnapshot> getTodosByCategory(String category) {
-    if (userId == null) return Stream.empty();
+    if (userId == null) return const Stream.empty();
 
     return _firestore
         .collection('users')
@@ -168,7 +171,7 @@ Response format: Only the category name in lowercase, nothing else.
 
   // Get todos by completion status
   Stream<QuerySnapshot> getTodosByStatus({required bool isDone}) {
-    if (userId == null) return Stream.empty();
+    if (userId == null) return const Stream.empty();
 
     return _firestore
         .collection('users')

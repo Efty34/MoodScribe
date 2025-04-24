@@ -20,15 +20,17 @@ class _AddTodoPageState extends State<AddTodoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(
           'Add New Task',
           style: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -36,7 +38,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new,
-            color: Colors.grey[800],
+            color: theme.colorScheme.onSurface,
             size: 22,
           ),
           onPressed: () => Navigator.pop(context),
@@ -52,22 +54,22 @@ class _AddTodoPageState extends State<AddTodoPage> {
               // Todo Field
               Text(
                 'What to do?',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _titleController,
-                style: GoogleFonts.poppins(),
+                style: theme.textTheme.bodyLarge,
                 maxLines: null,
                 decoration: InputDecoration(
                   hintText: 'Enter your task',
-                  hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
+                  hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  ),
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: theme.colorScheme.surface,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -86,10 +88,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
               // Date & Time Section
               Text(
                 'Schedule',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -101,13 +101,16 @@ class _AddTodoPageState extends State<AddTodoPage> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: theme.colorScheme.surface,
+                          border: Border.all(
+                              color: theme.colorScheme.primary.withOpacity(0.1),
+                              width: 1.5),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           children: [
                             Icon(Icons.calendar_today,
-                                color: Colors.blue[700], size: 20),
+                                color: theme.colorScheme.primary, size: 20),
                             const SizedBox(width: 12),
                             Text(
                               _selectedDate == null
@@ -116,8 +119,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
                                       .format(_selectedDate!),
                               style: GoogleFonts.poppins(
                                 color: _selectedDate == null
-                                    ? Colors.grey[500]
-                                    : Colors.grey[800],
+                                    ? theme.colorScheme.onSurface
+                                        .withOpacity(0.5)
+                                    : theme.colorScheme.onSurface,
                               ),
                             ),
                           ],
@@ -132,13 +136,16 @@ class _AddTodoPageState extends State<AddTodoPage> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: theme.colorScheme.surface,
+                          border: Border.all(
+                              color: theme.colorScheme.primary.withOpacity(0.1),
+                              width: 1.5),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           children: [
                             Icon(Icons.access_time,
-                                color: Colors.blue[700], size: 20),
+                                color: theme.colorScheme.primary, size: 20),
                             const SizedBox(width: 12),
                             Text(
                               _selectedTime == null
@@ -146,8 +153,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
                                   : _selectedTime!.format(context),
                               style: GoogleFonts.poppins(
                                 color: _selectedTime == null
-                                    ? Colors.grey[500]
-                                    : Colors.grey[800],
+                                    ? theme.colorScheme.onSurface
+                                        .withOpacity(0.5)
+                                    : theme.colorScheme.onSurface,
                               ),
                             ),
                           ],
@@ -164,10 +172,10 @@ class _AddTodoPageState extends State<AddTodoPage> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade200,
+              color: theme.colorScheme.onSurface.withOpacity(0.1),
               offset: const Offset(0, -2),
               blurRadius: 6,
             ),
@@ -176,7 +184,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
         child: ElevatedButton(
           onPressed: _saveTodo,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue[700],
+            backgroundColor: theme.colorScheme.primary,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -187,7 +195,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: theme.colorScheme.onPrimary,
             ),
           ),
         ),
@@ -272,18 +280,17 @@ class _AddTodoPageState extends State<AddTodoPage> {
   }
 
   void _saveTodo() {
+    final theme = Theme.of(context);
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             'Please enter your task',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onError,
             ),
           ),
-          backgroundColor: Colors.grey[800],
+          backgroundColor: theme.colorScheme.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -310,23 +317,21 @@ class _AddTodoPageState extends State<AddTodoPage> {
         SnackBar(
           content: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.check_circle_outline,
-                color: Colors.green,
+                color: theme.colorScheme.onPrimary,
                 size: 20,
               ),
               const SizedBox(width: 12),
               Text(
                 'Task added successfully',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onPrimary,
                 ),
               ),
             ],
           ),
-          backgroundColor: Colors.grey[800],
+          backgroundColor: theme.colorScheme.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -344,9 +349,11 @@ class _AddTodoPageState extends State<AddTodoPage> {
         SnackBar(
           content: Text(
             'Failed to add task',
-            style: GoogleFonts.poppins(),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onError,
+            ),
           ),
-          backgroundColor: Colors.red[400],
+          backgroundColor: theme.colorScheme.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),

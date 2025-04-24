@@ -255,4 +255,55 @@ class DiaryService {
       return {'current': 0, 'longest': 0, 'total': 0};
     }
   }
+
+  // Get stress and non-stress entries grouped by day
+  Future<Map<String, Map<String, int>>> getStressDataByDay(int days) async {
+    try {
+      // Calculate the date range (today minus specified days)
+      final DateTime now = DateTime.now();
+      final DateTime startDate =
+          DateTime(now.year, now.month, now.day - (days - 1))
+              .subtract(const Duration(milliseconds: 1));
+
+      final QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('diary')
+          .where('date', isGreaterThanOrEqualTo: startDate)
+          .orderBy('date', descending: false)
+          .get();
+
+      // Group entries by day and count stress vs non-stress
+      final Map<String, Map<String, int>> result = {};
+
+      // Initialize all days in range with zero counts
+      for (int i = 0; i < days; i++) {
+        final DateTime date =
+            DateTime(now.year, now.month, now.day - (days - 1) + i);
+        final String dateKey = '${date.month}-${date.day}';
+        result[dateKey] = {'stress': 0, 'non-stress': 0};
+      }
+
+      // Count entries by day and mood
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final timestamp = data['date'] as Timestamp;
+        final date = timestamp.toDate();
+        final String dateKey = '${date.month}-${date.day}';
+        final String mood = data['mood'] as String;
+
+        // Skip if the date is not in our range
+        if (!result.containsKey(dateKey)) continue;
+
+        // Map 'stress' directly, anything else goes to 'non-stress'
+        final String moodKey = mood == 'stress' ? 'stress' : 'non-stress';
+        result[dateKey]![moodKey] = (result[dateKey]![moodKey] ?? 0) + 1;
+      }
+
+      return result;
+    } catch (e) {
+      debugPrint('Error getting stress data by day: $e');
+      return {};
+    }
+  }
 }

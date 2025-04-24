@@ -1,4 +1,5 @@
 import 'package:diary/components/diary_streak_calendar.dart';
+import 'package:diary/components/stress_bar_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -69,6 +70,25 @@ class StatsPage extends StatelessWidget {
                   ],
                 ),
                 child: const DiaryStreakCalendar(),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Stress Bar Chart
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const StressBarChart(days: 90), // Show a month of data
               ),
 
               const SizedBox(height: 24),
