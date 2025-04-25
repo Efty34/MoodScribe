@@ -82,12 +82,6 @@ class CustomAppDrawer extends StatelessWidget {
                     ),
                   ),
                   // Logout button as icon in header
-                  IconButton(
-                    icon: const Icon(Icons.logout_rounded, size: 20),
-                    color: Colors.grey[600],
-                    onPressed: () => LogoutManager.handleLogout(context),
-                    tooltip: 'Logout',
-                  ),
                 ],
               ),
             ),
@@ -150,15 +144,28 @@ class CustomAppDrawer extends StatelessWidget {
               ),
             ),
 
-            // Version text at bottom
             Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Version 1.0.0',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Version text at bottom
+                  Text(
+                    'Version 1.0.0',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+
+                  IconButton(
+                    alignment: Alignment.bottomRight,
+                    icon: const Icon(Icons.logout_rounded, size: 26),
+                    color: Colors.red,
+                    onPressed: () => LogoutManager.handleLogout(context),
+                    tooltip: 'Logout',
+                  ),
+                ],
               ),
             ),
           ],

@@ -102,192 +102,269 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
+    // Get theme brightness to adapt UI to light/dark mode
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+    final screenSize = MediaQuery.of(context).size;
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        resizeToAvoidBottomInset: false,
-        body: Column(
-          children: [
-            // Top Image and Welcome Section
-            Container(
-              height: MediaQuery.of(context).size.height * 0.4,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(AppMedia.loginbg),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(60),
-                  bottomRight: Radius.circular(60),
-                ),
-                // boxShadow: [
-                //   BoxShadow(
-                //     color: Colors.black.withOpacity(0.1),
-                //     blurRadius: 20,
-                //     offset: const Offset(0, 10),
-                //   ),
-                // ],
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(60),
-                    bottomRight: Radius.circular(60),
-                  ),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withOpacity(0.1),
-                      Colors.black.withOpacity(0.5),
-                    ],
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Welcome Back!',
-                      style: GoogleFonts.poppins(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+        // Use theme-aware background color
+        backgroundColor: colorScheme.background,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: SizedBox(
+              height: screenSize.height - MediaQuery.of(context).padding.top,
+              child: Stack(
+                children: [
+                  // Gradient background - subtle and adapts to theme
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: isDarkMode
+                            ? [
+                                colorScheme.surface,
+                                colorScheme.background,
+                              ]
+                            : [
+                                colorScheme.surface,
+                                colorScheme.background,
+                              ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Login to continue your journey',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ),
+                  ),
 
-            // Login Form Section
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
+                  // Login content
+                  Column(
                     children: [
-                      const SizedBox(height: 40),
-                      ModernTextField(
-                        controller: emailController,
-                        hintText: 'Enter Email',
-                        keyboardType: TextInputType.emailAddress,
-                        prefixIcon: const Icon(
-                          Icons.email_outlined,
-                          color: Colors.blue,
-                          size: 20,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!value.contains('@')) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      ModernTextField(
-                        controller: passwordController,
-                        hintText: 'Enter Password',
-                        obscureText: true,
-                        prefixIcon: const Icon(
-                          Icons.lock_outline_rounded,
-                          color: Colors.blue,
-                          size: 20,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      // Replace the MyButton with AnimatedButton
-                      AnimatedButton(
-                        text: "Sign In",
-                        onTap: _isLoading ? null : () => _signIn(),
-                        isLoading: _isLoading,
-                      ),
-                      // const Spacer(),
-                      const SizedBox(height: 20),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Not a member? ",
-                            style: GoogleFonts.poppins(
-                              color: Colors.grey[700],
-                              fontSize: 14,
+                      // Top image section with curved bottom
+                      Hero(
+                        tag: 'login_image',
+                        child: Container(
+                          height: screenSize.height * 0.35,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            image: const DecorationImage(
+                              image: AssetImage(AppMedia.loginbg),
+                              fit: BoxFit.cover,
                             ),
+                            borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(0),
+                                bottomRight: Radius.circular(0),
+                                topLeft: Radius.circular(0),
+                                topRight: Radius.circular(0)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: colorScheme.shadow.withOpacity(0.2),
+                                blurRadius: 15,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
                           ),
-                          MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const RegisterPage(),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
+                          child: Stack(
+                            children: [
+                              // Gradient overlay for better text visibility
+                              Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.blue.withOpacity(0.3),
-                                    width: 1.5,
+                                  borderRadius: const BorderRadius.only(
+                                    bottomLeft: Radius.circular(40),
+                                    bottomRight: Radius.circular(40),
                                   ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "Register",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.blue[700],
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Icon(
-                                      Icons.arrow_forward_rounded,
-                                      color: Colors.blue[700],
-                                      size: 16,
-                                    ),
-                                  ],
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.black.withOpacity(0.0),
+                                      Colors.black.withOpacity(0.6),
+                                    ],
+                                  ),
                                 ),
                               ),
+
+                              // Welcome text overlay
+                              Positioned(
+                                bottom: 30,
+                                left: 0,
+                                right: 0,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Welcome Back',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Sign in to continue your journey',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          color: Colors.white.withOpacity(0.9),
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Form section with themed card effect
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: colorScheme.shadow
+                                    .withOpacity(isDarkMode ? 0.3 : 0.2),
+                                blurRadius: 15,
+                                spreadRadius: 5,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Form title
+                                Text(
+                                  'Sign In',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Please enter your credentials to continue',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    color:
+                                        colorScheme.onSurface.withOpacity(0.7),
+                                  ),
+                                ),
+                                const SizedBox(height: 30),
+
+                                // Email field with icon
+                                ModernTextField(
+                                  controller: emailController,
+                                  hintText: 'Email address',
+                                  keyboardType: TextInputType.emailAddress,
+                                  prefixIcon: Icon(
+                                    Icons.email_outlined,
+                                    color: colorScheme.primary,
+                                    size: 20,
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your email';
+                                    }
+                                    if (!value.contains('@')) {
+                                      return 'Please enter a valid email';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+
+                                // Password field with icon
+                                ModernTextField(
+                                  controller: passwordController,
+                                  hintText: 'Password',
+                                  obscureText: true,
+                                  prefixIcon: Icon(
+                                    Icons.lock_outline_rounded,
+                                    color: colorScheme.primary,
+                                    size: 20,
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your password';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 30),
+
+                                // Login button
+                                AnimatedButton(
+                                  text: "Sign In",
+                                  onTap: _isLoading ? null : () => _signIn(),
+                                  isLoading: _isLoading,
+                                ),
+
+                                const Spacer(),
+
+                                // Register link
+                                Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Don't have an account? ",
+                                        style: GoogleFonts.poppins(
+                                          color: colorScheme.onSurface
+                                              .withOpacity(0.7),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      MouseRegion(
+                                        cursor: SystemMouseCursors.click,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const RegisterPage(),
+                                              ),
+                                            );
+                                          },
+                                          child: Text(
+                                            "Register",
+                                            style: GoogleFonts.poppins(
+                                              color: colorScheme.primary,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                      const SizedBox(height: 20),
                     ],
                   ),
-                ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -34,20 +34,24 @@ class _ModernTextFieldState extends State<ModernTextField> {
 
   @override
   Widget build(BuildContext context) {
+    // Get theme colors
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscureText,
       validator: widget.validator,
       keyboardType: widget.keyboardType,
       style: GoogleFonts.poppins(
-        color: Colors.grey[800],
+        color: colorScheme.onSurface,
         fontSize: 15,
         fontWeight: FontWeight.w400,
       ),
       decoration: InputDecoration(
         hintText: widget.hintText,
         hintStyle: GoogleFonts.poppins(
-          color: Colors.grey[500],
+          color: colorScheme.onSurface.withOpacity(0.6),
           fontSize: 15,
           fontWeight: FontWeight.w300,
         ),
@@ -63,7 +67,7 @@ class _ModernTextFieldState extends State<ModernTextField> {
                   _obscureText
                       ? Icons.visibility_off_rounded
                       : Icons.visibility_rounded,
-                  color: Colors.blue,
+                  color: colorScheme.primary,
                   size: 22,
                 ),
                 splashRadius: 24,
@@ -76,7 +80,9 @@ class _ModernTextFieldState extends State<ModernTextField> {
             : null,
         prefixIconConstraints: const BoxConstraints(minWidth: 56),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: isDarkMode
+            ? colorScheme.surfaceVariant.withOpacity(0.7)
+            : colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -84,33 +90,33 @@ class _ModernTextFieldState extends State<ModernTextField> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.blue[100]!,
+            color: colorScheme.primary.withOpacity(0.3),
             width: 1.5,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.blue[400]!,
+            color: colorScheme.primary,
             width: 2,
           ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.red[200]!,
+            color: colorScheme.error.withOpacity(0.5),
             width: 1.5,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.red[400]!,
+            color: colorScheme.error,
             width: 2,
           ),
         ),
         errorStyle: GoogleFonts.poppins(
-          color: Colors.red[700],
+          color: colorScheme.error,
           fontSize: 12,
           fontWeight: FontWeight.w400,
         ),

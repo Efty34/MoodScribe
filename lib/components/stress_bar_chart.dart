@@ -299,8 +299,9 @@ class _StressBarChartState extends State<StressBarChart>
                                     sideTitles: SideTitles(
                                       showTitles: true,
                                       getTitlesWidget: (value, meta) {
-                                        if (value == 0)
+                                        if (value == 0) {
                                           return const SizedBox.shrink();
+                                        }
                                         return Padding(
                                           padding:
                                               const EdgeInsets.only(right: 8.0),

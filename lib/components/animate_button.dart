@@ -67,6 +67,10 @@ class _AnimatedButtonState extends State<AnimatedButton>
 
   @override
   Widget build(BuildContext context) {
+    // Get theme colors
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTapDown: _handleTapDown,
       onTapUp: _handleTapUp,
@@ -84,8 +88,14 @@ class _AnimatedButtonState extends State<AnimatedButton>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: widget.isLoading || widget.onTap == null
-                    ? [Colors.white, Colors.grey.shade300]
-                    : [Colors.blue.shade400, Colors.blue.shade800],
+                    ? [
+                        colorScheme.surfaceContainerHighest,
+                        colorScheme.surface,
+                      ]
+                    : [
+                        colorScheme.primary,
+                        colorScheme.primary.withOpacity(0.7),
+                      ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -93,8 +103,8 @@ class _AnimatedButtonState extends State<AnimatedButton>
               boxShadow: [
                 BoxShadow(
                   color: (widget.isLoading || widget.onTap == null
-                          ? Colors.white
-                          : Colors.blue)
+                          ? colorScheme.surfaceContainerHighest
+                          : colorScheme.primary)
                       .withOpacity(_isPressed ? 0.1 : 0.3),
                   blurRadius: 15,
                   offset: Offset(0, _isPressed ? 2 : 5),
@@ -106,20 +116,22 @@ class _AnimatedButtonState extends State<AnimatedButton>
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(
+                        SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.blue),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                colorScheme.primary),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Text(
                           'Please wait...',
                           style: GoogleFonts.poppins(
-                            color: Colors.blue,
+                            color: isDarkMode
+                                ? colorScheme.onSurface
+                                : colorScheme.primary,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             letterSpacing: 0.5,
@@ -133,16 +145,16 @@ class _AnimatedButtonState extends State<AnimatedButton>
                         Text(
                           widget.text,
                           style: GoogleFonts.poppins(
-                            color: Colors.white,
+                            color: colorScheme.onPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             letterSpacing: 0.5,
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(
+                        Icon(
                           Icons.arrow_forward_rounded,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                           size: 20,
                         ),
                       ],
