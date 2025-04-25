@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:diary/services/diary_service.dart';
+import 'package:diary/utils/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -36,63 +37,24 @@ class _DiaryEntryState extends State<DiaryEntry> {
         _contentController.clear();
 
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle_outline, color: Colors.white),
-                const SizedBox(width: 8),
-                Text(
-                  'Your diary entry has been saved!',
-                  style: GoogleFonts.poppins(),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.green[600],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
-          ),
+        AppSnackBar.show(
+          context: context,
+          message: 'Your diary entry has been saved!',
+          type: SnackBarType.success,
         );
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error_outline, color: Colors.white),
-                const SizedBox(width: 8),
-                Text(
-                  'Error: Failed to save entry',
-                  style: GoogleFonts.poppins(),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.red[400],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
-          ),
+        AppSnackBar.show(
+          context: context,
+          message: 'Error: Failed to save entry',
+          type: SnackBarType.error,
         );
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Please write something before saving.',
-            style: GoogleFonts.poppins(),
-          ),
-          backgroundColor: Colors.grey[800],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: const EdgeInsets.all(16),
-        ),
+      AppSnackBar.show(
+        context: context,
+        message: 'Please write something before saving.',
+        type: SnackBarType.warning,
       );
     }
   }

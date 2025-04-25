@@ -67,7 +67,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: theme.colorScheme.onBackground,
+            color: theme.colorScheme.onSurface,
             size: 22,
           ),
           onPressed: _exitSearchMode,
@@ -87,7 +87,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             autofocus: true,
             style: GoogleFonts.poppins(
               fontSize: 15,
-              color: theme.colorScheme.onBackground,
+              color: theme.colorScheme.onSurface,
             ),
             decoration: InputDecoration(
               prefixIcon: Icon(
@@ -135,7 +135,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         builder: (context) => IconButton(
           icon: Icon(
             Icons.menu_rounded,
-            color: theme.colorScheme.onBackground,
+            color: theme.colorScheme.onSurface,
             size: 28,
           ),
           onPressed: () => Scaffold.of(context).openDrawer(),
@@ -146,7 +146,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         style: GoogleFonts.poppins(
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          color: theme.colorScheme.onBackground,
+          color: theme.colorScheme.onSurface,
         ),
       ),
       actions: _buildActions(),
@@ -245,7 +245,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         IconButton(
           icon: Icon(
             Icons.search_rounded,
-            color: theme.colorScheme.onBackground,
+            color: theme.colorScheme.onSurface,
             size: 28,
           ),
           onPressed: () {

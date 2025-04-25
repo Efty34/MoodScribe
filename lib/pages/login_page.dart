@@ -3,6 +3,7 @@ import 'package:diary/components/animate_button.dart';
 import 'package:diary/components/modern_text_field.dart';
 import 'package:diary/pages/register_page.dart';
 import 'package:diary/utils/app_routes.dart';
+import 'package:diary/utils/app_snackbar.dart';
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -61,44 +62,17 @@ class _LoginPageState extends State<LoginPage>
       setState(() => _isLoading = false);
 
       if (error != null) {
-        // Show error with custom styling
+        // Show error with our new AppSnackBar
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(
-                    Icons.error_outline_rounded,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      error,
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.red[400],
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              margin: const EdgeInsets.all(16),
-              duration: const Duration(seconds: 4),
-              action: SnackBarAction(
-                label: 'OK',
-                textColor: Colors.white,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                },
-              ),
-            ),
+          AppSnackBar.show(
+            context: context,
+            message: error,
+            type: SnackBarType.error,
+            duration: const Duration(seconds: 4),
+            actionLabel: 'OK',
+            onAction: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            },
           );
         }
       } else {
@@ -117,32 +91,10 @@ class _LoginPageState extends State<LoginPage>
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.error_outline_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Connection error. Please check your internet.',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.red[400],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
-          ),
+        AppSnackBar.show(
+          context: context,
+          message: 'Connection error. Please check your internet.',
+          type: SnackBarType.error,
         );
       }
     }

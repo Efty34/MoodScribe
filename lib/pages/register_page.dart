@@ -2,6 +2,7 @@ import 'package:diary/auth/auth_service.dart';
 import 'package:diary/components/animate_button.dart';
 import 'package:diary/components/modern_text_field.dart';
 import 'package:diary/pages/login_page.dart';
+import 'package:diary/utils/app_snackbar.dart';
 import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,19 +27,10 @@ class _RegisterPageState extends State<RegisterPage> {
     if (!_formKey.currentState!.validate()) return;
 
     if (passwordController.text != confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Passwords do not match',
-            style: GoogleFonts.poppins(),
-          ),
-          backgroundColor: Colors.red[400],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: const EdgeInsets.all(16),
-        ),
+      AppSnackBar.show(
+        context: context,
+        message: 'Passwords do not match',
+        type: SnackBarType.error,
       );
       return;
     }
@@ -54,19 +46,14 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isLoading = false);
 
     if (error != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error,
-            style: GoogleFonts.poppins(),
-          ),
-          backgroundColor: Colors.red[400],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: const EdgeInsets.all(16),
-        ),
+      AppSnackBar.show(
+        context: context,
+        message: error,
+        type: SnackBarType.error,
+        actionLabel: 'Try Again',
+        onAction: () {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        },
       );
     } else if (mounted) {
       // Clear all text fields
@@ -76,19 +63,10 @@ class _RegisterPageState extends State<RegisterPage> {
       confirmPasswordController.clear();
 
       // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Registration successful! Please login.',
-            style: GoogleFonts.poppins(),
-          ),
-          backgroundColor: Colors.green[400],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: const EdgeInsets.all(16),
-        ),
+      AppSnackBar.show(
+        context: context,
+        message: 'Registration successful! Please login.',
+        type: SnackBarType.success,
       );
 
       // Navigate to login page

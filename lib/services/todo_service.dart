@@ -127,6 +127,20 @@ Response format: Only the category name in lowercase, nothing else.
     });
   }
 
+  // Update todo completion status
+  Future<void> updateTodoCompletion(String todoId, bool isCompleted) async {
+    if (userId == null) return;
+
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('todos')
+        .doc(todoId)
+        .update({
+      'isDone': isCompleted,
+    });
+  }
+
   // Get todos by category
   Stream<QuerySnapshot> getTodosByCategory(String category) {
     if (userId == null) return const Stream.empty();

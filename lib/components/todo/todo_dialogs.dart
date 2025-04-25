@@ -1,45 +1,31 @@
 import 'package:diary/services/todo_service.dart';
+import 'package:diary/utils/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class TodoDialogs {
   static void showUpdateSuccessMessage(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(
-              Icons.check_circle_outline_rounded,
-              color: Colors.blue,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              'Task updated successfully',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.grey[800],
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        duration: const Duration(seconds: 2),
-        elevation: 1,
-      ),
+    AppSnackBar.show(
+      context: context,
+      message: 'Task updated successfully',
+      type: SnackBarType.success,
+      duration: const Duration(seconds: 2),
+    );
+  }
+
+  static void showDeleteSuccessMessage(BuildContext context) {
+    AppSnackBar.show(
+      context: context,
+      message: 'Task deleted successfully',
+      type: SnackBarType.warning,
+      duration: const Duration(seconds: 2),
     );
   }
 
   static Future<bool> showDeleteConfirmation(
       BuildContext context, String todoId) async {
-    return await showDialog<bool>(
+    final result = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             title: Text(
@@ -86,6 +72,13 @@ class TodoDialogs {
           ),
         ) ??
         false;
+
+    // Show delete success message if user confirmed deletion
+    if (result && context.mounted) {
+      showDeleteSuccessMessage(context);
+    }
+
+    return result;
   }
 
   static Future<bool?> showUpdateDialog(
@@ -129,7 +122,7 @@ class TodoDialogs {
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[800],
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           content: SingleChildScrollView(
@@ -143,7 +136,7 @@ class TodoDialogs {
                     labelText: 'Task Title',
                     labelStyle: GoogleFonts.poppins(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -151,7 +144,7 @@ class TodoDialogs {
                   ),
                   style: GoogleFonts.poppins(
                     fontSize: 16,
-                    color: Colors.grey[800],
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 // Category will be determined automatically by Gemini API
@@ -177,7 +170,8 @@ class TodoDialogs {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
+                            border: Border.all(
+                                color: Theme.of(context).colorScheme.primary),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -185,7 +179,7 @@ class TodoDialogs {
                               Icon(
                                 Icons.calendar_today,
                                 size: 18,
-                                color: Colors.grey[600],
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                               const SizedBox(width: 8),
                               Text(
@@ -242,7 +236,8 @@ class TodoDialogs {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
+                            border: Border.all(
+                                color: Theme.of(context).colorScheme.primary),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -297,9 +292,9 @@ class TodoDialogs {
               child: Text(
                 'Cancel',
                 style: GoogleFonts.poppins(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
@@ -344,7 +339,7 @@ class TodoDialogs {
               child: Text(
                 'Update',
                 style: GoogleFonts.poppins(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Colors.blue[700],
                 ),

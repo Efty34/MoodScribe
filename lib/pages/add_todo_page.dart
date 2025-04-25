@@ -21,6 +21,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   final TodoService _todoService = TodoService();
+  bool _isLoading = false; // Add loading state flag
 
   @override
   Widget build(BuildContext context) {
@@ -120,6 +121,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
         icon: Icons.add_task_rounded,
         onPressed: _saveTodo,
         theme: theme,
+        isLoading: _isLoading, // Pass the loading state to the button
       ),
     );
   }
@@ -147,10 +149,18 @@ class _AddTodoPageState extends State<AddTodoPage> {
   }
 
   void _saveTodo() {
+    // Prevent multiple submissions
+    if (_isLoading) return;
+
     if (!_formKey.currentState!.validate()) {
       TodoFeedback.showErrorMessage(context, 'Please enter your task');
       return;
     }
+
+    // Set loading state to true before API call
+    setState(() {
+      _isLoading = true;
+    });
 
     _todoService
         .addTodo(
@@ -165,6 +175,13 @@ class _AddTodoPageState extends State<AddTodoPage> {
       Navigator.pop(context);
     }).catchError((error) {
       TodoFeedback.showErrorMessage(context, 'Failed to add task');
+    }).whenComplete(() {
+      // Reset loading state if the operation completes without navigation
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     });
   }
 

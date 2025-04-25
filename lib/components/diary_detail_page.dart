@@ -1,4 +1,5 @@
 import 'package:diary/services/diary_service.dart';
+import 'package:diary/utils/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -474,22 +475,18 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
   void _showSuccessSnackBar(String message) {
     if (!mounted) return;
-    final theme = Theme.of(context);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: GoogleFonts.poppins(
-            color: theme.colorScheme.onPrimary,
-          ),
-        ),
-        backgroundColor: theme.colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
+    // Determine the appropriate SnackBar type based on the message content
+    final SnackBarType type = message.toLowerCase().contains('error')
+        ? SnackBarType.error
+        : (message.toLowerCase().contains('deleted')
+            ? SnackBarType.warning
+            : SnackBarType.success);
+
+    AppSnackBar.show(
+      context: context,
+      message: message,
+      type: type,
     );
   }
 }
