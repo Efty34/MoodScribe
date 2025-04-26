@@ -22,7 +22,7 @@ class SettingsPage extends StatelessWidget {
           ),
         ),
         backgroundColor: theme.scaffoldBackgroundColor,
-        foregroundColor: theme.colorScheme.onBackground,
+        foregroundColor: theme.colorScheme.onSurface,
         elevation: 0,
       ),
       body: SafeArea(
@@ -94,7 +94,7 @@ class SettingsPage extends StatelessWidget {
               Align(
                 alignment: Alignment.center,
                 child: Text(
-                  'Mind Journal v1.0.0',
+                  'MoodScribe v1.0.0',
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     color: theme.hintColor,
