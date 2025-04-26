@@ -40,7 +40,7 @@ jobs:
       - name: Configure Firebase (Generate firebase_options.dart)
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: flutterfire configure --systembeta-7881e --platforms=android --yes --overwrite-firebase-options
+        run: flutterfire configure --project=systembeta-7881e --platforms=android --yes --overwrite-firebase-options
 
       - name: Build APK
         run: flutter build apk --release
