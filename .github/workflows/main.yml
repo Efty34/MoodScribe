@@ -30,12 +30,12 @@ jobs:
       - name: Install FlutterFire CLI
         run: dart pub global activate flutterfire_cli
 
+      - name: Install Firebase CLI
+        run: |
+          curl -sL https://firebase.tools | bash
+
       - name: Configure Firebase
         run: flutterfire configure --project=systembeta-7881e --platforms=android
-
-      - name: Create .env file
-        run: |
-          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
 
       - run: flutter build apk --release
 
