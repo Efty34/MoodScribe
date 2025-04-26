@@ -18,16 +18,26 @@ jobs:
 
       - uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: "zulu"
+          java-version: "17"
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
 
       - run: flutter pub get
 
-      - run: flutter build apk --release --split-per-abi
+      - name: Install FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
+
+      - name: Configure Firebase
+        run: flutterfire configure --project=systembeta-7881e --platforms=android
+
+      - name: Create .env file
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+
+      - run: flutter build apk --release
 
       - name: Push to Releases
         uses: ncipollo/release-action@v1
