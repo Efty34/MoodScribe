@@ -34,17 +34,13 @@ jobs:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Login to Firebase using token
-        run: firebase login:ci --token "${{ secrets.FIREBASE_TOKEN }}"
-
       - name: Install FlutterFire CLI
         run: dart pub global activate flutterfire_cli
 
       - name: Configure Firebase (Generate firebase_options.dart)
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: flutterfire configure --project=systembeta-7881e --platforms=android
-
-      - name: Create .env file
-        run: echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
 
       - name: Build APK
         run: flutter build apk --release
