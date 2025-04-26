@@ -5,7 +5,7 @@ import 'package:lottie/lottie.dart';
 import 'drawer_styles.dart';
 
 /// A reusable menu item component for the app drawer
-/// Supports both Lottie animations and icons
+/// Supports both Lottie animations and icons with a modern design
 class DrawerMenuItem extends StatelessWidget {
   final String title;
   final dynamic icon;
@@ -22,25 +22,14 @@ class DrawerMenuItem extends StatelessWidget {
     this.badgeCount,
   });
 
-  TextStyle _getTextStyle(
-    BuildContext context, {
-    required double size,
-    FontWeight weight = FontWeight.w500,
-    Color? color,
-  }) {
-    final theme = Theme.of(context);
-    return GoogleFonts.poppins(
-      fontSize: size,
-      fontWeight: weight,
-      color: color ?? theme.textTheme.bodyLarge?.color,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.colorScheme.primary;
+
+    // Reduced icon size for cleaner appearance
+    const double iconSize = 24.0;
 
     return Material(
       color: Colors.transparent,
@@ -49,57 +38,49 @@ class DrawerMenuItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(DrawerStyles.borderRadius),
         splashColor: primaryColor.withOpacity(0.1),
         highlightColor: primaryColor.withOpacity(0.05),
+        hoverColor: primaryColor.withOpacity(0.03),
         child: Ink(
-          height: DrawerStyles.menuItemHeight,
+          height: 56, // Reduced height for minimalism
           decoration: BoxDecoration(
-            color: isDark ? theme.colorScheme.surface : theme.cardColor,
+            color: isDark ? Colors.transparent : Colors.transparent,
             borderRadius: BorderRadius.circular(DrawerStyles.borderRadius),
-            boxShadow: isDark
-                ? []
-                : [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                // Icon or Animation
+                // Icon or Animation with consistent sizing
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 32,
+                  height: 32,
                   decoration: isLottie
                       ? null
                       : BoxDecoration(
-                          color: primaryColor.withOpacity(isDark ? 0.2 : 0.1),
+                          color: primaryColor.withOpacity(isDark ? 0.15 : 0.1),
                           shape: BoxShape.circle,
                         ),
                   child: isLottie
                       ? Lottie.asset(
                           icon,
-                          width: 40,
-                          height: 40,
+                          width: 32,
+                          height: 32,
                           repeat: true,
                           animate: true,
                         )
                       : Icon(
                           icon,
                           color: primaryColor,
-                          size: DrawerStyles.iconSize,
+                          size: iconSize,
                         ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 // Title
                 Expanded(
                   child: Text(
                     title,
-                    style: _getTextStyle(
-                      context,
-                      size: 16,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
@@ -112,16 +93,15 @@ class DrawerMenuItem extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.error.withOpacity(0.8),
+                      color: theme.colorScheme.error.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       badgeCount!,
-                      style: _getTextStyle(
-                        context,
-                        size: 12,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
                         color: theme.colorScheme.onError,
-                        weight: FontWeight.w600,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

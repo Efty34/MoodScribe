@@ -111,7 +111,7 @@ class _LoginPageState extends State<LoginPage>
       opacity: _fadeAnimation,
       child: Scaffold(
         // Use theme-aware background color
-        backgroundColor: colorScheme.background,
+        backgroundColor: colorScheme.surface,
         body: SafeArea(
           child: SingleChildScrollView(
             physics: const ClampingScrollPhysics(),
@@ -128,11 +128,11 @@ class _LoginPageState extends State<LoginPage>
                         colors: isDarkMode
                             ? [
                                 colorScheme.surface,
-                                colorScheme.background,
+                                colorScheme.surface,
                               ]
                             : [
                                 colorScheme.surface,
-                                colorScheme.background,
+                                colorScheme.surface,
                               ],
                       ),
                     ),

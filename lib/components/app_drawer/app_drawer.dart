@@ -7,7 +7,7 @@ import 'drawer_menu_item.dart';
 import 'drawer_styles.dart';
 import 'logout_manager.dart';
 
-/// Custom drawer component for the app
+/// Custom drawer component for the app with modern minimal design
 class CustomAppDrawer extends StatelessWidget {
   const CustomAppDrawer({super.key});
 
@@ -16,153 +16,263 @@ class CustomAppDrawer extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.colorScheme.primary;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Reduce drawer width to 75% of screen width
+    final drawerWidth = screenWidth * 0.75;
 
     // User's initial (placeholder - could be fetched from user profile)
     const userInitial = 'A';
 
-    return Drawer(
-      backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.grey[50],
-      child: SafeArea(
-        child: Column(
-          children: [
-            // App Header with User Avatar
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  // App Logo
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius:
-                          BorderRadius.circular(DrawerStyles.borderRadius / 2),
-                    ),
-                    child: ClipRRect(
-                      borderRadius:
-                          BorderRadius.circular(DrawerStyles.borderRadius / 2),
-                      child: Image.asset(
-                        AppMedia.logo,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  // App Name
-                  Expanded(
-                    child: Text(
-                      'MoodScribe',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: theme.textTheme.titleLarge?.color,
-                      ),
-                    ),
-                  ),
-                  // User Avatar (or Initials)
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: primaryColor.withOpacity(0.2),
-                    child: Text(
-                      userInitial,
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: primaryColor,
-                      ),
-                    ),
-                  ),
-                  // Logout button as icon in header
-                ],
-              ),
+    return Theme(
+      data: Theme.of(context).copyWith(
+        // Remove default drawer edge padding
+        drawerTheme: DrawerThemeData(
+          width: drawerWidth,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(DrawerStyles.borderRadius),
+              bottomRight: Radius.circular(DrawerStyles.borderRadius),
             ),
-
-            // Menu Items List
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 20,
+          ),
+        ),
+      ),
+      child: Drawer(
+        backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.grey[50],
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Modern stacked header with logo and user info
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                  // Add subtle blur effect in the header
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      isDark
+                          ? const Color(0xFF2A2A2A).withOpacity(0.95)
+                          : Colors.white.withOpacity(0.95),
+                      isDark ? const Color(0xFF2A2A2A) : Colors.white,
+                    ],
+                  ),
                 ),
-                children: [
-                  DrawerMenuItem(
-                    title: 'Journal',
-                    icon: AppMedia.diary,
-                    isLottie: true,
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(height: 12),
-                  DrawerMenuItem(
-                    title: 'Sessions',
-                    icon: Icons.calendar_month_rounded,
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(height: 12),
-                  DrawerMenuItem(
-                    title: 'Games',
-                    icon: Icons.games_rounded,
-                    onTap: () => Navigator.pop(context),
-                    badgeCount: '3',
-                  ),
-                  const SizedBox(height: 12),
-                  DrawerMenuItem(
-                    title: 'Stats',
-                    icon: AppMedia.graph,
-                    isLottie: true,
-                    onTap: () => Navigator.of(context)
-                      ..pop()
-                      ..pushNamed(AppRoutes.statsPage),
-                  ),
-                  const SizedBox(height: 12),
-                  DrawerMenuItem(
-                    title: 'Settings',
-                    icon: AppMedia.settings,
-                    isLottie: true,
-                    onTap: () => Navigator.of(context)
-                      ..pop()
-                      ..pushNamed(AppRoutes.settingsPage),
-                  ),
-                ],
-              ),
-            ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // App logo centered
+                    Center(
+                      child: Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(
+                              DrawerStyles.borderRadius / 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: primaryColor.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                              DrawerStyles.borderRadius / 2),
+                          child: Image.asset(
+                            AppMedia.logo,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Version text at bottom
-                  Text(
-                    'Version 1.0.0',
+                    const SizedBox(height: 12),
+
+                    // App name centered with slightly larger font
+                    Center(
+                      child: Text(
+                        'MoodScribe',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: theme.textTheme.titleLarge?.color,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // User info row
+                    Row(
+                      children: [
+                        // User Avatar (or Initials)
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor: primaryColor.withOpacity(0.2),
+                          child: Text(
+                            userInitial,
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        // Greeting text
+                        Text(
+                          'Hello!',
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: theme.textTheme.bodyLarge?.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Menu Items in a list with logical groups and dividers
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  children: [
+                    // Main features group
+                    _buildSectionHeader(context, 'Main'),
+                    const SizedBox(height: 8),
+                    DrawerMenuItem(
+                      title: 'Journal',
+                      icon: Icons.book_outlined,
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(height: 10),
+                    DrawerMenuItem(
+                      title: 'Sessions',
+                      icon: Icons.calendar_month_rounded,
+                      onTap: () => Navigator.pop(context),
+                    ),
+
+                    const SizedBox(height: 20),
+                    const Divider(height: 1),
+                    const SizedBox(height: 20),
+
+                    // Activities group
+                    _buildSectionHeader(context, 'Activities'),
+                    const SizedBox(height: 8),
+                    DrawerMenuItem(
+                      title: 'Games',
+                      icon: Icons.games_rounded,
+                      onTap: () => Navigator.pop(context),
+                      badgeCount: '3',
+                    ),
+                    const SizedBox(height: 10),
+                    DrawerMenuItem(
+                      title: 'Stats',
+                      icon: Icons.bar_chart_rounded,
+                      onTap: () => Navigator.of(context)
+                        ..pop()
+                        ..pushNamed(AppRoutes.statsPage),
+                    ),
+
+                    const SizedBox(height: 20),
+                    const Divider(height: 1),
+                    const SizedBox(height: 20),
+
+                    // App settings group
+                    _buildSectionHeader(context, 'App'),
+                    const SizedBox(height: 8),
+                    DrawerMenuItem(
+                      title: 'Settings',
+                      icon: Icons.settings_outlined,
+                      onTap: () => Navigator.of(context)
+                        ..pop()
+                        ..pushNamed(AppRoutes.settingsPage),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Logout button - full width
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: ElevatedButton.icon(
+                  onPressed: () => LogoutManager.handleLogout(context),
+                  icon: Icon(
+                    Icons.logout_rounded,
+                    size: 20,
+                    color: isDark ? Colors.black : Colors.white,
+                  ),
+                  label: Text(
+                    'Logout',
                     style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                      color: isDark ? Colors.black : Colors.white,
                     ),
                   ),
-
-                  IconButton(
-                    alignment: Alignment.bottomRight,
-                    icon: const Icon(Icons.logout_rounded, size: 26),
-                    color: Colors.red,
-                    onPressed: () => LogoutManager.handleLogout(context),
-                    tooltip: 'Logout',
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.error.withOpacity(0.9),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(DrawerStyles.borderRadius),
+                    ),
+                    elevation: isDark ? 0 : 1,
+                    minimumSize: const Size(double.infinity, 48),
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+
+              // Version info
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Text(
+                  'Version 1.0.0',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper method to create section headers
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, bottom: 4),
+      child: Text(
+        title,
+        style: GoogleFonts.poppins(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: theme.colorScheme.primary.withOpacity(0.8),
+          letterSpacing: 0.5,
         ),
       ),
     );

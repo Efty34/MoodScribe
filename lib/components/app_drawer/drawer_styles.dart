@@ -6,7 +6,7 @@ class DrawerStyles {
   DrawerStyles._();
 
   /// Border radius for menu items and other components
-  static const double borderRadius = 16.0;
+  static const double borderRadius = 12.0;
 
   /// Standard icon size
   static const double iconSize = 24.0;
