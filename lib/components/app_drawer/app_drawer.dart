@@ -50,17 +50,20 @@ class CustomAppDrawer extends StatelessWidget {
                       borderRadius:
                           BorderRadius.circular(DrawerStyles.borderRadius / 2),
                     ),
-                    child: Icon(
-                      Icons.auto_stories_rounded,
-                      color: primaryColor,
-                      size: 24,
+                    child: ClipRRect(
+                      borderRadius:
+                          BorderRadius.circular(DrawerStyles.borderRadius / 2),
+                      child: Image.asset(
+                        AppMedia.logo,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
                   // App Name
                   Expanded(
                     child: Text(
-                      'Mind Journal',
+                      'MoodScribe',
                       style: GoogleFonts.poppins(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -94,15 +97,6 @@ class CustomAppDrawer extends StatelessWidget {
                   vertical: 20,
                 ),
                 children: [
-                  DrawerMenuItem(
-                    title: 'MoodBuddy',
-                    icon: AppMedia.moodbubby,
-                    isLottie: true,
-                    onTap: () => Navigator.of(context)
-                      ..pop()
-                      ..pushNamed(AppRoutes.moodBuddyPage),
-                  ),
-                  const SizedBox(height: 12),
                   DrawerMenuItem(
                     title: 'Journal',
                     icon: AppMedia.diary,

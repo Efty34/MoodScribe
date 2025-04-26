@@ -20,24 +20,24 @@ class TodoItem extends StatelessWidget {
 
   IconData _getCategoryIcon(String category) {
     switch (category.toLowerCase()) {
-      case 'exam':
-        return Icons.school;
-      case 'submission':
-        return Icons.assignment;
+      case 'work':
+        return Icons.work;
+      case 'personal':
+        return Icons.person;
+      case 'health':
+        return Icons.health_and_safety;
+      case 'finance':
+        return Icons.account_balance_wallet;
       case 'shopping':
         return Icons.shopping_bag;
-      case 'groceries':
-        return Icons.shopping_cart;
+      case 'education':
+        return Icons.school;
+      case 'travel':
+        return Icons.flight;
+      case 'home':
+        return Icons.home;
       case 'fitness':
         return Icons.fitness_center;
-      case 'self-care':
-        return Icons.spa_outlined;
-      case 'food':
-        return Icons.restaurant;
-      case 'social':
-        return Icons.people_outline;
-      case 'medicine':
-        return Icons.medical_services;
       default:
         return Icons.add_to_photos_sharp;
     }

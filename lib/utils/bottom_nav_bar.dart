@@ -57,7 +57,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   PreferredSizeWidget _buildAppBar() {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     if (_isSearching && (currentIndex == 0 || currentIndex == 3)) {
       return AppBar(

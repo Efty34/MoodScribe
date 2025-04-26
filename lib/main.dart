@@ -1,6 +1,5 @@
 import 'package:diary/auth/auth_wrapper.dart';
 import 'package:diary/firebase_options.dart';
-import 'package:diary/mood_buddy/pages/mood_buddy_page.dart';
 import 'package:diary/pages/login_page.dart';
 import 'package:diary/pages/register_page.dart';
 import 'package:diary/pages/settings_page.dart';
@@ -16,16 +15,11 @@ import 'package:diary/utils/theme_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await Hive.initFlutter();
-  await Hive.openBox<String>('diaryBox');
-   await dotenv.load(fileName: ".env");
   runApp(
     MultiProvider(
       providers: [
@@ -64,7 +58,6 @@ class MyApp extends StatelessWidget {
         AppRoutes.loginPage: (context) => const LoginPage(),
         AppRoutes.registerPage: (context) => const RegisterPage(),
         AppRoutes.bottomNavBar: (context) => const BottomNavBar(),
-        AppRoutes.moodBuddyPage: (context) => const MoodBuddyPage(),
         AppRoutes.settingsPage: (context) => const SettingsPage(),
         AppRoutes.statsPage: (context) => const StatsPage(),
       },

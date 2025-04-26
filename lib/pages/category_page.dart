@@ -36,7 +36,7 @@ class CategoryPage extends StatelessWidget {
                       'Find what suits your mood',
                       style: GoogleFonts.poppins(
                         fontSize: 20,
-                        color: theme.colorScheme.onBackground,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w200,
                       ),
                     ),

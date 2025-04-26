@@ -1,23 +1,27 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/auth/auth_service.dart';
-import 'package:diary/mood_buddy/services/gemini_service.dart';
+import 'package:http/http.dart' as http;
 
 class TodoService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String? userId = AuthService().currentUser?.uid;
-  final GeminiService _geminiService = GeminiService();
+  // API endpoint for category determination
+  final String _categoryApiUrl =
+      'https://mood-scribe-recommendation-ai-agent.vercel.app/api/todo/category';
 
   // Predefined categories
   static const List<String> categories = [
-    'exam',
-    'submission',
+    'work',
+    'personal',
+    'health',
+    'finance',
     'shopping',
-    'groceries',
+    'education',
+    'travel',
+    'home',
     'fitness',
-    'self-care',
-    'food',
-    'social',
-    'medicine',
     'default'
   ];
 
@@ -33,52 +37,44 @@ class TodoService {
         .snapshots();
   }
 
-  // Determine category using Gemini
+  // Backend API call to determine category
   Future<String> _determineCategory(String title) async {
     try {
-      final prompt = '''
-Analyze this task title and categorize it into one of these categories. Only respond with a single word (the category name in lowercase).
+      final requestData = {
+        'task': title,
+      };
 
-Task: "$title"
+      final response = await http.post(
+        Uri.parse(_categoryApiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestData),
+      );
 
-Categories and their contexts:
-- exam: Academic tests, exams, quizzes, studying, test preparation, exam dates, revision
-- submission: Academic assignments, homework, projects, deadlines, papers, reports
-- shopping: Non-food items, clothes, electronics, accessories, household items
-- groceries: Food items, ingredients, kitchen supplies, fruits, vegetables
-- fitness: Exercise, workout, sports, physical activities, gym, running, yoga
-- self-care: Meditation, relaxation, personal care, mental health, skincare
-- food: Cooking, eating out, food orders, dining, meal preparation, restaurants
-- social: Meetings, gatherings, calls, events, parties, social activities
-- medicine: Medications, doctor appointments, health-related tasks, medical checkups
-- default: Tasks that don't clearly fit into any other category
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        // Get category from response and convert to lowercase for consistency
+        String category = data['category']?.toString().toLowerCase() ?? '';
 
-Response format: Only the category name in lowercase, nothing else.
-''';
+        // No need to validate against predefined categories
+        // as we're trusting the backend's response
+        if (category.isNotEmpty) {
+          return category;
+        }
 
-      String response = await _geminiService.getResponse(prompt);
-      response = response.toLowerCase().trim();
-
-      // Remove any punctuation or extra text
-      response = response.replaceAll(RegExp(r'[^\w\s]'), '');
-
-      // Extract just the first word
-      response = response.split(' ').first;
-
-      // Validate the category
-      if (categories.contains(response)) {
-        return response;
+        print('Empty category from API for task: $title');
+        return 'default';
+      } else {
+        print(
+            'API error: ${response.statusCode} - ${response.body} for task: $title');
+        return 'default';
       }
-
-      print('Invalid category from Gemini: $response for task: $title');
-      return 'default';
     } catch (e) {
       print('Error determining category: $e for task: $title');
       return 'default';
     }
   }
 
-  // Add new todo
+  // Add new todo - only requires title from frontend
   Future<void> addTodo({
     required String title,
     String? date,
@@ -86,7 +82,7 @@ Response format: Only the category name in lowercase, nothing else.
   }) async {
     if (userId == null) return;
 
-    // Determine category using Gemini
+    // Determine category using backend API
     final category = await _determineCategory(title);
 
     await _firestore.collection('users').doc(userId).collection('todos').add({
@@ -99,20 +95,19 @@ Response format: Only the category name in lowercase, nothing else.
     });
   }
 
-  // Update todo
+  // Update todo - only requires title from frontend, category is determined by backend
   Future<void> updateTodo({
     required String todoId,
     required String title,
     String? date,
     String? time,
-    String? category,
+    String?
+        category, // This param will be ignored as category is determined by backend
   }) async {
     if (userId == null) return;
 
-    // Use provided category or determine new category using Gemini
-    final todoCategory = category != null && category.isNotEmpty
-        ? category.toLowerCase()
-        : await _determineCategory(title);
+    // Always determine new category using backend API
+    final todoCategory = await _determineCategory(title);
 
     await _firestore
         .collection('users')
