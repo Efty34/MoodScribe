@@ -16,6 +16,7 @@ class DiaryEntry extends StatefulWidget {
 class _DiaryEntryState extends State<DiaryEntry> {
   final TextEditingController _contentController = TextEditingController();
   final DiaryService _diaryService = DiaryService();
+  bool _isLoading = false;
   // String _selectedMood = 'neutral';
 
   void _saveEntry() async {
@@ -23,6 +24,11 @@ class _DiaryEntryState extends State<DiaryEntry> {
 
     if (content.isNotEmpty) {
       try {
+        // Set loading state to true
+        setState(() {
+          _isLoading = true;
+        });
+
         // Get prediction from Flask backend
         final prediction = await _monitorStress(content);
 
@@ -49,6 +55,13 @@ class _DiaryEntryState extends State<DiaryEntry> {
           message: 'Error: Failed to save entry',
           type: SnackBarType.error,
         );
+      } finally {
+        // Set loading state back to false
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     } else {
       AppSnackBar.show(
@@ -61,7 +74,8 @@ class _DiaryEntryState extends State<DiaryEntry> {
 
   Future<String> _monitorStress(String text) async {
     try {
-      final url = Uri.parse('http://10.0.2.2:5000/predict');
+      final url =
+          Uri.parse('https://stressmodel-deployment01.onrender.com/predict');
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -169,14 +183,24 @@ class _DiaryEntryState extends State<DiaryEntry> {
                       ),
                       animationDuration: const Duration(milliseconds: 200),
                     ),
-                    onPressed: _saveEntry,
-                    icon: const Icon(Icons.add, size: 20),
+                    onPressed: _isLoading ? null : _saveEntry,
+                    icon: _isLoading
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: theme.colorScheme.onPrimary,
+                            ),
+                          )
+                        : const Icon(Icons.add, size: 20),
                     label: Text(
-                      "Save Entry",
+                      _isLoading ? "Saving..." : "Save Entry",
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
+                        color: theme.colorScheme.onPrimary,
                       ),
                     ),
                   ),
