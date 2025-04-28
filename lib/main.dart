@@ -1,5 +1,7 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:diary/auth/auth_wrapper.dart';
 import 'package:diary/firebase_options.dart';
+import 'package:diary/notification/notification_controller.dart';
 import 'package:diary/pages/login_page.dart';
 import 'package:diary/pages/register_page.dart';
 import 'package:diary/pages/settings_page.dart';
@@ -20,6 +22,49 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await AwesomeNotifications().initialize(null, [
+    NotificationChannel(
+      channelGroupKey: "notification_channel_group",
+      channelKey: "notification_channel",
+      channelName: "Notification channel",
+      channelDescription: "Notification channel description",
+      defaultColor: const Color(0xFF9D50DD),
+      ledColor: const Color(0xFF9D50DD),
+      importance: NotificationImportance.High,
+      playSound: true,
+    ),
+    NotificationChannel(
+      channelGroupKey: "notification_channel_group",
+      channelKey: "todo_channel",
+      channelName: "Todo Reminders",
+      channelDescription: "Notifications for todo reminders",
+      defaultColor: const Color(0xFF9D50DD),
+      ledColor: const Color(0xFF9D50DD),
+      importance: NotificationImportance.High,
+      playSound: true,
+    ),
+  ], channelGroups: [
+    NotificationChannelGroup(
+      channelGroupKey: "notification_channel_group",
+      channelGroupName: "Notification channel group",
+    ),
+  ]);
+
+  bool isNotificationEnabled =
+      await AwesomeNotifications().isNotificationAllowed();
+  if (!isNotificationEnabled) {
+    await AwesomeNotifications().requestPermissionToSendNotifications(
+      permissions: [
+        NotificationPermission.Alert,
+        NotificationPermission.Sound,
+        NotificationPermission.Badge,
+        NotificationPermission.Vibration,
+        NotificationPermission.Light,
+        NotificationPermission.CriticalAlert,
+      ],
+    );
+  }
+
   runApp(
     MultiProvider(
       providers: [
@@ -34,8 +79,26 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+        onNotificationCreatedMethod:
+            NotificationController.onNotificationCreatedMethod,
+        onNotificationDisplayedMethod:
+            NotificationController.onNotificationDisplayedMethod,
+        onDismissActionReceivedMethod:
+            NotificationController.onNotificationDismissedMethod);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

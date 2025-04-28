@@ -9,6 +9,8 @@ class ScheduleCard extends StatelessWidget {
   final TimeOfDay? selectedTime;
   final Function() onPickDate;
   final Function() onPickTime;
+  final bool enableNotification;
+  final Function(bool) onNotificationToggle;
 
   const ScheduleCard({
     super.key,
@@ -18,6 +20,8 @@ class ScheduleCard extends StatelessWidget {
     required this.selectedTime,
     required this.onPickDate,
     required this.onPickTime,
+    required this.enableNotification,
+    required this.onNotificationToggle,
   });
 
   @override
@@ -75,6 +79,54 @@ class ScheduleCard extends StatelessWidget {
                 ? 'Set time'
                 : selectedTime!.format(context),
             onTap: onPickTime,
+          ),
+
+          const SizedBox(height: 16),
+
+          // Notification toggle
+          _buildNotificationToggle(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationToggle(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: isDark
+            ? theme.colorScheme.surfaceContainerLow.withOpacity(0.3)
+            : theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.notifications_active_rounded,
+            size: 20,
+            color: enableNotification
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurface.withOpacity(0.6),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Enable notification',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Switch(
+            value: enableNotification,
+            onChanged: onNotificationToggle,
+            activeColor: theme.colorScheme.primary,
           ),
         ],
       ),

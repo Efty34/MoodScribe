@@ -111,6 +111,9 @@ class TodoDialogs {
       }
     }
 
+    // Initialize notification toggle with the saved value
+    bool enableNotification = data['enableNotification'] ?? false;
+
     // Category will be determined automatically by Gemini API
 
     return await showDialog<bool>(
@@ -281,6 +284,47 @@ class TodoDialogs {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                // Notification Toggle
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.primary),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.notifications_active,
+                        size: 18,
+                        color: enableNotification
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey[600],
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Enable Notification',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                      ),
+                      Switch(
+                        value: enableNotification,
+                        onChanged: (value) {
+                          setState(() {
+                            enableNotification = value;
+                          });
+                        },
+                        activeColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -328,6 +372,7 @@ class TodoDialogs {
                       : DateFormat('MMM dd, yyyy').format(selectedDate!),
                   time:
                       selectedTime == null ? '' : selectedTime!.format(context),
+                  enableNotification: enableNotification,
                   // Category will be determined by Gemini API
                 );
 

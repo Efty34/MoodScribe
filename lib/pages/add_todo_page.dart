@@ -22,6 +22,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
   TimeOfDay? _selectedTime;
   final TodoService _todoService = TodoService();
   bool _isLoading = false; // Add loading state flag
+  bool _enableNotification = false; // Add notification toggle state
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +85,12 @@ class _AddTodoPageState extends State<AddTodoPage> {
                 selectedTime: _selectedTime,
                 onPickDate: _pickDate,
                 onPickTime: _pickTime,
+                enableNotification: _enableNotification,
+                onNotificationToggle: (value) {
+                  setState(() {
+                    _enableNotification = value;
+                  });
+                },
               ),
 
               const SizedBox(height: 12),
@@ -169,12 +176,15 @@ class _AddTodoPageState extends State<AddTodoPage> {
           ? ''
           : DateFormat('MMM dd, yyyy').format(_selectedDate!),
       time: _selectedTime == null ? '' : _selectedTime!.format(context),
+      enableNotification: _enableNotification,
     )
         .then((_) {
       TodoFeedback.showSuccessMessage(context, 'Task added successfully');
       Navigator.pop(context);
     }).catchError((error) {
-      TodoFeedback.showErrorMessage(context, 'Failed to add task');
+      print('Error adding todo: $error');
+      TodoFeedback.showErrorMessage(
+          context, 'Failed to add task: ${error.toString()}');
     }).whenComplete(() {
       // Reset loading state if the operation completes without navigation
       if (mounted) {

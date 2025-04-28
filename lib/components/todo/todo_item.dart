@@ -266,6 +266,21 @@ class TodoItem extends StatelessWidget {
                         color: theme.colorScheme.onSurface.withOpacity(0.7),
                       ),
                     ),
+                    if (data['enableNotification'] == true) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Icon(
+                          Icons.notifications_active,
+                          color: theme.colorScheme.tertiary,
+                          size: 14,
+                        ),
+                      ),
+                    ],
                   ],
                 )
               ],
