@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/auth/auth_service.dart';
+import 'package:diary/notification/notification_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -88,50 +89,141 @@ class TodoService {
     if (date.isEmpty || time.isEmpty) return;
 
     try {
-      print('Attempting to schedule notification for: $title at $date $time');
+      // Use the improved notification scheduling from NotificationUtils
+      final result = await NotificationUtils.scheduleImprovedTodoNotification(
+        todoId: todoId,
+        title: title,
+        date: date,
+        time: time,
+      );
 
-      // Parse date
-      final dateFormat = DateFormat('MMM dd, yyyy');
-      final DateTime todoDate;
-      try {
-        todoDate = dateFormat.parse(date);
-      } catch (e) {
-        print('Failed to parse date: $date - $e');
+      if (!result) {
+        // If the improved method fails, try the fallback method
+        debugPrint('Improved notification failed. Trying fallback method...');
+        await _scheduleFallbackNotification(todoId, title, date, time);
+      }
+    } catch (e) {
+      debugPrint('Error scheduling notification: $e');
+    }
+  }
+
+  // Fallback notification method using the original approach
+  Future<void> _scheduleFallbackNotification(
+    String todoId,
+    String title,
+    String date,
+    String time,
+  ) async {
+    try {
+      debugPrint(
+          'Fallback: Scheduling notification for: $title at $date $time');
+
+      // First ensure permissions are granted
+      await NotificationUtils.requestPermissions();
+      await NotificationUtils.requestExactAlarmPermission();
+
+      // Try multiple date formats
+      DateTime? scheduledDate;
+
+      // Try different date format parsers
+      final List<DateFormat> dateFormats = [
+        DateFormat('MMM dd, yyyy'), // "Apr 28, 2025"
+        DateFormat('yyyy-MM-dd'), // "2025-04-28"
+        DateFormat('dd-MM-yyyy'), // "28-04-2025"
+        DateFormat('dd/MM/yyyy'), // "28/04/2025"
+      ];
+
+      DateTime? todoDate;
+      for (var format in dateFormats) {
+        try {
+          todoDate = format.parse(date);
+          debugPrint('Successfully parsed date with format: ${format.pattern}');
+          break;
+        } catch (e) {
+          // Continue to next format
+        }
+      }
+
+      if (todoDate == null) {
+        debugPrint('Failed to parse date with any format: $date');
         return;
       }
 
       // Parse time string - handle different time formats
-      TimeOfDay timeOfDay;
+      TimeOfDay? timeOfDay;
       try {
         // Try different time formats
-        DateTime parsedTime;
-        try {
-          // Try standard format (e.g., "1:30 PM")
-          parsedTime = DateFormat.jm().parse(time);
-        } catch (e) {
+        DateTime? parsedTime;
+
+        // List of time formats to try
+        final List<DateFormat> timeFormats = [
+          DateFormat.jm(), // "1:30 PM"
+          DateFormat.Hm(), // "13:30"
+          DateFormat('h:mm a'), // "1:30 pm"
+          DateFormat('HH:mm'), // "13:30"
+        ];
+
+        for (var format in timeFormats) {
           try {
-            // Try 24-hour format (e.g., "13:30")
-            parsedTime = DateFormat.Hm().parse(time);
-          } catch (e2) {
-            // Last attempt with a more flexible format
-            parsedTime = DateFormat('h:mm a').parse(time);
+            parsedTime = format.parse(time);
+            debugPrint(
+                'Successfully parsed time with format: ${format.pattern}');
+            break;
+          } catch (e) {
+            // Continue to next format
           }
         }
 
-        timeOfDay = TimeOfDay(
-          hour: parsedTime.hour,
-          minute: parsedTime.minute,
-        );
+        if (parsedTime != null) {
+          timeOfDay = TimeOfDay(
+            hour: parsedTime.hour,
+            minute: parsedTime.minute,
+          );
+          debugPrint('Parsed time to: ${timeOfDay.hour}:${timeOfDay.minute}');
+        } else {
+          // Try to manually parse HH:MM format
+          final parts = time.split(':');
+          if (parts.length == 2) {
+            final hour = int.tryParse(parts[0].trim());
 
-        print(
-            'Successfully parsed time to: ${timeOfDay.hour}:${timeOfDay.minute}');
+            // Handle the second part which might have AM/PM
+            String minutePart = parts[1].trim();
+            int? minute;
+            bool isPM = false;
+
+            if (minutePart.toLowerCase().contains('pm')) {
+              isPM = true;
+              minutePart = minutePart.toLowerCase().replaceAll('pm', '').trim();
+            } else if (minutePart.toLowerCase().contains('am')) {
+              minutePart = minutePart.toLowerCase().replaceAll('am', '').trim();
+            }
+
+            minute = int.tryParse(minutePart);
+
+            if (hour != null && minute != null) {
+              int adjustedHour = hour;
+              // Adjust hour for PM if in 12-hour format
+              if (isPM && hour < 12) {
+                adjustedHour += 12;
+              }
+
+              timeOfDay = TimeOfDay(hour: adjustedHour, minute: minute);
+              debugPrint(
+                  'Manually parsed time to: ${timeOfDay.hour}:${timeOfDay.minute}');
+            }
+          }
+        }
       } catch (e) {
-        print('Failed to parse time: $time - $e');
+        debugPrint('Error in time parsing: $e');
+      }
+
+      if (timeOfDay == null) {
+        debugPrint('Failed to parse time with any method: $time');
         return;
       }
 
       // Combine date and time
-      final scheduledDate = DateTime(
+      scheduledDate = DateTime(
         todoDate.year,
         todoDate.month,
         todoDate.day,
@@ -139,44 +231,55 @@ class TodoService {
         timeOfDay.minute,
       );
 
-      print('Combined scheduled date: $scheduledDate');
+      debugPrint('Fallback combined scheduled date: $scheduledDate');
 
       // Skip if scheduled time is in the past
       if (scheduledDate.isBefore(DateTime.now())) {
-        print('Skipping notification for past date: $scheduledDate');
+        debugPrint('Skipping notification for past date: $scheduledDate');
         return;
       }
 
       // Create a unique notification ID from the todo ID
       final notificationId = todoId.hashCode;
 
-      print('Creating notification with ID: $notificationId');
+      // Schedule the notification with both channels
+      for (String channelKey in ['notification_channel', 'todo_channel']) {
+        final result = await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: notificationId + (channelKey == 'todo_channel' ? 1 : 0),
+            channelKey: channelKey,
+            title: 'Task Reminder',
+            body: title,
+            wakeUpScreen: true,
+            category: NotificationCategory.Reminder,
+            notificationLayout: NotificationLayout.Default,
+            payload: {
+              'todoId': todoId,
+              'scheduledTime': scheduledDate.toIso8601String(),
+            },
+          ),
+          schedule: NotificationCalendar.fromDate(
+            date: scheduledDate,
+            allowWhileIdle: true,
+            preciseAlarm: true,
+            repeats: false,
+          ),
+          actionButtons: [
+            NotificationActionButton(
+              key: 'MARK_DONE',
+              label: 'Mark Done',
+            ),
+          ],
+        );
 
-      // Schedule the notification
-      final result = await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          id: notificationId,
-          channelKey: 'todo_channel',
-          title: 'Task Reminder',
-          body: title,
-          notificationLayout: NotificationLayout.Default,
-          payload: {
-            'todoId': todoId,
-            'scheduledTime': scheduledDate.toIso8601String(),
-          },
-        ),
-        schedule: NotificationCalendar.fromDate(date: scheduledDate),
-      );
-
-      print('Notification scheduling result: $result');
-
-      if (result) {
-        print('Notification successfully scheduled for: $scheduledDate');
-      } else {
-        print('Failed to schedule notification');
+        debugPrint(
+            'Fallback notification scheduling result for $channelKey: $result');
       }
+
+      // Debug current scheduled notifications
+      await NotificationUtils.debugScheduledNotifications();
     } catch (e) {
-      print('Error scheduling notification: $e');
+      debugPrint('Error in fallback notification: $e');
     }
   }
 

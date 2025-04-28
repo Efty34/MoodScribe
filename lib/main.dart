@@ -28,8 +28,8 @@ void main() async {
       channelKey: "notification_channel",
       channelName: "Notification channel",
       channelDescription: "Notification channel description",
-      defaultColor: const Color(0xFF9D50DD),
-      ledColor: const Color(0xFF9D50DD),
+      defaultColor: Color.fromARGB(255, 40, 40, 40),
+      ledColor: Color.fromARGB(255, 40, 40, 40),
       importance: NotificationImportance.High,
       playSound: true,
     ),
@@ -38,8 +38,8 @@ void main() async {
       channelKey: "todo_channel",
       channelName: "Todo Reminders",
       channelDescription: "Notifications for todo reminders",
-      defaultColor: const Color(0xFF9D50DD),
-      ledColor: const Color(0xFF9D50DD),
+      defaultColor: Color.fromARGB(255, 40, 40, 40),
+      ledColor: Color.fromARGB(255, 40, 40, 40),
       importance: NotificationImportance.High,
       playSound: true,
     ),
@@ -97,6 +97,13 @@ class _MyAppState extends State<MyApp> {
             NotificationController.onNotificationDisplayedMethod,
         onDismissActionReceivedMethod:
             NotificationController.onNotificationDismissedMethod);
+
+    // Reschedule all todo notifications after app starts
+    // This ensures notifications persist after device reboots
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationController.rescheduleAllTodoNotifications();
+    });
+
     super.initState();
   }
 

@@ -39,6 +39,38 @@ class CustomAppDrawer extends StatelessWidget {
     Navigator.pop(context);
   }
 
+  // Schedule a notification to appear after 20 seconds
+  Future<void> _scheduleNotification() async {
+    final scheduleTime = DateTime.now().add(const Duration(seconds: 20));
+    const notificationId = 7; // Fixed ID for scheduled notifications
+
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: notificationId,
+        channelKey: 'notification_channel',
+        title: 'Scheduled Notification',
+        body:
+            'This notification was scheduled to appear 20 seconds after triggering!',
+        wakeUpScreen: true,
+        category: NotificationCategory.Reminder,
+        notificationLayout: NotificationLayout.Default,
+        payload: {'scheduledTime': scheduleTime.toString()},
+      ),
+      schedule: NotificationCalendar.fromDate(
+        date: scheduleTime,
+        allowWhileIdle: true,
+        preciseAlarm: true,
+        repeats: false,
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'MARK_DONE',
+          label: 'Mark Done',
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -215,9 +247,10 @@ class CustomAppDrawer extends StatelessWidget {
                     DrawerMenuItem(
                       title: 'Stats',
                       icon: Icons.bar_chart_rounded,
-                      onTap: () => Navigator.of(context)
-                        ..pop()
-                        ..pushNamed(AppRoutes.statsPage),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, AppRoutes.statsPage);
+                      },
                     ),
 
                     const SizedBox(height: 20),
@@ -230,15 +263,26 @@ class CustomAppDrawer extends StatelessWidget {
                     DrawerMenuItem(
                       title: 'Notification',
                       icon: Icons.notifications_outlined,
-                      onTap: () => _showTestNotification(context),
+                      onTap: () {
+                        _scheduleNotification();
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Notification scheduled for 20 seconds from now!'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 10),
                     DrawerMenuItem(
                       title: 'Settings',
                       icon: Icons.settings_outlined,
-                      onTap: () => Navigator.of(context)
-                        ..pop()
-                        ..pushNamed(AppRoutes.settingsPage),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, AppRoutes.settingsPage);
+                      },
                     ),
                   ],
                 ),
