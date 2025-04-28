@@ -1,5 +1,5 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:diary/utils/app_routes.dart';
-import 'package:diary/utils/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,6 +10,34 @@ import 'logout_manager.dart';
 /// Custom drawer component for the app with modern minimal design
 class CustomAppDrawer extends StatelessWidget {
   const CustomAppDrawer({super.key});
+
+  // Show a test notification
+  Future<void> _showTestNotification(BuildContext context) async {
+    int notificationId =
+        DateTime.now().millisecondsSinceEpoch.remainder(100000);
+
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: notificationId,
+        channelKey: 'notification_channel',
+        title: 'Hello from MoodScribe!',
+        body: 'This is a test notification from the app drawer',
+        notificationLayout: NotificationLayout.Default,
+        payload: {'source': 'app_drawer'},
+      ),
+    );
+
+    // Show a feedback snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Notification sent!'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    // Close the drawer
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +119,7 @@ class CustomAppDrawer extends StatelessWidget {
                           borderRadius: BorderRadius.circular(
                               DrawerStyles.borderRadius / 2),
                           child: Image.asset(
-                            AppMedia.logo,
+                            'assets/images/logo.png',
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -199,6 +227,12 @@ class CustomAppDrawer extends StatelessWidget {
                     // App settings group
                     _buildSectionHeader(context, 'App'),
                     const SizedBox(height: 8),
+                    DrawerMenuItem(
+                      title: 'Notification',
+                      icon: Icons.notifications_outlined,
+                      onTap: () => _showTestNotification(context),
+                    ),
+                    const SizedBox(height: 10),
                     DrawerMenuItem(
                       title: 'Settings',
                       icon: Icons.settings_outlined,
