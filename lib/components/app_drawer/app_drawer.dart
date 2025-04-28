@@ -257,25 +257,25 @@ class CustomAppDrawer extends StatelessWidget {
                     const Divider(height: 1),
                     const SizedBox(height: 20),
 
-                    // App settings group
+                    // // App settings group
                     _buildSectionHeader(context, 'App'),
                     const SizedBox(height: 8),
-                    DrawerMenuItem(
-                      title: 'Notification',
-                      icon: Icons.notifications_outlined,
-                      onTap: () {
-                        _scheduleNotification();
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                'Notification scheduled for 20 seconds from now!'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 10),
+                    // DrawerMenuItem(
+                    //   title: 'Notification',
+                    //   icon: Icons.notifications_outlined,
+                    //   onTap: () {
+                    //     _scheduleNotification();
+                    //     Navigator.pop(context);
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       const SnackBar(
+                    //         content: Text(
+                    //             'Notification scheduled for 20 seconds from now!'),
+                    //         duration: Duration(seconds: 2),
+                    //       ),
+                    //     );
+                    //   },
+                    // ),
+                    // const SizedBox(height: 10),
                     DrawerMenuItem(
                       title: 'Settings',
                       icon: Icons.settings_outlined,

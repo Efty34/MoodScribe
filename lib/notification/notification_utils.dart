@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -285,5 +287,44 @@ class NotificationUtils {
     // Debug message about exact alarm permission
     debugPrint(
         'Note: For Android 12+, exact alarm permission must be granted in system settings');
+  }
+
+  /// Show a dialog to guide users to enable exact alarm permission
+  static Future<void> showExactAlarmPermissionDialog(
+      BuildContext context) async {
+    if (!Platform.isAndroid) return;
+
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Exact Alarm Permission'),
+        content: const Text(
+          'For reliable notifications, this app needs permission to schedule exact alarms.\n\n'
+          'Please go to Settings > Apps > MoodScribe > Permissions > Alarms & Reminders and enable "Allow precise alarms".',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Later'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _openAndroidSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Helper method to open Android system settings
+  static Future<void> _openAndroidSettings() async {
+    try {
+      await AwesomeNotifications().showNotificationConfigPage();
+    } catch (e) {
+      debugPrint('Error opening settings: $e');
+    }
   }
 }

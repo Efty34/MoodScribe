@@ -1,3 +1,4 @@
+import 'package:diary/components/settings/exact_alarm_permission_tile.dart';
 import 'package:diary/utils/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,7 +32,32 @@ class SettingsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Section title
+              // Notifications section
+              Text(
+                'Notifications',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Notification Test Tile
+              // NotificationTestTile(
+              //   theme: theme,
+              //   isDark: isDark,
+              // ),
+
+              // Exact Alarm Permission Tile (Android 12+ only)
+              ExactAlarmPermissionTile(
+                theme: theme,
+                isDark: isDark,
+              ),
+
+              const SizedBox(height: 24),
+
+              // Appearance section
               Text(
                 'Appearance',
                 style: GoogleFonts.poppins(

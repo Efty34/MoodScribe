@@ -33,14 +33,14 @@ class TodoDialogs {
               style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[800],
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             content: Text(
               'Are you sure you want to delete this task?',
               style: GoogleFonts.poppins(
                 fontSize: 16,
-                color: Colors.grey[700],
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             shape:
