@@ -1,5 +1,5 @@
 import 'package:diary/services/favorites_service.dart';
-import 'package:diary/utils/show_snackbar.dart';
+import 'package:diary/utils/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -323,10 +323,11 @@ class _RecommendationCardState extends State<RecommendationCard> {
       if (_isFavorite) {
         if (widget.favoriteId != null) {
           await _favoritesService.removeFromFavorites(widget.favoriteId!);
-          showCustomSnackbar(
-            context,
+          AppSnackBar.show(
+            context: context,
             message: 'Removed from favorites',
-            isAdded: false,
+            type: SnackBarType.success,
+            customIcon: Icons.favorite_border_rounded,
           );
         }
       } else {
@@ -337,10 +338,11 @@ class _RecommendationCardState extends State<RecommendationCard> {
           category: widget.category,
           genres: widget.genres,
         );
-        showCustomSnackbar(
-          context,
+        AppSnackBar.show(
+          context: context,
           message: 'Added to favorites',
-          isAdded: true,
+          type: SnackBarType.success,
+          customIcon: Icons.favorite_rounded,
         );
       }
 
@@ -348,10 +350,10 @@ class _RecommendationCardState extends State<RecommendationCard> {
         _isFavorite = !_isFavorite;
       });
     } catch (e) {
-      showCustomSnackbar(
-        context,
+      AppSnackBar.show(
+        context: context,
         message: 'Failed to update favorites',
-        isAdded: false,
+        type: SnackBarType.error,
       );
     }
   }

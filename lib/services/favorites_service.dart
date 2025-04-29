@@ -68,4 +68,18 @@ class FavoritesService {
         .orderBy('timestamp', descending: true)
         .get();
   }
+
+  // Get favorites for a specific user
+  Future<QuerySnapshot> getFavoritesForUser(String specificUserId) async {
+    if (specificUserId.isEmpty) {
+      throw Exception('Invalid user ID');
+    }
+
+    return await _firestore
+        .collection('users')
+        .doc(specificUserId)
+        .collection('favorites')
+        .orderBy('timestamp', descending: true)
+        .get();
+  }
 }

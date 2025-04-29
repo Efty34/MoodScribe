@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/components/build_profile_section.dart';
-import 'package:diary/components/profilepage/collection_section.dart';
+import 'package:diary/components/profilepage/category_collection_section.dart';
 import 'package:diary/components/profilepage/stats_section.dart';
 import 'package:diary/services/favorites_service.dart';
 import 'package:diary/services/profile_provider.dart';
@@ -11,7 +11,12 @@ import 'package:provider/provider.dart';
 import '../services/mood_chart_provider.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final String? userId; // Add userId parameter to fetch specific user's data
+
+  const ProfilePage({
+    super.key,
+    this.userId,
+  });
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -39,7 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  Future<void> _fetchFavorites() async {
+  Future<void> _fetchFavorites({String? specificUserId}) async {
     if (!mounted) return;
 
     setState(() {
@@ -48,7 +53,10 @@ class _ProfilePageState extends State<ProfilePage> {
     });
 
     try {
-      final snapshot = await _favoritesService.getFavoritesOnce();
+      final snapshot = widget.userId != null
+          ? await _favoritesService.getFavoritesForUser(widget.userId!)
+          : await _favoritesService.getFavoritesOnce();
+
       if (!mounted) return;
 
       setState(() {
@@ -135,20 +143,30 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildFavoritesSection(ThemeData theme) {
-    if (_isLoadingFavorites && _cachedFavorites == null) {
-      return _buildLoadingState(theme);
+    // When using a specific user ID, we still need to use the one-time fetch method
+    if (widget.userId != null) {
+      if (_isLoadingFavorites && _cachedFavorites == null) {
+        return _buildLoadingState(theme);
+      }
+
+      if (_favoritesError != null) {
+        return _buildErrorStateWithRetry(
+          _favoritesError!,
+          theme,
+          onRetry: _fetchFavorites,
+        );
+      }
+
+      final favorites = _cachedFavorites ?? [];
+      return CategoryCollectionSection(collections: favorites);
     }
 
-    if (_favoritesError != null) {
-      return _buildErrorStateWithRetry(
-        _favoritesError!,
-        theme,
-        onRetry: _fetchFavorites,
-      );
-    }
-
-    final favorites = _cachedFavorites ?? [];
-    return CollectionSection(favorites: favorites);
+    // For the current user, use a stream for real-time updates
+    return CategoryCollectionSection(
+      favoritesStream: _favoritesService.getFavorites(),
+      collections:
+          _cachedFavorites, // Provide cached data for initial render if available
+    );
   }
 
   Widget _buildLoadingState(ThemeData theme) {
