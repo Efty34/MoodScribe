@@ -34,7 +34,8 @@ class _MoodChartCardState extends State<MoodChartCard> {
 
     // Get available width to make chart responsive
     final screenWidth = MediaQuery.of(context).size.width;
-    final chartSize = screenWidth > 400 ? 260.0 : screenWidth * 0.65;
+    // Further reduce chart size to fix the remaining 10px overflow
+    final chartSize = screenWidth > 400 ? 170.0 : screenWidth * 0.43;
 
     return Container(
       decoration: BoxDecoration(
@@ -118,7 +119,7 @@ class _MoodChartCardState extends State<MoodChartCard> {
                           Text(
                             '$total',
                             style: GoogleFonts.nunito(
-                              fontSize: 22,
+                              fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: theme.colorScheme.onSurface,
                             ),
@@ -126,7 +127,7 @@ class _MoodChartCardState extends State<MoodChartCard> {
                           Text(
                             'Entries',
                             style: GoogleFonts.nunito(
-                              fontSize: 14,
+                              fontSize: 12,
                               color: theme.hintColor,
                             ),
                           ),

@@ -59,7 +59,7 @@ class _StatsSectionState extends State<StatsSection> {
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onBackground,
+                  color: theme.colorScheme.onSurface,
                   letterSpacing: 0.5,
                 ),
               ),
