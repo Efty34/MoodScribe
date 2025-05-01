@@ -104,7 +104,17 @@ class AuthService {
       );
 
       // Sign in to Firebase with the Google credentials
-      return await _auth.signInWithCredential(credential);
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      // Store user data in Firestore - similar to email signup flow
+      await UserService().updateUserProfile(
+        username: userCredential.user?.displayName ??
+            googleUser.displayName ??
+            'Google User',
+        email: userCredential.user?.email ?? googleUser.email,
+      );
+
+      return userCredential;
     } catch (e) {
       print('Google Sign-In Error: $e'); // For debugging
       rethrow; // Rethrow to handle in UI
