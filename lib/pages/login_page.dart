@@ -354,6 +354,92 @@ class _LoginPageState extends State<LoginPage>
                                     ],
                                   ),
                                 ),
+
+                                // Google Sign In button
+                                const SizedBox(height: 20),
+                                Center(
+                                  child: ElevatedButton(
+                                    onPressed: _isLoading
+                                        ? null
+                                        : () async {
+                                            setState(() => _isLoading = true);
+                                            try {
+                                              final result = await AuthService()
+                                                  .signInWithGoogle();
+
+                                              if (!mounted) return;
+                                              setState(
+                                                  () => _isLoading = false);
+
+                                              if (result != null) {
+                                                if (mounted) {
+                                                  Navigator.of(context)
+                                                      .pushNamedAndRemoveUntil(
+                                                    AppRoutes.bottomNavBar,
+                                                    (route) => false,
+                                                  );
+                                                }
+                                              }
+                                            } catch (e) {
+                                              setState(
+                                                  () => _isLoading = false);
+                                              if (mounted) {
+                                                AppSnackBar.show(
+                                                  context: context,
+                                                  message:
+                                                      'Failed to sign in with Google.',
+                                                  type: SnackBarType.error,
+                                                );
+                                              }
+                                            }
+                                          },
+                                    style: ElevatedButton.styleFrom(
+                                      // backgroundColor: colorScheme.secondary,
+                                      // foregroundColor: colorScheme.primary,
+                                      elevation: 1,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 0, vertical: 10),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        side: BorderSide(
+                                          color: colorScheme.outline
+                                              .withOpacity(0.5),
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // Google logo that adapts to theme
+                                        Container(
+                                          height: 24,
+                                          width: 24,
+                                          decoration: BoxDecoration(
+                                            color: colorScheme.secondary,
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                          ),
+                                          child: Center(
+                                            child: Image.asset(
+                                              AppMedia.google,
+                                              height: 12,
+                                              width: 12,
+                                            ),
+                                          ),
+                                        ),
+                                        // const SizedBox(width: 12),
+                                        // Text(
+                                        //   'Sign in with Google',
+                                        //   style: GoogleFonts.poppins(
+                                        //     fontSize: 14,
+                                        //     fontWeight: FontWeight.w500,
+                                        //   ),
+                                        // ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
