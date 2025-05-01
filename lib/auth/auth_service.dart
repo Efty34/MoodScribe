@@ -78,29 +78,36 @@ class AuthService {
   }
 
   // Google sign in
-  signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle(
+      {bool forceAccountSelection = true}) async {
     try {
+      // Sign out first if we want to force account selection
+      if (forceAccountSelection) {
+        await GoogleSignIn().signOut();
+      }
+
       // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-      if(googleUser == null) {
+      if (googleUser == null) {
         return null; // User canceled the sign-in
       }
 
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication? googleAuth =
+      final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
 
       // Sign in to Firebase with the Google credentials
       return await _auth.signInWithCredential(credential);
     } catch (e) {
       print('Google Sign-In Error: $e'); // For debugging
+      rethrow; // Rethrow to handle in UI
     }
   }
 

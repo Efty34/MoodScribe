@@ -412,19 +412,24 @@ class _LoginPageState extends State<LoginPage>
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         // Google logo that adapts to theme
+                                        // Google logo that adapts to theme
                                         Container(
                                           height: 24,
                                           width: 24,
                                           decoration: BoxDecoration(
-                                            color: colorScheme.secondary,
+                                            color:
+                                                Theme.of(context).brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.white
+                                                    : colorScheme.secondary,
                                             borderRadius:
                                                 BorderRadius.circular(30),
                                           ),
                                           child: Center(
                                             child: Image.asset(
                                               AppMedia.google,
-                                              height: 12,
-                                              width: 12,
+                                              height: 16,
+                                              width: 16,
                                             ),
                                           ),
                                         ),
