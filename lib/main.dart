@@ -30,7 +30,9 @@ void main() async {
       channelDescription: "Notification channel description",
       defaultColor: Color.fromARGB(255, 40, 40, 40),
       ledColor: Color.fromARGB(255, 40, 40, 40),
-      importance: NotificationImportance.High,
+      importance: NotificationImportance.Max,
+      defaultPrivacy: NotificationPrivacy.Public,
+      locked: true,
       playSound: true,
     ),
     NotificationChannel(
@@ -40,7 +42,9 @@ void main() async {
       channelDescription: "Notifications for todo reminders",
       defaultColor: Color.fromARGB(255, 40, 40, 40),
       ledColor: Color.fromARGB(255, 40, 40, 40),
-      importance: NotificationImportance.High,
+      importance: NotificationImportance.Max,
+      defaultPrivacy: NotificationPrivacy.Public,
+      locked: true,
       playSound: true,
     ),
   ], channelGroups: [
@@ -61,6 +65,7 @@ void main() async {
         NotificationPermission.Vibration,
         NotificationPermission.Light,
         NotificationPermission.CriticalAlert,
+        NotificationPermission.PreciseAlarms
       ],
     );
   }
