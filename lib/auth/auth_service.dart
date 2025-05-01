@@ -90,7 +90,7 @@ class AuthService {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       if (googleUser == null) {
-        return null; // User canceled the sign-in
+        return null; // User canceled the sign-in token
       }
 
       // Obtain the auth details from the request
