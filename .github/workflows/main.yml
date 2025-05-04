@@ -51,6 +51,7 @@ jobs:
           artifacts: "build/app/outputs/apk/release/*.apk"
           tag: v${{ github.run_number }}
           token: ${{ secrets.TOKEN }}
+          allowTagReuse: true
 
       - name: upload artifact to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
