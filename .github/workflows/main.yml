@@ -46,9 +46,8 @@ jobs:
         run: flutter build apk --release
 
       - name: Upload to Firebase App Distribution
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
+          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gcloud_key.json"
           firebase appdistribution:distribute build/app/outputs/apk/release/app-release.apk \
             --app ${{ secrets.FIREBASE_APP_ID }} \
-            --release-notes "New MoodScribe build from GitHub Actions"
+            --release-notes "New build from GitHub Actions"
