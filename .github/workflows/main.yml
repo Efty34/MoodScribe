@@ -1,3 +1,57 @@
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
+
+# name: Build My Flutter App
+
+# jobs:
+#   build:
+#     name: Build and Distribute APK
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+
+#       - name: Set up Java
+#         uses: actions/setup-java@v2
+#         with:
+#           distribution: "zulu"
+#           java-version: "17"
+
+#       - name: Set up Flutter
+#         uses: subosito/flutter-action@v2
+#         with:
+#           channel: "stable"
+
+#       - name: Install dependencies
+#         run: flutter pub get
+
+#       - name: Install Firebase CLI
+#         run: npm install -g firebase-tools
+
+#       - name: Install FlutterFire CLI
+#         run: dart pub global activate flutterfire_cli
+
+#       - name: Configure Firebase (Generate firebase_options.dart)
+#         env:
+#           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+#         run: flutterfire configure --project=systembeta-7881e --platforms=android --yes --overwrite-firebase-options
+
+#       - name: Build APK
+#         run: flutter build apk --release
+
+#       - name: Upload to Firebase App Distribution
+#         run: |
+#           export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gcloud_key.json"
+#           firebase appdistribution:distribute build/app/outputs/apk/release/app-release.apk \
+#             --app ${{ secrets.FIREBASE_APP_ID }} \
+#             --release-notes "New build from GitHub Actions"
+
 on:
   push:
     branches:
@@ -31,23 +85,34 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+      - name: Install Firebase CLI and Google Cloud SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl apt-transport-https ca-certificates gnupg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+          sudo apt-get update && sudo apt-get install -y google-cloud-sdk
+          npm install -g firebase-tools
+
+      - name: Authenticate with Service Account
+        run: |
+          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > $HOME/gcloud_key.json
+          gcloud auth activate-service-account --key-file=$HOME/gcloud_key.json
+          gcloud config set project systembeta-7881e
+        env:
+          CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
 
       - name: Install FlutterFire CLI
         run: dart pub global activate flutterfire_cli
 
       - name: Configure Firebase (Generate firebase_options.dart)
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: flutterfire configure --project=systembeta-7881e --platforms=android --yes --overwrite-firebase-options
 
       - name: Build APK
         run: flutter build apk --release
 
-      - name: Upload to Firebase App Distribution
+      - name: Distribute APK via Firebase
         run: |
-          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gcloud_key.json"
           firebase appdistribution:distribute build/app/outputs/apk/release/app-release.apk \
             --app ${{ secrets.FIREBASE_APP_ID }} \
             --release-notes "New build from GitHub Actions"
