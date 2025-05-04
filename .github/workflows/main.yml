@@ -10,7 +10,7 @@ name: Build My Flutter App
 
 jobs:
   build:
-    name: Build and Release APK
+    name: Build and Distribute APK
     runs-on: ubuntu-latest
 
     steps:
@@ -45,9 +45,10 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
-      - name: Push to Releases
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "build/app/outputs/apk/release/*.apk"
-          tag: v${{ github.run_number }}
-          token: ${{ secrets.TOKEN }}
+      - name: Upload to Firebase App Distribution
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          firebase appdistribution:distribute build/app/outputs/apk/release/app-release.apk \
+            --app ${{ secrets.FIREBASE_APP_ID }} \
+            --release-notes "New MoodScribe build from GitHub Actions"
