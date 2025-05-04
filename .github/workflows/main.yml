@@ -96,7 +96,7 @@ jobs:
 
       - name: Authenticate with Service Account
         run: |
-          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > $HOME/gcloud_key.json
+          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > $HOME/gcloud_key.json
           gcloud auth activate-service-account --key-file=$HOME/gcloud_key.json
           gcloud config set project systembeta-7881e
         env:
