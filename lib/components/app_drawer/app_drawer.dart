@@ -258,8 +258,8 @@ class CustomAppDrawer extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     // // App settings group
-                    _buildSectionHeader(context, 'App'),
-                    const SizedBox(height: 8),
+                    // _buildSectionHeader(context, 'App'),
+                    // const SizedBox(height: 8),
                     // DrawerMenuItem(
                     //   title: 'Notification',
                     //   icon: Icons.notifications_outlined,

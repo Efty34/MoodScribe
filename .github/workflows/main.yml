@@ -58,7 +58,7 @@ jobs:
         with:
           appId: ${{secrets.FIREBASE_APP_ID}}
           serviceCredentialsFileContent: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
-          groups: MoodScribe
+          groups: moodscribe
           file: build/app/outputs/apk/release/app-release.apk
           releaseNotes: |
             Build: ${{ github.run_number }}
