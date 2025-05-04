@@ -176,7 +176,7 @@ class CategoryCollectionSection extends StatelessWidget {
 
   Widget _buildCategorizedCollections(
       BuildContext context, List<QueryDocumentSnapshot> items) {
-    final theme = Theme.of(context);
+    // final theme = Theme.of(context);
 
     // Group items by their actual category from the data
     Map<String, List<QueryDocumentSnapshot>> categorizedItems = {};
