@@ -51,3 +51,11 @@ jobs:
           artifacts: "build/app/outputs/apk/release/*.apk"
           tag: v${{ github.run_number }}
           token: ${{ secrets.TOKEN }}
+
+      - name: upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          serviceCredentialsFileContent: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+          groups: testers
+          file: build/app/outputs/apk/release/app-release.apk
