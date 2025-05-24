@@ -119,4 +119,9 @@ class StreakCalendarProvider with ChangeNotifier {
     _diarySubscription?.cancel();
     super.dispose();
   }
+
+  // Expose the diary service for direct access when needed
+  DiaryService getDiaryService() {
+    return _diaryService;
+  }
 }

@@ -366,98 +366,266 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.5),
-      isScrollControlled: false,
-      builder: (context) {
-        return Container(
-          decoration: BoxDecoration(
-            color: isDark ? theme.colorScheme.surface : theme.cardColor,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
+    // Fetch stress/non-stress breakdown
+    _getEntryBreakdown(normalizedDate).then((breakdown) {
+      // Bottom sheet might have been dismissed if the operation takes time
+      if (!context.mounted) return;
+
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        barrierColor: Colors.black.withOpacity(0.5),
+        isScrollControlled: false,
+        builder: (context) {
+          return Container(
+            decoration: BoxDecoration(
+              color: isDark ? theme.colorScheme.surface : theme.cardColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
             ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handle bar
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(top: 12, bottom: 16),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: theme.dividerColor,
-                    borderRadius: BorderRadius.circular(2),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 12, bottom: 16),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.dividerColor,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
 
-              // Date header and entry count
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      formattedDate,
-                      style: GoogleFonts.nunito(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: entries > 0
-                                ? (isDark
-                                    ? theme.colorScheme.primary.withOpacity(0.2)
-                                    : theme.colorScheme.primary
-                                        .withOpacity(0.1))
-                                : theme.colorScheme.surfaceContainerHighest
-                                    .withOpacity(isDark ? 0.5 : 1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            entries > 0
-                                ? Icons.edit_note_rounded
-                                : Icons.notes_rounded,
-                            color: entries > 0
-                                ? theme.colorScheme.primary
-                                : theme.hintColor,
-                            size: 22,
-                          ),
+                // Date header and entry count
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        formattedDate,
+                        style: GoogleFonts.nunito(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            entries > 0
-                                ? '$entries ${entries == 1 ? 'entry' : 'entries'} on this day'
-                                : 'No entries on this day',
-                            style: GoogleFonts.nunito(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: entries > 0
+                                  ? (isDark
+                                      ? theme.colorScheme.primary
+                                          .withOpacity(0.2)
+                                      : theme.colorScheme.primary
+                                          .withOpacity(0.1))
+                                  : theme.colorScheme.surfaceContainerHighest
+                                      .withOpacity(isDark ? 0.5 : 1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              entries > 0
+                                  ? Icons.edit_note_rounded
+                                  : Icons.notes_rounded,
+                              color: entries > 0
+                                  ? theme.colorScheme.primary
+                                  : theme.hintColor,
+                              size: 22,
                             ),
                           ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              entries > 0
+                                  ? '$entries ${entries == 1 ? 'entry' : 'entries'} on this day'
+                                  : 'No entries on this day',
+                              style: GoogleFonts.nunito(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Entry breakdown by mood (Stress/Non-Stress)
+                if (entries > 0)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Divider(),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Entry Breakdown',
+                          style: GoogleFonts.nunito(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Stress entries
+                        _buildMoodSummaryRow(
+                          context: context,
+                          icon: Icons.mood_bad,
+                          iconColor: Color(0xFFE53935),
+                          label: 'Stress',
+                          count: breakdown['stress'] ?? 0,
+                          total: entries,
+                          isDark: isDark,
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Non-stress entries
+                        _buildMoodSummaryRow(
+                          context: context,
+                          icon: Icons.mood,
+                          iconColor: Color(0xFF43A047),
+                          label: 'Non-Stress',
+                          count: breakdown['non-stress'] ?? 0,
+                          total: entries,
+                          isDark: isDark,
                         ),
                       ],
                     ),
-                  ],
+                  ),
+              ],
+            ),
+          );
+        },
+      );
+    });
+  }
+
+  // Helper to build each mood summary row
+  Widget _buildMoodSummaryRow({
+    required BuildContext context,
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required int count,
+    required int total,
+    required bool isDark,
+  }) {
+    final theme = Theme.of(context);
+    final percentage = total > 0 ? (count / total) * 100 : 0;
+
+    return Row(
+      children: [
+        // Icon
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: iconColor.withOpacity(isDark ? 0.2 : 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            color: iconColor,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 12),
+
+        // Label and count
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.nunito(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    '$count ${count == 1 ? 'entry' : 'entries'} (${percentage.toStringAsFixed(0)}%)',
+                    style: GoogleFonts.nunito(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+
+              // Progress bar
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: total > 0 ? count / total : 0,
+                  backgroundColor: iconColor.withOpacity(0.1),
+                  color: iconColor.withOpacity(isDark ? 0.8 : 0.7),
+                  minHeight: 8,
                 ),
               ),
             ],
           ),
-        );
-      },
+        ),
+      ],
     );
+  }
+
+  // Fetch stress/non-stress entry breakdown for a specific date
+  Future<Map<String, int>> _getEntryBreakdown(DateTime date) async {
+    // Reuse existing DiaryService functionality
+    final diaryService =
+        Provider.of<StreakCalendarProvider>(context, listen: false)
+            .getDiaryService();
+
+    try {
+      // Prepare date range for the whole day
+      final startOfDay = DateTime(date.year, date.month, date.day);
+      final endOfDay =
+          DateTime(date.year, date.month, date.day, 23, 59, 59, 999);
+
+      // Get entries for this date
+      final entries = await diaryService.getDiaryEntriesByDateRangeOnce(
+          startOfDay, endOfDay);
+
+      // Count by mood
+      final Map<String, int> breakdown = {
+        'stress': 0,
+        'non-stress': 0,
+      };
+
+      for (var doc in entries.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final mood = data['mood'] as String? ?? '';
+
+        if (mood == 'stress') {
+          breakdown['stress'] = (breakdown['stress'] ?? 0) + 1;
+        } else {
+          breakdown['non-stress'] = (breakdown['non-stress'] ?? 0) + 1;
+        }
+      }
+
+      return breakdown;
+    } catch (e) {
+      debugPrint('Error getting entry breakdown: $e');
+      return {'stress': 0, 'non-stress': 0};
+    }
   }
 }

@@ -1,7 +1,5 @@
 import 'package:diary/components/diary_streak_calendar.dart';
-import 'package:diary/components/stress_bar_chart.dart';
 import 'package:diary/services/streak_calendar_provider.dart';
-import 'package:diary/services/stress_chart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -27,12 +25,6 @@ class _StatsPageState extends State<StatsPage> {
     final calendarProvider =
         Provider.of<StreakCalendarProvider>(context, listen: false);
     await calendarProvider.refreshData();
-
-    // Refresh stress chart data
-    final stressChartProvider =
-        Provider.of<StressChartProvider>(context, listen: false);
-    await stressChartProvider
-        .refreshData(90); // Use the same default of 90 days
 
     setState(() {
       _isRefreshing = false;
@@ -101,7 +93,7 @@ class _StatsPageState extends State<StatsPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    'Track your journaling habits and maintain your writing streak.',
+                    'Track your journaling habits and maintain your writing streak. Click on any day to see mood details.',
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       color: theme.colorScheme.onSurface.withOpacity(0.7),
@@ -127,26 +119,6 @@ class _StatsPageState extends State<StatsPage> {
                     ],
                   ),
                   child: const DiaryStreakCalendar(),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Stress Bar Chart
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const StressBarChart(days: 90), // Show a month of data
                 ),
 
                 const SizedBox(height: 24),

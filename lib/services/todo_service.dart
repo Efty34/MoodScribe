@@ -447,17 +447,4 @@ class TodoService {
         .doc(todoId)
         .delete();
   }
-
-  // Get todos by completion status
-  Stream<QuerySnapshot> getTodosByStatus({required bool isDone}) {
-    if (userId == null) return const Stream.empty();
-
-    return _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('todos')
-        .where('isDone', isEqualTo: isDone)
-        .orderBy('created_at', descending: true)
-        .snapshots();
-  }
 }

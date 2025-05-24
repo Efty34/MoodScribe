@@ -96,6 +96,23 @@ class DiaryService {
         .snapshots();
   }
 
+  // Get diary entries by date range as a Future (one-time fetch)
+  Future<QuerySnapshot> getDiaryEntriesByDateRangeOnce(
+      DateTime startDate, DateTime endDate) async {
+    if (userId == null) {
+      throw Exception('User not authenticated');
+    }
+
+    return await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('diary')
+        .where('date', isGreaterThanOrEqualTo: startDate)
+        .where('date', isLessThanOrEqualTo: endDate)
+        .orderBy('date', descending: true)
+        .get();
+  }
+
   // Get diary entries by mood
   Stream<QuerySnapshot> getDiaryEntriesByMood(String mood) {
     if (userId == null) return Stream.empty();

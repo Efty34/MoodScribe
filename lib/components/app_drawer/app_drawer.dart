@@ -81,9 +81,6 @@ class CustomAppDrawer extends StatelessWidget {
     // Reduce drawer width to 75% of screen width
     final drawerWidth = screenWidth * 0.75;
 
-    // User's initial (placeholder - could be fetched from user profile)
-    const userInitial = 'A';
-
     return Theme(
       data: Theme.of(context).copyWith(
         // Remove default drawer edge padding
@@ -171,37 +168,6 @@ class CustomAppDrawer extends StatelessWidget {
                           letterSpacing: 0.5,
                         ),
                       ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // User info row
-                    Row(
-                      children: [
-                        // User Avatar (or Initials)
-                        CircleAvatar(
-                          radius: 18,
-                          backgroundColor: primaryColor.withOpacity(0.2),
-                          child: Text(
-                            userInitial,
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: primaryColor,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Greeting text
-                        Text(
-                          'Hello!',
-                          style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: theme.textTheme.bodyLarge?.color,
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),

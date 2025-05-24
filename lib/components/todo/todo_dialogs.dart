@@ -116,211 +116,439 @@ class TodoDialogs {
 
     // Category will be determined automatically by Gemini API
 
+    final Size screenSize = MediaQuery.of(context).size;
     return await showDialog<bool>(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: Text(
-            'Update Task',
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+        builder: (context, setState) => Dialog(
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: screenSize.width * 0.08,
+            vertical: screenSize.height * 0.05,
           ),
-          content: SingleChildScrollView(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 8,
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: screenSize.width * 0.9,
+              maxHeight: screenSize.height * 0.8,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(
-                  controller: titleController,
-                  decoration: InputDecoration(
-                    labelText: 'Task Title',
-                    labelStyle: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
+                // Solid Color Header
+                Container(
+                  decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  width: double.infinity,
+                  child: Center(
+                    child: Text(
+                      'Update Task',
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
                   ),
                 ),
-                // Category will be determined automatically by Gemini API
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: selectedDate ?? DateTime.now(),
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2101),
-                          );
-                          if (date != null) {
-                            setState(() {
-                              selectedDate = date;
-                            });
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 12),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Theme.of(context).colorScheme.primary),
-                            borderRadius: BorderRadius.circular(8),
+                // Content
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Title Section
+                        Text(
+                          'Task Title',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                size: 18,
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: titleController,
+                          decoration: InputDecoration(
+                            hintText: 'Enter task title',
+                            filled: true,
+                            fillColor: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerLowest,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outline
+                                    .withOpacity(0.3),
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outline
+                                    .withOpacity(0.3),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
                                 color: Theme.of(context).colorScheme.primary,
+                                width: 1.5,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                selectedDate == null
-                                    ? 'Select Date'
-                                    : DateFormat('MMM dd, yyyy')
-                                        .format(selectedDate!),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  color: selectedDate == null
-                                      ? Colors.grey[500]
-                                      : Colors.grey[800],
-                                ),
-                              ),
-                              if (selectedDate != null) ...[
-                                const Spacer(),
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      selectedDate = null;
-                                    });
-                                  },
-                                  child: Icon(
-                                    Icons.close,
-                                    size: 16,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ],
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 16),
+                          ),
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () async {
-                          final time = await showTimePicker(
-                            context: context,
-                            initialTime: selectedTime ?? TimeOfDay.now(),
-                          );
-                          if (time != null) {
-                            setState(() {
-                              selectedTime = time;
-                            });
-                          }
-                        },
-                        child: Container(
+
+                        const SizedBox(height: 24),
+
+                        // Date and Time Section
+                        Text(
+                          'Date & Time',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Date Selector
+                        InkWell(
+                          onTap: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: selectedDate ?? DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(2101),
+                            );
+                            if (date != null) {
+                              setState(() {
+                                selectedDate = date;
+                              });
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerLowest,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outline
+                                    .withOpacity(0.3),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 22,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    selectedDate == null
+                                        ? 'Select Date'
+                                        : DateFormat('MMM dd, yyyy')
+                                            .format(selectedDate!),
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 15,
+                                      color: selectedDate == null
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withOpacity(0.6)
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                    ),
+                                  ),
+                                ),
+                                if (selectedDate != null)
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    iconSize: 20,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedDate = null;
+                                      });
+                                    },
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Time Selector
+                        InkWell(
+                          onTap: () async {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: selectedTime ?? TimeOfDay.now(),
+                            );
+                            if (time != null) {
+                              setState(() {
+                                selectedTime = time;
+                              });
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerLowest,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outline
+                                    .withOpacity(0.3),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time,
+                                  size: 22,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    selectedTime == null
+                                        ? 'Select Time'
+                                        : selectedTime!.format(context),
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 15,
+                                      color: selectedTime == null
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withOpacity(0.6)
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                    ),
+                                  ),
+                                ),
+                                if (selectedTime != null)
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    iconSize: 20,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedTime = null;
+                                      });
+                                    },
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Notification Section
+                        Text(
+                          'Notification',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 12),
+                              horizontal: 16, vertical: 14),
                           decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerLowest,
+                            borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                                color: Theme.of(context).colorScheme.primary),
-                            borderRadius: BorderRadius.circular(8),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .outline
+                                  .withOpacity(0.3),
+                            ),
                           ),
                           child: Row(
                             children: [
                               Icon(
-                                Icons.access_time,
-                                size: 18,
-                                color: Colors.grey[600],
+                                Icons.notifications_active,
+                                size: 22,
+                                color: enableNotification
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                selectedTime == null
-                                    ? 'Select Time'
-                                    : selectedTime!.format(context),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  color: selectedTime == null
-                                      ? Colors.grey[500]
-                                      : Colors.grey[800],
-                                ),
-                              ),
-                              if (selectedTime != null) ...[
-                                const Spacer(),
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      selectedTime = null;
-                                    });
-                                  },
-                                  child: Icon(
-                                    Icons.close,
-                                    size: 16,
-                                    color: Colors.grey[600],
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Enable Notification',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 15,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
-                              ],
+                              ),
+                              Switch(
+                                value: enableNotification,
+                                onChanged: (value) {
+                                  setState(() {
+                                    enableNotification = value;
+                                  });
+                                },
+                                activeColor:
+                                    Theme.of(context).colorScheme.primary,
+                              ),
                             ],
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 16),
-                // Notification Toggle
+
+                // Action Buttons
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Theme.of(context).colorScheme.primary),
-                    borderRadius: BorderRadius.circular(8),
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        offset: const Offset(0, -3),
+                        blurRadius: 6,
+                      ),
+                    ],
                   ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Icon(
-                        Icons.notifications_active,
-                        size: 18,
-                        color: enableNotification
-                            ? Theme.of(context).colorScheme.primary
-                            : Colors.grey[600],
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
                         child: Text(
-                          'Enable Notification',
+                          'Cancel',
                           style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.grey[800],
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
-                      Switch(
-                        value: enableNotification,
-                        onChanged: (value) {
-                          setState(() {
-                            enableNotification = value;
-                          });
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (titleController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Task title cannot be empty',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                backgroundColor: Colors.red[400],
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          await todoService.updateTodo(
+                            todoId: docId,
+                            title: titleController.text.trim(),
+                            date: selectedDate == null
+                                ? ''
+                                : DateFormat('MMM dd, yyyy')
+                                    .format(selectedDate!),
+                            time: selectedTime == null
+                                ? ''
+                                : selectedTime!.format(context),
+                            enableNotification: enableNotification,
+                            // Category will be determined by Gemini API
+                          );
+
+                          if (context.mounted) {
+                            showUpdateSuccessMessage(context);
+                            Navigator.of(context).pop(true);
+                          }
                         },
-                        activeColor: Theme.of(context).colorScheme.primary,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Update',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -328,69 +556,6 @@ class TodoDialogs {
               ],
             ),
           ),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                if (titleController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Task title cannot be empty',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      backgroundColor: Colors.red[400],
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
-                  return;
-                }
-
-                await todoService.updateTodo(
-                  todoId: docId,
-                  title: titleController.text.trim(),
-                  date: selectedDate == null
-                      ? ''
-                      : DateFormat('MMM dd, yyyy').format(selectedDate!),
-                  time:
-                      selectedTime == null ? '' : selectedTime!.format(context),
-                  enableNotification: enableNotification,
-                  // Category will be determined by Gemini API
-                );
-
-                if (context.mounted) {
-                  showUpdateSuccessMessage(context);
-                  Navigator.of(context).pop(true);
-                }
-              },
-              child: Text(
-                'Update',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.blue[700],
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );
