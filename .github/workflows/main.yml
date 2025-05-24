@@ -26,10 +26,18 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: "3.33.0"
           channel: "stable"
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Fix CardTheme issue in monochrome_theme.dart
+        run: |
+          if grep -q "cardTheme: CardTheme" "lib/utils/monochrome_theme.dart"; then
+            sed -i 's/cardTheme: CardTheme/cardTheme: CardThemeData/g' lib/utils/monochrome_theme.dart
+            echo "Fixed CardTheme references in monochrome_theme.dart"
+          fi
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
