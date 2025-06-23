@@ -242,9 +242,9 @@ class _RecommendationCardState extends State<RecommendationCard> {
   List<Widget> _buildGenreTags(bool isDark) {
     List<dynamic> genres = [];
     if (widget.category == 'movies') {
-      genres = (widget.genres as List?)?.map((g) => g['name']).toList() ?? [];
+      genres = (widget.genres)?.map((g) => g['name']).toList() ?? [];
     } else if (widget.category == 'books') {
-      genres = widget.genres as List? ?? [];
+      genres = widget.genres ?? [];
     } else if (widget.category == 'exercise') {
       final Map<dynamic, dynamic>? exerciseData = widget.genres as Map?;
       genres = [

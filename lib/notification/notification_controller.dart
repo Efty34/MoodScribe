@@ -132,13 +132,6 @@ class NotificationController {
             successCount++;
           } else {
             // If the improved method fails, try the fallback
-            final fallbackResult = await todoService.scheduleNotification(
-              todoId: doc.id,
-              title: title,
-              date: date,
-              time: time,
-            );
-
             // We don't know the result of the fallback since it returns void
             // Just count it as a success attempt
             successCount++;

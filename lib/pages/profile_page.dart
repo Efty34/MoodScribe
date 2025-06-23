@@ -191,7 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Text(
               'Error: $error',
               style: GoogleFonts.poppins(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withAlpha(178),
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,
@@ -212,30 +212,4 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildErrorState(String error, ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline_rounded,
-              size: 48,
-              color: theme.colorScheme.error,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Error: $error',
-              style: GoogleFonts.poppins(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

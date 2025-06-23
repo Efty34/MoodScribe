@@ -1,4 +1,3 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:diary/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,66 +9,6 @@ import 'logout_manager.dart';
 /// Custom drawer component for the app with modern minimal design
 class CustomAppDrawer extends StatelessWidget {
   const CustomAppDrawer({super.key});
-
-  // Show a test notification
-  Future<void> _showTestNotification(BuildContext context) async {
-    int notificationId =
-        DateTime.now().millisecondsSinceEpoch.remainder(100000);
-
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: notificationId,
-        channelKey: 'notification_channel',
-        title: 'Hello from MoodScribe!',
-        body: 'This is a test notification from the app drawer',
-        notificationLayout: NotificationLayout.Default,
-        payload: {'source': 'app_drawer'},
-      ),
-    );
-
-    // Show a feedback snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Notification sent!'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-
-    // Close the drawer
-    Navigator.pop(context);
-  }
-
-  // Schedule a notification to appear after 20 seconds
-  Future<void> _scheduleNotification() async {
-    final scheduleTime = DateTime.now().add(const Duration(seconds: 20));
-    const notificationId = 7; // Fixed ID for scheduled notifications
-
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: notificationId,
-        channelKey: 'notification_channel',
-        title: 'Scheduled Notification',
-        body:
-            'This notification was scheduled to appear 20 seconds after triggering!',
-        wakeUpScreen: true,
-        category: NotificationCategory.Reminder,
-        notificationLayout: NotificationLayout.Default,
-        payload: {'scheduledTime': scheduleTime.toString()},
-      ),
-      schedule: NotificationCalendar.fromDate(
-        date: scheduleTime,
-        allowWhileIdle: true,
-        preciseAlarm: true,
-        repeats: false,
-      ),
-      actionButtons: [
-        NotificationActionButton(
-          key: 'MARK_DONE',
-          label: 'Mark Done',
-        ),
-      ],
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

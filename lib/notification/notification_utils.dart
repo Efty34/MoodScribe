@@ -138,7 +138,7 @@ class NotificationUtils {
           parsedDate.year,
           parsedDate.month,
           parsedDate.day,
-          parsedTime!.hour,
+          parsedTime.hour,
           parsedTime.minute,
         );
 

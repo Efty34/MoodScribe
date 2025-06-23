@@ -39,8 +39,7 @@ class AppSnackBar {
         iconColor = Colors.amber;
         break;
       case SnackBarType.info:
-      default:
-        icon = customIcon ?? Icons.info_outline;
+      icon = customIcon ?? Icons.info_outline;
         iconColor = Colors.blue;
         break;
     }
