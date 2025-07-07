@@ -16,6 +16,8 @@ class MonochromeTheme {
       onSecondary: Color(0xFF000000), // Off-black
       surface: Color(0xFFFFFFFF), // Pure white
       onSurface: Color(0xFF191919), // Off-black
+      background: Color(0xFFFFFFFF), // Pure white
+      onBackground: Color(0xFF191919), // Off-black
       error: Color(0xFF000000), // Black for errors (was red)
       onError: Color(0xFFFFFFFF), // Pure white
       primaryContainer: Color(0xFFE0E0E0), // Light gray
@@ -52,6 +54,7 @@ class MonochromeTheme {
       ),
     ),
 
+
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: const Color(0xFFF5F5F5),
@@ -85,6 +88,8 @@ class MonochromeTheme {
       onSecondary: Color(0xFFFFFFFF), // Pure white
       surface: Color(0xFF121212), // Nearly black
       onSurface: Color(0xFFFFFFFF), // Pure white
+      background: Color(0xFF121212), // Nearly black
+      onBackground: Color(0xFFFFFFFF), // Pure white
       error: Color(0xFFFFFFFF), // White for errors (was colored)
       onError: Color(0xFF000000), // Pure black
       primaryContainer: Color(0xFF2C2C2C), // Dark gray
