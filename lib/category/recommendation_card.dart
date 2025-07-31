@@ -50,8 +50,8 @@ class _RecommendationCardState extends State<RecommendationCard> {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.2)
-                : Colors.black.withOpacity(0.05),
+                ? Colors.black.withAlpha(51)
+                : Colors.black.withAlpha(12),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -101,7 +101,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
                           Icon(
                             _getCategoryIcon(),
                             size: 16,
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface.withAlpha(153),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -109,8 +109,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.6),
+                              color: theme.colorScheme.onSurface.withAlpha(153),
                               letterSpacing: 1,
                             ),
                           ),
@@ -130,7 +129,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
                               width: 100,
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? Colors.orange.withOpacity(0.2)
+                                    ? Colors.orange.withAlpha(51)
                                     : Colors.orange[50],
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -152,7 +151,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
                                     ),
                                     decoration: BoxDecoration(
                                       color: isDark
-                                          ? Colors.orange.withOpacity(0.3)
+                                          ? Colors.orange.withAlpha(76)
                                           : Colors.orange[100],
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -194,7 +193,7 @@ class _RecommendationCardState extends State<RecommendationCard> {
                                       size: 32,
                                       color: isDark
                                           ? theme.colorScheme.onSurface
-                                              .withOpacity(0.3)
+                                              .withAlpha(76)
                                           : Colors.grey[400],
                                     ),
                                   );
@@ -214,8 +213,8 @@ class _RecommendationCardState extends State<RecommendationCard> {
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? Colors.black.withOpacity(0.5)
-                                  : Colors.black.withOpacity(0.3),
+                                  ? Colors.black.withAlpha(127)
+                                  : Colors.black.withAlpha(76),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(

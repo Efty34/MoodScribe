@@ -60,7 +60,7 @@ class _StatsPageState extends State<StatsPage> {
                   )
                 : Icon(
                     Icons.refresh_rounded,
-                    color: theme.colorScheme.primary.withOpacity(0.8),
+                    color: theme.colorScheme.primary.withAlpha(204),
                   ),
             onPressed: _isRefreshing ? null : _refreshAllStats,
             tooltip: 'Refresh all stats',
@@ -96,7 +96,7 @@ class _StatsPageState extends State<StatsPage> {
                     'Track your journaling habits and maintain your writing streak. Click on any day to see mood details.',
                     style: GoogleFonts.poppins(
                       fontSize: 14,
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withAlpha(178),
                     ),
                   ),
                 ),
@@ -112,7 +112,7 @@ class _StatsPageState extends State<StatsPage> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withAlpha(12),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
