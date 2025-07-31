@@ -6,6 +6,7 @@ import 'package:diary/pages/login_page.dart';
 import 'package:diary/pages/register_page.dart';
 import 'package:diary/pages/settings_page.dart';
 import 'package:diary/pages/stats_page.dart';
+import 'package:diary/services/calendar_access_provider.dart';
 import 'package:diary/services/mood_chart_provider.dart';
 import 'package:diary/services/profile_provider.dart';
 import 'package:diary/services/streak_calendar_provider.dart';
@@ -78,6 +79,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => MoodChartProvider()),
         ChangeNotifierProvider(create: (_) => StreakCalendarProvider()),
         ChangeNotifierProvider(create: (_) => StressChartProvider()),
+        ChangeNotifierProvider(create: (_) => CalendarAccessProvider()),
       ],
       child: const MyApp(),
     ),

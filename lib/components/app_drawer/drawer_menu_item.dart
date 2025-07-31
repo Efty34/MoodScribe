@@ -12,6 +12,8 @@ class DrawerMenuItem extends StatelessWidget {
   final VoidCallback onTap;
   final bool isLottie;
   final String? badgeCount;
+  final bool isDisabled;
+  final String? subtitle;
 
   const DrawerMenuItem({
     super.key,
@@ -20,6 +22,8 @@ class DrawerMenuItem extends StatelessWidget {
     required this.onTap,
     this.isLottie = false,
     this.badgeCount,
+    this.isDisabled = false,
+    this.subtitle,
   });
 
   @override
@@ -34,13 +38,15 @@ class DrawerMenuItem extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: isDisabled ? null : onTap,
         borderRadius: BorderRadius.circular(DrawerStyles.borderRadius),
-        splashColor: primaryColor.withOpacity(0.1),
-        highlightColor: primaryColor.withOpacity(0.05),
-        hoverColor: primaryColor.withOpacity(0.03),
+        splashColor: isDisabled ? null : primaryColor.withOpacity(0.1),
+        highlightColor: isDisabled ? null : primaryColor.withOpacity(0.05),
+        hoverColor: isDisabled ? null : primaryColor.withOpacity(0.03),
         child: Ink(
-          height: 56, // Reduced height for minimalism
+          height: subtitle != null
+              ? 68
+              : 56, // Increased height when subtitle exists
           decoration: BoxDecoration(
             color: isDark ? Colors.transparent : Colors.transparent,
             borderRadius: BorderRadius.circular(DrawerStyles.borderRadius),
@@ -56,7 +62,9 @@ class DrawerMenuItem extends StatelessWidget {
                   decoration: isLottie
                       ? null
                       : BoxDecoration(
-                          color: primaryColor.withOpacity(isDark ? 0.15 : 0.1),
+                          color: isDisabled
+                              ? theme.disabledColor.withOpacity(0.1)
+                              : primaryColor.withOpacity(isDark ? 0.15 : 0.1),
                           shape: BoxShape.circle,
                         ),
                   child: isLottie
@@ -69,20 +77,40 @@ class DrawerMenuItem extends StatelessWidget {
                         )
                       : Icon(
                           icon,
-                          color: primaryColor,
+                          color:
+                              isDisabled ? theme.disabledColor : primaryColor,
                           size: iconSize,
                         ),
                 ),
                 const SizedBox(width: 14),
-                // Title
+                // Title and subtitle
                 Expanded(
-                  child: Text(
-                    title,
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.onSurface,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: isDisabled
+                              ? theme.disabledColor
+                              : theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle!,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: theme.hintColor,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 // Badge (if any)

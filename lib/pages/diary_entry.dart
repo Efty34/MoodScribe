@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:diary/models/stress_prediction_response.dart';
+import 'package:diary/services/calendar_access_provider.dart';
 import 'package:diary/services/diary_service.dart';
 import 'package:diary/utils/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class DiaryEntry extends StatefulWidget {
   const DiaryEntry({super.key});
@@ -55,6 +57,12 @@ class _DiaryEntryState extends State<DiaryEntry> {
         setState(() {
           _selectedCategory = null;
         });
+
+        // Trigger calendar access check via provider
+        if (mounted) {
+          Provider.of<CalendarAccessProvider>(context, listen: false)
+              .checkCalendarAccess();
+        }
 
         if (!mounted) return;
         AppSnackBar.show(

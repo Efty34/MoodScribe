@@ -60,7 +60,7 @@ class CategoryPage extends StatelessWidget {
                   dividerColor: Colors.transparent,
                   labelColor: theme.colorScheme.primary,
                   unselectedLabelColor:
-                      theme.colorScheme.onSurface.withOpacity(0.5),
+                      theme.colorScheme.onSurface.withAlpha(127),
                   indicatorSize: TabBarIndicatorSize.label,
                   indicatorColor: theme.colorScheme.primary,
                   labelStyle: GoogleFonts.poppins(

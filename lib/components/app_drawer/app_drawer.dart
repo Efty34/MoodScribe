@@ -1,6 +1,8 @@
+import 'package:diary/services/calendar_access_provider.dart';
 import 'package:diary/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import 'drawer_menu_item.dart';
 import 'drawer_styles.dart';
@@ -142,12 +144,41 @@ class CustomAppDrawer extends StatelessWidget {
                     // Activities group
                     _buildSectionHeader(context, 'Activities'),
                     const SizedBox(height: 8),
-                    DrawerMenuItem(
-                      title: 'Mood Streak Calendar',
-                      icon: Icons.calendar_view_month,
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, AppRoutes.statsPage);
+                    Consumer<CalendarAccessProvider>(
+                      builder: (context, calendarProvider, child) {
+                        final hasCalendarAccess =
+                            calendarProvider.hasCalendarAccess;
+
+                        return DrawerMenuItem(
+                          title: 'Mood Streak Calendar',
+                          icon: hasCalendarAccess
+                              ? Icons.calendar_view_month
+                              : Icons.lock_outlined,
+                          isDisabled: !hasCalendarAccess,
+                          subtitle: hasCalendarAccess
+                              ? '✨ Unlocked with 5-day streak!'
+                              : 'Unlock with 5-day streak',
+                          onTap: hasCalendarAccess
+                              ? () {
+                                  Navigator.pop(context);
+                                  Navigator.pushNamed(
+                                      context, AppRoutes.statsPage);
+                                }
+                              : () {
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Keep journaling! Unlock this feature with a 5-day streak.',
+                                        style: GoogleFonts.nunito(),
+                                      ),
+                                      backgroundColor:
+                                          theme.colorScheme.primaryContainer,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                  );
+                                },
+                        );
                       },
                     ),
 

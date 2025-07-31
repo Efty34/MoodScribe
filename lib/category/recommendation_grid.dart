@@ -55,7 +55,7 @@ class _RecommendationGridState extends State<RecommendationGrid> {
                   Text(
                     'Finding the best recommendations for you...',
                     style: GoogleFonts.poppins(
-                      color: theme.colorScheme.onBackground.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withAlpha(135),
                       fontSize: 14,
                     ),
                   ),
@@ -78,7 +78,7 @@ class _RecommendationGridState extends State<RecommendationGrid> {
                   Text(
                     'Error loading recommendations',
                     style: GoogleFonts.poppins(
-                      color: theme.colorScheme.onBackground.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withAlpha(135),
                       fontSize: 14,
                     ),
                   ),
@@ -105,7 +105,7 @@ class _RecommendationGridState extends State<RecommendationGrid> {
                   Text(
                     'No recommendations found',
                     style: GoogleFonts.poppins(
-                      color: theme.colorScheme.onBackground.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withAlpha(135),
                       fontSize: 14,
                     ),
                   ),

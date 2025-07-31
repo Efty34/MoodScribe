@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diary/auth/auth_service.dart';
 import 'package:diary/services/diary_service.dart';
 import 'package:diary/services/favorites_service.dart';
 import 'package:http/http.dart' as http;
@@ -8,64 +10,128 @@ class RecommendationService {
   static List<Map<String, dynamic>>? _cachedRecommendations;
   final DiaryService _diaryService = DiaryService();
   final FavoritesService _favoritesService = FavoritesService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String baseUrl =
       'https://mood-scribe-recommendation-ai-agent.vercel.app/api/recommendations/combined';
 
-  Future<Map<String, dynamic>> _prepareRecommendationData() async {
-    // Get stress percentage from diary entries
-    final diaryStats = await _diaryService.getDiaryStatistics();
-    final moodCounts = diaryStats['mood_counts'] as Map<String, dynamic>;
+  Future<Map<String, int>> _getPredictedAspectCounts() async {
+    try {
+      final String? userId = AuthService().currentUser?.uid;
+      if (userId == null) return {};
 
-    final int totalEntries = diaryStats['total_entries'];
+      // Get all diary entries using Firestore directly
+      final QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('diary')
+          .get();
 
-    // Count stress entries handling both old and new format
-    int stressCount = 0;
-    moodCounts.forEach((mood, count) {
-      final moodLower = mood.toLowerCase();
-      if (moodLower.contains('stress') && !moodLower.contains('no stress')) {
-        stressCount += count as int;
+      final Map<String, int> aspectCounts = {};
+
+      for (var entry in snapshot.docs) {
+        final data = entry.data() as Map<String, dynamic>;
+        final predictedAspect = data['predictedAspect'] as String?;
+
+        if (predictedAspect != null && predictedAspect.isNotEmpty) {
+          aspectCounts[predictedAspect] =
+              (aspectCounts[predictedAspect] ?? 0) + 1;
+        }
       }
-    });
 
-    final double stressPercentage =
-        totalEntries > 0 ? (stressCount / totalEntries) * 100 : 0;
-
-    // Get user's favorites
-    final snapshot = await _favoritesService.getFavoritesOnce();
-    final favorites = snapshot.docs;
-
-    // Group favorites by category
-    final Map<String, List<String>> pastLikings = {
-      'favoriteMovies': [],
-      'favoriteBooks': [],
-      'favoriteSongs': [],
-    };
-
-    for (var favorite in favorites) {
-      final data = favorite.data() as Map<String, dynamic>;
-      final title = data['title'] as String;
-
-      switch (data['category']) {
-        case 'movies':
-          pastLikings['favoriteMovies']!.add(title);
-          break;
-        case 'books':
-          pastLikings['favoriteBooks']!.add(title);
-          break;
-        case 'music':
-          pastLikings['favoriteSongs']!.add(title);
-          break;
-      }
+      return aspectCounts;
+    } catch (e) {
+      // Return empty map if there's an error
+      return {};
     }
+  }
 
-    // Remove empty categories
-    pastLikings.removeWhere((key, value) => value.isEmpty);
+  Future<Map<String, dynamic>> _prepareRecommendationData() async {
+    try {
+      // Get comprehensive diary statistics
+      final diaryStats = await _diaryService.getDiaryStatistics();
+      // print('Raw diary stats: $diaryStats');
 
-    // Prepare the final request payload
-    return {
-      'stressEntryPercentage': stressPercentage.round(),
-      if (pastLikings.isNotEmpty) 'pastLikings': pastLikings,
-    };
+      final moodCounts = diaryStats['mood_counts'] as Map<String, dynamic>;
+      final int totalEntries = diaryStats['total_entries'];
+
+      // print('Mood counts: $moodCounts');
+      // print('Total entries: $totalEntries');
+
+      // Count stress and no stress entries handling both old and new format
+      int stressCount = 0;
+      int noStressCount = 0;
+
+      moodCounts.forEach((mood, count) {
+        final moodLower = mood.toLowerCase();
+        if (moodLower.contains('stress')) {
+          if (moodLower.contains('no stress')) {
+            noStressCount += count as int;
+          } else {
+            stressCount += count as int;
+          }
+        }
+      });
+
+      // Get predicted aspects count
+      final aspectCounts = await _getPredictedAspectCounts();
+
+      // Get user's favorites
+      final snapshot = await _favoritesService.getFavoritesOnce();
+      final favorites = snapshot.docs;
+
+      // Group favorites by category - ensure exact key names match API expectation
+      final Map<String, List<String>> pastLikings = {
+        'favoriteMovies': <String>[],
+        'favoriteBooks': <String>[],
+        'favoriteSongs': <String>[],
+      };
+
+      for (var favorite in favorites) {
+        final data = favorite.data() as Map<String, dynamic>;
+        final title = data['title'] as String;
+
+        switch (data['category']) {
+          case 'movies':
+            pastLikings['favoriteMovies']!.add(title);
+            break;
+          case 'books':
+            pastLikings['favoriteBooks']!.add(title);
+            break;
+          case 'music':
+            pastLikings['favoriteSongs']!.add(title);
+            break;
+        }
+      }
+
+      // Remove empty categories
+      pastLikings.removeWhere((key, value) => value.isEmpty);
+
+      // Prepare the final request payload
+      final payload = {
+        'totalEntries': totalEntries,
+        'totalStressEntries': stressCount,
+        'totalNoStressEntries': noStressCount,
+        'predictedAspectCounts': aspectCounts,
+        if (pastLikings.isNotEmpty) 'pastLikings': pastLikings,
+      };
+
+      // Debug: Print data structure
+      // print(
+      //     'Diary Stats: totalEntries=$totalEntries, stress=$stressCount, noStress=$noStressCount');
+      // print('Aspect Counts: $aspectCounts');
+      // print('Past Likings: $pastLikings');
+
+      return payload;
+    } catch (e) {
+      // print('Error preparing recommendation data: $e');
+      // Return minimal data structure if there's an error
+      return {
+        'totalEntries': 0,
+        'totalStressEntries': 0,
+        'totalNoStressEntries': 0,
+        'predictedAspectCounts': <String, int>{},
+      };
+    }
   }
 
   Future<List<Map<String, dynamic>>> getRecommendations(
@@ -77,11 +143,18 @@ class RecommendationService {
 
     try {
       final requestData = await _prepareRecommendationData();
+
+      // Debug: Print the request data to see what's being sent
+      // print('Sending to API: ${json.encode(requestData)}');
+
       final response = await http.post(
         Uri.parse(baseUrl),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(requestData),
       );
+
+      // print('API Response Status: ${response.statusCode}');
+      // print('API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
@@ -156,10 +229,12 @@ class RecommendationService {
         _cachedRecommendations = formattedData;
         return formattedData;
       } else {
+        // print('API Error Response: ${response.body}');
         throw Exception(
-            'Failed to get recommendations: ${response.statusCode}');
+            'Failed to get recommendations: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
+      // print('Recommendation Service Error: $e');
       throw Exception('Error getting recommendations: $e');
     }
   }

@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/auth/auth_service.dart';
+import 'package:diary/services/user_service.dart';
 import 'package:flutter/foundation.dart';
 
 class DiaryService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String? userId = AuthService().currentUser?.uid;
+  final UserService _userService = UserService();
 
   // Add new diary entry
   Future<void> addDiaryEntry({
@@ -370,11 +372,16 @@ class DiaryService {
         }
       }
 
-      return {
+      final result = {
         'current': currentStreak,
         'longest': longestStreak,
         'total': snapshot.docs.length,
       };
+
+      // Check and unlock calendar access if 5-day streak is achieved
+      await _userService.checkAndUnlockCalendarAccess(currentStreak);
+
+      return result;
     } catch (e) {
       debugPrint('Error calculating streaks: $e');
       return {'current': 0, 'longest': 0, 'total': 0};
