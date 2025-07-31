@@ -41,18 +41,6 @@ class _StatsSectionState extends State<StatsSection> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Row(
             children: [
-              Container(
-                width: 4,
-                height: 24,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.blue[400]!, Colors.blue[700]!],
-                  ),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
               const SizedBox(width: 12),
               Text(
                 'Statistics',
@@ -78,7 +66,7 @@ class _StatsSectionState extends State<StatsSection> {
                       )
                     : Icon(
                         Icons.refresh_rounded,
-                        color: theme.colorScheme.primary.withOpacity(0.8),
+                        color: theme.colorScheme.primary.withAlpha(204),
                       ),
                 onPressed: _isRefreshing ? null : _refreshMoodData,
                 tooltip: 'Refresh stats',

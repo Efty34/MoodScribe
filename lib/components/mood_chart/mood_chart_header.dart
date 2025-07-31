@@ -21,7 +21,7 @@ class MoodChartHeader extends StatelessWidget {
               style: GoogleFonts.nunito(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: theme.colorScheme.onBackground,
+                color: theme.colorScheme.onSurface,
                 letterSpacing: 0.5,
               ),
             ),
@@ -39,8 +39,8 @@ class MoodChartHeader extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: isDarkMode
-                ? theme.colorScheme.primary.withOpacity(0.2)
-                : theme.colorScheme.primary.withOpacity(0.1),
+                ? theme.colorScheme.primary.withAlpha(51)
+                : theme.colorScheme.primary.withAlpha(25),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(

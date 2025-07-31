@@ -155,8 +155,8 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                       boxShadow: [
                         BoxShadow(
                           color: isDark
-                              ? Colors.black.withOpacity(0.15)
-                              : Colors.black.withOpacity(0.05),
+                              ? Colors.black.withAlpha(38)
+                              : Colors.black.withAlpha(12),
                           offset: const Offset(0, 3),
                           blurRadius: 10,
                           spreadRadius: 0,
@@ -168,7 +168,7 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                               end: Alignment.bottomRight,
                               colors: [
                                 theme.colorScheme.surface,
-                                theme.colorScheme.surface.withOpacity(0.9),
+                                theme.colorScheme.surface.withAlpha(229),
                               ],
                             )
                           : LinearGradient(
@@ -176,7 +176,7 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                               end: Alignment.bottomRight,
                               colors: [
                                 theme.cardColor,
-                                theme.cardColor.withOpacity(0.95),
+                                theme.cardColor.withAlpha(242),
                               ],
                             ),
                     ),
@@ -192,13 +192,13 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: theme.colorScheme.primary
-                                      .withOpacity(isDark ? 0.8 : 0.2),
+                                      .withAlpha(isDark ? 204 : 51),
                                   width: 2,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: theme.colorScheme.primary
-                                        .withOpacity(isDark ? 0.2 : 0.1),
+                                        .withAlpha(isDark ? 51 : 25),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -208,9 +208,8 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                                 radius: 26,
                                 backgroundImage: const AssetImage(AppMedia.dp),
                                 backgroundColor: isDark
-                                    ? theme.colorScheme.surface.withOpacity(0.7)
-                                    : theme.colorScheme.secondary
-                                        .withOpacity(0.2),
+                                    ? theme.colorScheme.surface.withAlpha(178)
+                                    : theme.colorScheme.secondary.withAlpha(51),
                               ),
                             ),
                             const SizedBox(width: 14),
@@ -253,7 +252,7 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                                   : Icon(
                                       Icons.refresh_rounded,
                                       color: theme.colorScheme.primary
-                                          .withOpacity(0.8),
+                                          .withAlpha(204),
                                     ),
                               onPressed: _isRefreshing ? null : _refreshData,
                               tooltip: 'Refresh data',
@@ -303,8 +302,8 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                                 profileProvider.hasData)
                               Container(
                                 decoration: BoxDecoration(
-                                  color: theme.colorScheme.surface
-                                      .withOpacity(0.4),
+                                  color:
+                                      theme.colorScheme.surface.withAlpha(102),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 padding: const EdgeInsets.all(16),
@@ -336,10 +335,10 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
       {bool isHighlighted = false}) {
     final Color bgColor = isDark
         ? (isHighlighted
-            ? theme.colorScheme.primary.withOpacity(0.15)
-            : theme.colorScheme.surface.withOpacity(0.7))
+            ? theme.colorScheme.primary.withAlpha(38)
+            : theme.colorScheme.surface.withAlpha(178))
         : (isHighlighted
-            ? theme.colorScheme.primary.withOpacity(0.05)
+            ? theme.colorScheme.primary.withAlpha(12)
             : theme.cardColor);
 
     return Container(
@@ -351,8 +350,7 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
         boxShadow: isHighlighted
             ? [
                 BoxShadow(
-                  color: theme.colorScheme.primary
-                      .withOpacity(isDark ? 0.15 : 0.08),
+                  color: theme.colorScheme.primary.withAlpha(isDark ? 38 : 20),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),

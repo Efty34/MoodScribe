@@ -53,14 +53,14 @@ class MoodChartLegend extends StatelessWidget {
           _buildLegendItem(
             context: context,
             color: stressedColor,
-            label: 'Stressed',
+            label: 'Stress',
             value: stressValue,
           ),
           const SizedBox(height: 12),
           _buildLegendItem(
             context: context,
             color: positiveColor,
-            label: 'Not Stressed',
+            label: 'No Stress',
             value: nonStressValue,
           ),
         ],

@@ -44,8 +44,8 @@ class _MoodChartCardState extends State<MoodChartCard> {
         boxShadow: [
           BoxShadow(
             color: isDarkMode
-                ? Colors.black.withOpacity(0.2)
-                : Colors.black.withOpacity(0.05),
+                ? Colors.black.withAlpha(51)
+                : Colors.black.withAlpha(12),
             blurRadius: 15,
             offset: const Offset(0, 5),
             spreadRadius: -2,
@@ -113,7 +113,7 @@ class _MoodChartCardState extends State<MoodChartCard> {
                                     : Icons.sentiment_dissatisfied_rounded)
                                 : Icons.sentiment_neutral_rounded,
                             size: 32,
-                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                            color: theme.colorScheme.onSurface.withAlpha(178),
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -164,7 +164,7 @@ class _MoodChartCardState extends State<MoodChartCard> {
 
     return [
       PieChartSectionData(
-        color: stressedColor.withOpacity(0.9),
+        color: stressedColor.withAlpha(229),
         value: stressPercentage * widget.animation.value,
         title:
             touchedIndex == 0 ? '${stressPercentage.toStringAsFixed(1)}%' : '',
@@ -175,18 +175,18 @@ class _MoodChartCardState extends State<MoodChartCard> {
           color: Colors.white,
           shadows: [
             Shadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withAlpha(76),
               blurRadius: 3,
             ),
           ],
         ),
         badgeWidget: touchedIndex == 0
-            ? _buildBadge(stressPercentage.toStringAsFixed(1), theme)
+            ? _buildBadge('Stress', stressPercentage.toStringAsFixed(1), theme)
             : null,
         badgePositionPercentageOffset: 0.5,
       ),
       PieChartSectionData(
-        color: positiveColor.withOpacity(0.9),
+        color: positiveColor.withAlpha(229),
         value: nonStressPercentage * widget.animation.value,
         title: touchedIndex == 1
             ? '${nonStressPercentage.toStringAsFixed(1)}%'
@@ -198,20 +198,21 @@ class _MoodChartCardState extends State<MoodChartCard> {
           color: Colors.white,
           shadows: [
             Shadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withAlpha(76),
               blurRadius: 3,
             ),
           ],
         ),
         badgeWidget: touchedIndex == 1
-            ? _buildBadge(nonStressPercentage.toStringAsFixed(1), theme)
+            ? _buildBadge(
+                'No Stress', nonStressPercentage.toStringAsFixed(1), theme)
             : null,
         badgePositionPercentageOffset: 0.5,
       ),
     ];
   }
 
-  Widget _buildBadge(String percentage, ThemeData theme) {
+  Widget _buildBadge(String label, String percentage, ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return AnimatedContainer(
@@ -221,20 +222,33 @@ class _MoodChartCardState extends State<MoodChartCard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.2),
+            color: Colors.black.withAlpha(isDarkMode ? 76 : 51),
             blurRadius: 6,
             spreadRadius: 1,
           )
         ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: Text(
-        '$percentage%',
-        style: GoogleFonts.nunito(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          color: theme.colorScheme.onSurface,
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.nunito(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface.withAlpha(204),
+            ),
+          ),
+          Text(
+            '$percentage%',
+            style: GoogleFonts.nunito(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+        ],
       ),
     );
   }

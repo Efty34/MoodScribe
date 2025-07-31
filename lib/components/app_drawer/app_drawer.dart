@@ -143,15 +143,8 @@ class CustomAppDrawer extends StatelessWidget {
                     _buildSectionHeader(context, 'Activities'),
                     const SizedBox(height: 8),
                     DrawerMenuItem(
-                      title: 'Games',
-                      icon: Icons.games_rounded,
-                      onTap: () => Navigator.pop(context),
-                      badgeCount: '3',
-                    ),
-                    const SizedBox(height: 10),
-                    DrawerMenuItem(
-                      title: 'Stats',
-                      icon: Icons.bar_chart_rounded,
+                      title: 'Mood Streak Calendar',
+                      icon: Icons.calendar_view_month,
                       onTap: () {
                         Navigator.pop(context);
                         Navigator.pushNamed(context, AppRoutes.statsPage);
