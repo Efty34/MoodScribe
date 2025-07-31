@@ -89,8 +89,19 @@ class _HomePageState extends State<HomePage> {
                   : entries.where((doc) {
                       final data = doc.data() as Map<String, dynamic>;
                       final content = (data['content'] as String).toLowerCase();
+                      final mood =
+                          (data['mood'] as String? ?? '').toLowerCase();
+                      final category =
+                          (data['category'] as String? ?? '').toLowerCase();
+                      final predictedAspect =
+                          (data['predicted_aspect'] as String? ?? '')
+                              .toLowerCase();
                       final query = widget.searchState.query.toLowerCase();
-                      return content.contains(query);
+
+                      return content.contains(query) ||
+                          mood.contains(query) ||
+                          category.contains(query) ||
+                          predictedAspect.contains(query);
                     }).toList();
 
               if (filteredEntries.isEmpty) {
@@ -120,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                           'Try searching with different keywords',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
-                            color: theme.hintColor.withOpacity(0.8),
+                            color: theme.hintColor.withAlpha(204),
                           ),
                         ),
                       ],
@@ -147,7 +158,7 @@ class _HomePageState extends State<HomePage> {
                   final doc = filteredEntries[index];
                   final data = doc.data() as Map<String, dynamic>;
                   final content = data['content'] as String;
-                  final mood = data['mood'] as String;
+                  final mood = data['mood'] as String? ?? 'unknown';
                   final date = (data['date'] as Timestamp).toDate();
 
                   final truncatedContent = content.length > 100
@@ -173,9 +184,7 @@ class _HomePageState extends State<HomePage> {
                         MaterialPageRoute(
                           builder: (_) => DiaryDetailPage(
                             entryId: doc.id,
-                            initialContent: content,
-                            initialMood: mood,
-                            date: date,
+                            entryData: data,
                           ),
                         ),
                       );
@@ -221,7 +230,7 @@ class _HomePageState extends State<HomePage> {
         TextSpan(
           text: text.substring(index, index + query.length),
           style: TextStyle(
-            backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
+            backgroundColor: theme.colorScheme.primary.withAlpha(51),
             fontWeight: FontWeight.bold,
             color: theme.colorScheme.primary,
           ),

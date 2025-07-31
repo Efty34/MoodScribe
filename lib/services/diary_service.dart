@@ -11,6 +11,12 @@ class DiaryService {
     required String content,
     required String mood,
     required DateTime date,
+    String? category,
+    String? predictedAspect,
+    double? ensembledStressConfidence,
+    double? logregStressConfidence,
+    double? attentionModelStressConfidence,
+    double? attentionModelAspectConfidence,
   }) async {
     if (userId == null) return;
 
@@ -18,6 +24,12 @@ class DiaryService {
       'content': content,
       'mood': mood,
       'date': date,
+      'category': category,
+      'predicted_aspect': predictedAspect,
+      'ensembled_stress_confidence': ensembledStressConfidence,
+      'logreg_stress_confidence': logregStressConfidence,
+      'attention_model_stress_confidence': attentionModelStressConfidence,
+      'attention_model_aspect_confidence': attentionModelAspectConfidence,
       'created_at': FieldValue.serverTimestamp(),
       'updated_at': FieldValue.serverTimestamp(),
     });
@@ -53,6 +65,12 @@ class DiaryService {
     required String content,
     required String mood,
     required DateTime date,
+    String? category,
+    String? predictedAspect,
+    double? ensembledStressConfidence,
+    double? logregStressConfidence,
+    double? attentionModelStressConfidence,
+    double? attentionModelAspectConfidence,
   }) async {
     if (userId == null) return;
 
@@ -65,6 +83,12 @@ class DiaryService {
       'content': content,
       'mood': mood,
       'date': date,
+      'category': category,
+      'predicted_aspect': predictedAspect,
+      'ensembled_stress_confidence': ensembledStressConfidence,
+      'logreg_stress_confidence': logregStressConfidence,
+      'attention_model_stress_confidence': attentionModelStressConfidence,
+      'attention_model_aspect_confidence': attentionModelAspectConfidence,
       'updated_at': FieldValue.serverTimestamp(),
     });
   }
@@ -126,6 +150,45 @@ class DiaryService {
         .snapshots();
   }
 
+  // Get diary entries by predicted aspect
+  Stream<QuerySnapshot> getDiaryEntriesByPredictedAspect(String aspect) {
+    if (userId == null) return Stream.empty();
+
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('diary')
+        .where('predicted_aspect', isEqualTo: aspect)
+        .orderBy('date', descending: true)
+        .snapshots();
+  }
+
+  // Get diary entries by category
+  Stream<QuerySnapshot> getDiaryEntriesByCategory(String category) {
+    if (userId == null) return Stream.empty();
+
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('diary')
+        .where('category', isEqualTo: category)
+        .orderBy('date', descending: true)
+        .snapshots();
+  }
+
+  // Get entries with high stress confidence (above threshold)
+  Stream<QuerySnapshot> getHighStressConfidenceEntries(double threshold) {
+    if (userId == null) return Stream.empty();
+
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('diary')
+        .where('ensembled_stress_confidence', isGreaterThan: threshold)
+        .orderBy('ensembled_stress_confidence', descending: true)
+        .snapshots();
+  }
+
   // Get diary statistics
   Future<Map<String, dynamic>> getDiaryStatistics() async {
     if (userId == null) return {};
@@ -137,17 +200,62 @@ class DiaryService {
         .get();
 
     final Map<String, int> moodCounts = {};
+    final Map<String, int> aspectCounts = {};
+    final Map<String, int> categoryCounts = {};
+    double totalEnsembledConfidence = 0.0;
+    double totalLogregConfidence = 0.0;
+    double totalAttentionModelStressConfidence = 0.0;
+    double totalAttentionModelAspectConfidence = 0.0;
     int totalEntries = entries.docs.length;
 
     for (var doc in entries.docs) {
       final data = doc.data() as Map<String, dynamic>;
-      final mood = data['mood'] as String;
+
+      // Count moods
+      final mood = data['mood'] as String? ?? 'unknown';
       moodCounts[mood] = (moodCounts[mood] ?? 0) + 1;
+
+      // Count predicted aspects
+      final predictedAspect = data['predicted_aspect'] as String?;
+      if (predictedAspect != null) {
+        aspectCounts[predictedAspect] =
+            (aspectCounts[predictedAspect] ?? 0) + 1;
+      }
+
+      // Count categories
+      final category = data['category'] as String?;
+      if (category != null) {
+        categoryCounts[category] = (categoryCounts[category] ?? 0) + 1;
+      }
+
+      // Sum confidence scores
+      totalEnsembledConfidence +=
+          (data['ensembled_stress_confidence'] as num?)?.toDouble() ?? 0.0;
+      totalLogregConfidence +=
+          (data['logreg_stress_confidence'] as num?)?.toDouble() ?? 0.0;
+      totalAttentionModelStressConfidence +=
+          (data['attention_model_stress_confidence'] as num?)?.toDouble() ??
+              0.0;
+      totalAttentionModelAspectConfidence +=
+          (data['attention_model_aspect_confidence'] as num?)?.toDouble() ??
+              0.0;
     }
 
     return {
       'total_entries': totalEntries,
       'mood_counts': moodCounts,
+      'aspect_counts': aspectCounts,
+      'category_counts': categoryCounts,
+      'average_ensembled_confidence':
+          totalEntries > 0 ? totalEnsembledConfidence / totalEntries : 0.0,
+      'average_logreg_confidence':
+          totalEntries > 0 ? totalLogregConfidence / totalEntries : 0.0,
+      'average_attention_stress_confidence': totalEntries > 0
+          ? totalAttentionModelStressConfidence / totalEntries
+          : 0.0,
+      'average_attention_aspect_confidence': totalEntries > 0
+          ? totalAttentionModelAspectConfidence / totalEntries
+          : 0.0,
     };
   }
 
@@ -307,13 +415,16 @@ class DiaryService {
         final timestamp = data['date'] as Timestamp;
         final date = timestamp.toDate();
         final String dateKey = '${date.month}-${date.day}';
-        final String mood = data['mood'] as String;
+        final String mood = (data['mood'] as String? ?? '').toLowerCase();
 
         // Skip if the date is not in our range
         if (!result.containsKey(dateKey)) continue;
 
-        // Map 'stress' directly, anything else goes to 'non-stress'
-        final String moodKey = mood == 'stress' ? 'stress' : 'non-stress';
+        // Handle both old and new mood formats
+        final String moodKey =
+            (mood.contains('stress') && !mood.contains('no stress'))
+                ? 'stress'
+                : 'non-stress';
         result[dateKey]![moodKey] = (result[dateKey]![moodKey] ?? 0) + 1;
       }
 

@@ -42,12 +42,15 @@ class DiaryEntryCard extends StatelessWidget {
             : DateTime.now());
 
     Color getMoodColor(String moodValue, bool background) {
+      final isStress = moodValue.toLowerCase().contains('stress') &&
+          !moodValue.toLowerCase().contains('no stress');
+
       if (background) {
-        return moodValue == 'stress'
+        return isStress
             ? (isDark ? Colors.red.withOpacity(0.2) : Colors.red[50]!)
             : (isDark ? Colors.green.withOpacity(0.2) : Colors.green[50]!);
       } else {
-        return moodValue == 'stress'
+        return isStress
             ? (isDark ? Colors.red[500]! : Colors.red[700]!)
             : (isDark ? Colors.green[500]! : Colors.green[700]!);
       }

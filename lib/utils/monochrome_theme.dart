@@ -54,7 +54,6 @@ class MonochromeTheme {
       ),
     ),
 
-
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: const Color(0xFFF5F5F5),
@@ -125,7 +124,6 @@ class MonochromeTheme {
         ),
       ),
     ),
-
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,

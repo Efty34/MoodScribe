@@ -17,7 +17,15 @@ class RecommendationService {
     final moodCounts = diaryStats['mood_counts'] as Map<String, dynamic>;
 
     final int totalEntries = diaryStats['total_entries'];
-    final int stressCount = moodCounts['stress'] ?? 0;
+
+    // Count stress entries handling both old and new format
+    int stressCount = 0;
+    moodCounts.forEach((mood, count) {
+      final moodLower = mood.toLowerCase();
+      if (moodLower.contains('stress') && !moodLower.contains('no stress')) {
+        stressCount += count as int;
+      }
+    });
 
     final double stressPercentage =
         totalEntries > 0 ? (stressCount / totalEntries) * 100 : 0;

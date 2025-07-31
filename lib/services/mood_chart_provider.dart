@@ -99,8 +99,18 @@ class MoodChartProvider with ChangeNotifier {
       final moodCounts = diaryStats['mood_counts'] as Map<String, dynamic>;
 
       // Count stress vs no stress entries
-      final stressCount = moodCounts['stress'] ?? 0;
-      final nonStressCount = moodCounts['no stress'] ?? 0;
+      int stressCount = 0;
+      int nonStressCount = 0;
+
+      // Handle both old and new mood formats
+      moodCounts.forEach((mood, count) {
+        final moodLower = mood.toLowerCase();
+        if (moodLower.contains('stress') && !moodLower.contains('no stress')) {
+          stressCount += count as int;
+        } else {
+          nonStressCount += count as int;
+        }
+      });
 
       // Update chart data
       _chartData = MoodChartData(

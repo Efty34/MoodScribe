@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:diary/models/stress_prediction_response.dart';
 import 'package:diary/services/diary_service.dart';
 import 'package:diary/utils/app_snackbar.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class _DiaryEntryState extends State<DiaryEntry> {
   final TextEditingController _contentController = TextEditingController();
   final DiaryService _diaryService = DiaryService();
   bool _isLoading = false;
-  // String _selectedMood = 'neutral';
+  String? _selectedCategory;
 
   void _saveEntry() async {
     final content = _contentController.text.trim();
@@ -30,17 +31,30 @@ class _DiaryEntryState extends State<DiaryEntry> {
         });
 
         // Get prediction from Flask backend
-        final prediction = await _monitorStress(content);
+        final predictionResponse =
+            await _monitorStress(content, _selectedCategory);
 
         // Save to Firestore using DiaryService
         await _diaryService.addDiaryEntry(
           content: content,
-          mood: prediction,
+          category: _selectedCategory,
+          mood: predictionResponse.ensembledStressPrediction,
           date: DateTime.now(),
+          predictedAspect: predictionResponse.predictedAspect,
+          ensembledStressConfidence:
+              predictionResponse.ensembledStressConfidence,
+          logregStressConfidence: predictionResponse.logregStressConfidence,
+          attentionModelStressConfidence:
+              predictionResponse.attentionModelStressConfidence,
+          attentionModelAspectConfidence:
+              predictionResponse.attentionModelAspectConfidence,
         );
 
         // Clear the TextField & show a SnackBar
         _contentController.clear();
+        setState(() {
+          _selectedCategory = null;
+        });
 
         if (!mounted) return;
         AppSnackBar.show(
@@ -72,23 +86,26 @@ class _DiaryEntryState extends State<DiaryEntry> {
     }
   }
 
-  Future<String> _monitorStress(String text) async {
+  Future<StressPredictionResponse> _monitorStress(
+      String text, String? category) async {
     try {
       final url =
-          Uri.parse('https://stressmodel-deployment01.onrender.com/predict');
+          Uri.parse('https://stress-aspect-detection-api.onrender.com/predict');
+
+      final requestBody = {
+        'text': text,
+        'initial_aspect': category,
+      };
+
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: json.encode({'text': text}),
+        body: json.encode(requestBody),
       );
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        if (responseData.containsKey('prediction')) {
-          return responseData['prediction']; // "stress" or "no stress"
-        } else {
-          throw Exception('Invalid response format: ${response.body}');
-        }
+        return StressPredictionResponse.fromJson(responseData);
       } else {
         throw Exception('HTTP Error: ${response.statusCode}');
       }
@@ -120,26 +137,104 @@ class _DiaryEntryState extends State<DiaryEntry> {
               ),
               const SizedBox(height: 24),
 
+              // Category Dropdown
+              Container(
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? theme.colorScheme.surface.withAlpha(178)
+                      : theme.colorScheme.surface,
+                  border: Border.all(color: theme.dividerColor),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: isDark
+                      ? [
+                          BoxShadow(
+                            color: Colors.white.withAlpha(12),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(12),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                ),
+                child: DropdownButtonFormField<String>(
+                  value: _selectedCategory,
+                  decoration: InputDecoration(
+                    hintText: 'Select a category (optional)',
+                    hintStyle: GoogleFonts.poppins(
+                      color: theme.hintColor,
+                      fontSize: 14,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.category_outlined,
+                      color: theme.hintColor,
+                      size: 20,
+                    ),
+                  ),
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  dropdownColor: theme.colorScheme.surface,
+                  icon: Icon(
+                    Icons.keyboard_arrow_down,
+                    color: theme.hintColor,
+                  ),
+                  items: [
+                    'Relationships & Family',
+                    'Financial Stress',
+                    'Health & Well-being',
+                    'Severe Trauma',
+                  ].map((category) {
+                    return DropdownMenuItem<String>(
+                      value: category,
+                      child: Text(
+                        category,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedCategory = value;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+
               // Content TextField
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
                     color: isDark
-                        ? theme.colorScheme.surface.withOpacity(0.7)
+                        ? theme.colorScheme.surface.withAlpha(178)
                         : theme.colorScheme.surface,
                     border: Border.all(color: theme.dividerColor),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: isDark
                         ? [
                             BoxShadow(
-                              color: Colors.white.withOpacity(0.05),
+                              color: Colors.white.withAlpha(12),
                               blurRadius: 10,
                               offset: const Offset(0, 2),
                             ),
                           ]
                         : [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withAlpha(12),
                               blurRadius: 10,
                               offset: const Offset(0, 2),
                             ),
@@ -177,7 +272,7 @@ class _DiaryEntryState extends State<DiaryEntry> {
                       backgroundColor: theme.colorScheme.primary,
                       foregroundColor: theme.colorScheme.onPrimary,
                       elevation: 3,
-                      shadowColor: Colors.black.withOpacity(isDark ? 0.5 : 0.3),
+                      shadowColor: Colors.black.withAlpha(isDark ? 127 : 76),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

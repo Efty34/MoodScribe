@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/services/diary_service.dart';
 import 'package:diary/utils/app_snackbar.dart';
 import 'package:flutter/material.dart';
@@ -6,16 +7,12 @@ import 'package:intl/intl.dart';
 
 class DiaryDetailPage extends StatefulWidget {
   final String entryId;
-  final String initialContent;
-  final String initialMood;
-  final DateTime date;
+  final Map<String, dynamic> entryData;
 
   const DiaryDetailPage({
     super.key,
     required this.entryId,
-    required this.initialContent,
-    required this.initialMood,
-    required this.date,
+    required this.entryData,
   });
 
   @override
@@ -26,12 +23,32 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   final DiaryService _diaryService = DiaryService();
   late String content;
   late String mood;
+  late DateTime date;
+  late String? category;
+  late String? predictedAspect;
+  late double? ensembledStressConfidence;
+  late double? logregStressConfidence;
+  late double? attentionModelStressConfidence;
+  late double? attentionModelAspectConfidence;
 
   @override
   void initState() {
     super.initState();
-    content = widget.initialContent;
-    mood = widget.initialMood;
+    content = widget.entryData['content'] as String;
+    mood = widget.entryData['mood'] as String? ?? 'unknown';
+    date = (widget.entryData['date'] as Timestamp).toDate();
+    category = widget.entryData['category'] as String?;
+    predictedAspect = widget.entryData['predicted_aspect'] as String?;
+    ensembledStressConfidence =
+        (widget.entryData['ensembled_stress_confidence'] as num?)?.toDouble();
+    logregStressConfidence =
+        (widget.entryData['logreg_stress_confidence'] as num?)?.toDouble();
+    attentionModelStressConfidence =
+        (widget.entryData['attention_model_stress_confidence'] as num?)
+            ?.toDouble();
+    attentionModelAspectConfidence =
+        (widget.entryData['attention_model_aspect_confidence'] as num?)
+            ?.toDouble();
   }
 
   @override
@@ -40,12 +57,15 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     final isDark = theme.brightness == Brightness.dark;
 
     Color getMoodColor(String mood, bool background) {
+      final isStress = mood.toLowerCase().contains('stress') &&
+          !mood.toLowerCase().contains('no stress');
+
       if (background) {
-        return mood == 'stress'
-            ? (isDark ? Colors.red.withOpacity(0.2) : Colors.red[50]!)
-            : (isDark ? Colors.green.withOpacity(0.2) : Colors.green[50]!);
+        return isStress
+            ? (isDark ? Colors.red.withAlpha(51) : Colors.red[50]!)
+            : (isDark ? Colors.green.withAlpha(51) : Colors.green[50]!);
       } else {
-        return mood == 'stress'
+        return isStress
             ? (isDark ? Colors.red[300]! : Colors.red[700]!)
             : (isDark ? Colors.green[300]! : Colors.green[700]!);
       }
@@ -118,7 +138,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      DateFormat('MMM dd, yyyy').format(widget.date),
+                      DateFormat('MMM dd, yyyy').format(date),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: theme.hintColor,
@@ -153,10 +173,157 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                   content,
                   style: GoogleFonts.poppins(
                     fontSize: 16,
-                    color: theme.colorScheme.onBackground,
+                    color: theme.colorScheme.onSurface,
                     height: 1.5,
                   ),
                 ),
+
+                const SizedBox(height: 24),
+                Divider(color: theme.dividerColor),
+                const SizedBox(height: 16),
+
+                // Additional Analysis Information
+                if (category != null || predictedAspect != null) ...[
+                  Text(
+                    'Analysis Details',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Category & Predicted Aspect
+                  if (category != null) ...[
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.category_outlined,
+                          size: 16,
+                          color: theme.hintColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Selected Category: ',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: theme.hintColor,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            category!,
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+
+                  if (predictedAspect != null) ...[
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.psychology_outlined,
+                          size: 16,
+                          color: theme.hintColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'AI Predicted Aspect: ',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: theme.hintColor,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            predictedAspect!,
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ],
+
+                // Confidence Scores
+                if (ensembledStressConfidence != null ||
+                    logregStressConfidence != null ||
+                    attentionModelStressConfidence != null ||
+                    attentionModelAspectConfidence != null) ...[
+                  Text(
+                    'Model Confidence Scores',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (ensembledStressConfidence != null)
+                    _buildConfidenceRow(
+                      'Ensemble Model',
+                      ensembledStressConfidence!,
+                      theme,
+                      Icons.merge_type,
+                    ),
+                  if (logregStressConfidence != null)
+                    _buildConfidenceRow(
+                      'Logistic Regression',
+                      logregStressConfidence!,
+                      theme,
+                      Icons.analytics_outlined,
+                    ),
+                  if (attentionModelStressConfidence != null)
+                    _buildConfidenceRow(
+                      'Attention Model (Stress)',
+                      attentionModelStressConfidence!,
+                      theme,
+                      Icons.visibility_outlined,
+                    ),
+                  if (attentionModelAspectConfidence != null)
+                    _buildConfidenceRow(
+                      'Attention Model (Aspect)',
+                      attentionModelAspectConfidence!,
+                      theme,
+                      Icons.center_focus_strong,
+                    ),
+                  const SizedBox(height: 16),
+                ] else ...[
+                  // Debug section - show when no confidence scores are available
+                  Text(
+                    'Debug Info',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Ensemble: ${ensembledStressConfidence?.toString() ?? "null"}\n'
+                    'Logreg: ${logregStressConfidence?.toString() ?? "null"}\n'
+                    'Attention Stress: ${attentionModelStressConfidence?.toString() ?? "null"}\n'
+                    'Attention Aspect: ${attentionModelAspectConfidence?.toString() ?? "null"}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: theme.hintColor,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ],
             ),
           ),
@@ -171,12 +338,15 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     final contentController = TextEditingController(text: content);
 
     Color getMoodColor(String mood, bool background) {
+      final isStress = mood.toLowerCase().contains('stress') &&
+          !mood.toLowerCase().contains('no stress');
+
       if (background) {
-        return mood == 'stress'
-            ? (isDark ? Colors.red.withOpacity(0.2) : Colors.red[50]!)
-            : (isDark ? Colors.green.withOpacity(0.2) : Colors.green[50]!);
+        return isStress
+            ? (isDark ? Colors.red.withAlpha(51) : Colors.red[50]!)
+            : (isDark ? Colors.green.withAlpha(51) : Colors.green[50]!);
       } else {
-        return mood == 'stress'
+        return isStress
             ? (isDark ? Colors.red[300]! : Colors.red[700]!)
             : (isDark ? Colors.green[300]! : Colors.green[700]!);
       }
@@ -214,12 +384,12 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                       style: GoogleFonts.poppins(
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
-                        color: dialogTheme.colorScheme.onBackground,
+                        color: dialogTheme.colorScheme.onSurface,
                       ),
                     ),
                     IconButton(
                       icon: Icon(Icons.close,
-                          color: dialogTheme.colorScheme.onBackground),
+                          color: dialogTheme.colorScheme.onSurface),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -235,7 +405,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      DateFormat('MMM dd, yyyy').format(widget.date),
+                      DateFormat('MMM dd, yyyy').format(date),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: dialogTheme.hintColor,
@@ -268,7 +438,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                     decoration: BoxDecoration(
                       color: isDialogDark
                           ? dialogTheme.colorScheme.secondary
-                          : dialogTheme.colorScheme.secondary.withOpacity(0.3),
+                          : dialogTheme.colorScheme.secondary.withAlpha(76),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: dialogTheme.dividerColor),
                     ),
@@ -280,7 +450,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         height: 1.5,
-                        color: dialogTheme.colorScheme.onBackground,
+                        color: dialogTheme.colorScheme.onSurface,
                       ),
                       decoration: InputDecoration(
                         hintText: 'Write your thoughts...',
@@ -324,7 +494,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                               entryId: widget.entryId,
                               content: updatedContent,
                               mood: mood,
-                              date: widget.date,
+                              date: date,
                             );
                             setState(() {
                               content = updatedContent;
@@ -391,7 +561,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? dialogTheme.colorScheme.error.withOpacity(0.2)
+                        ? dialogTheme.colorScheme.error.withAlpha(51)
                         : Colors.red[50],
                     shape: BoxShape.circle,
                   ),
@@ -407,7 +577,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: dialogTheme.colorScheme.onBackground,
+                    color: dialogTheme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -487,6 +657,70 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
       context: context,
       message: message,
       type: type,
+    );
+  }
+
+  Widget _buildConfidenceRow(
+      String label, double confidence, ThemeData theme, IconData icon) {
+    final percentage = (confidence * 100).toStringAsFixed(1);
+    final confidenceColor = confidence > 0.7
+        ? Colors.green
+        : confidence > 0.5
+            ? Colors.orange
+            : Colors.red;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: theme.hintColor,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 2,
+            child: Text(
+              '$label:',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: theme.hintColor,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: confidenceColor.withAlpha(25),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: confidenceColor.withAlpha(76),
+                    ),
+                  ),
+                  child: Text(
+                    '$percentage%',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: confidenceColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

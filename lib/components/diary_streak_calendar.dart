@@ -498,8 +498,8 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
                           context: context,
                           icon: Icons.mood,
                           iconColor: Color(0xFF43A047),
-                          label: 'Non-Stress',
-                          count: breakdown['non-stress'] ?? 0,
+                          label: 'No Stress',
+                          count: breakdown['no stress'] ?? 0,
                           total: entries,
                           isDark: isDark,
                         ),
@@ -608,17 +608,18 @@ class _DiaryStreakCalendarState extends State<DiaryStreakCalendar>
       // Count by mood
       final Map<String, int> breakdown = {
         'stress': 0,
-        'non-stress': 0,
+        'no stress': 0,
       };
 
       for (var doc in entries.docs) {
         final data = doc.data() as Map<String, dynamic>;
-        final mood = data['mood'] as String? ?? '';
+        final mood = (data['mood'] as String? ?? '').toLowerCase();
 
-        if (mood == 'stress') {
+        // Handle both old and new mood formats
+        if (mood.contains('stress') && !mood.contains('no stress')) {
           breakdown['stress'] = (breakdown['stress'] ?? 0) + 1;
         } else {
-          breakdown['non-stress'] = (breakdown['non-stress'] ?? 0) + 1;
+          breakdown['no stress'] = (breakdown['no stress'] ?? 0) + 1;
         }
       }
 
