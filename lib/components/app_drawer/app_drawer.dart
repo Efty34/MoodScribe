@@ -126,7 +126,7 @@ class CustomAppDrawer extends StatelessWidget {
                     _buildSectionHeader(context, 'Main'),
                     const SizedBox(height: 8),
                     DrawerMenuItem(
-                      title: 'Journal',
+                      title: 'Journaling',
                       icon: Icons.book_outlined,
                       onTap: () => Navigator.pop(context),
                     ),
