@@ -209,7 +209,7 @@ class _LoginPageState extends State<LoginPage>
                                         'Sign in to continue your journey',
                                         style: GoogleFonts.poppins(
                                           fontSize: 14,
-                                          color: Colors.white.withOpacity(0.9),
+                                          color: Colors.white.withAlpha(229),
                                           letterSpacing: 0.3,
                                         ),
                                       ),
