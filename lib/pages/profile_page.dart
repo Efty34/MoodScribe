@@ -104,18 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Profile Section with enhanced shadow and margin
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: theme.colorScheme.outline,
-                      width: 1,
-                    ),
-                  ),
-                  child: const BuildProfileSection(),
-                ),
+                const BuildProfileSection(),
 
                 const SizedBox(height: 24),
 
@@ -211,5 +200,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
 }

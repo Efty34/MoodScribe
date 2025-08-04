@@ -38,7 +38,7 @@ class _StatsSectionState extends State<StatsSection> {
       children: [
         // Section header
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             children: [
               const SizedBox(width: 12),

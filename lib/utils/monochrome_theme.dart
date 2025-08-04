@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// A strict monochrome black and white color scheme
+/// A soothing, wellness-focused color scheme with a bluish vibe for a stress monitoring app
 class MonochromeTheme {
   // Private constructor to prevent instantiation
   MonochromeTheme._();
@@ -9,45 +9,43 @@ class MonochromeTheme {
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     colorScheme: const ColorScheme.light(
-      // Core palette - pure black and white with subtle gray variations
-      primary: Color(0xFF000000), // Pure black
+      // Core palette - soft blues and cool neutrals
+      primary: Color(0xFF42A5F5), // Soft sky blue
       onPrimary: Color(0xFFFFFFFF), // Pure white
-      secondary: Color(0xFFF5F5F5), // Light gray
-      onSecondary: Color(0xFF000000), // Off-black
-      surface: Color(0xFFFFFFFF), // Pure white
-      onSurface: Color(0xFF191919), // Off-black
-      background: Color(0xFFFFFFFF), // Pure white
-      onBackground: Color(0xFF191919), // Off-black
-      error: Color(0xFF000000), // Black for errors (was red)
+      secondary: Color(0xFF90CAF9), // Light blue
+      onSecondary: Color(0xFF263238), // Dark blue-gray
+      surface: Color(0xFFF5F7FA), // Light cool gray
+      onSurface: Color(0xFF2E2E2E), // Dark charcoal
+      error: Color(0xFFE57373), // Soft coral for errors
       onError: Color(0xFFFFFFFF), // Pure white
-      primaryContainer: Color(0xFFE0E0E0), // Light gray
-      secondaryContainer: Color(0xFFF0F0F0), // Even lighter gray
-      outline: Color(0xFFD0D0D0), // Border color
+      primaryContainer: Color(0xFFE1F5FE), // Very light blue
+      secondaryContainer: Color(0xFFBBDEFB), // Pale blue
+      outline: Color(0xFFB0BEC5), // Muted blue-gray for borders
     ),
-    scaffoldBackgroundColor: const Color(0xFFFFFFFF),
-    cardColor: const Color(0xFFFFFFFF),
-    dividerColor: const Color(0xFFE0E0E0), // Light gray divider
-    hintColor: const Color(0xFF757575), // Medium gray text
-    splashColor: const Color(0xFFEEEEEE), // Light gray splash
-    highlightColor: const Color(0xFFE0E0E0), // Light gray highlight
-    disabledColor: const Color(0xFFC0C0C0), // Medium gray for disabled
+    scaffoldBackgroundColor: const Color(0xFFE3F2FD), // Very light blue
+    cardColor: const Color(0xFFFFFFFF), // Pure white for cards
+    dividerColor: const Color(0xFFD1D9E0), // Soft blue-gray divider
+    hintColor: const Color(0xFF78909C), // Muted blue-gray for hints
+    splashColor: const Color(0xFFBBDEFB), // Pale blue splash
+    highlightColor: const Color(0xFFE1F5FE), // Very light blue highlight
+    disabledColor: const Color(0xFFB0BEC5), // Muted blue-gray for disabled
 
     // Typography colors
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Color(0xFF191919)),
-      bodyMedium: TextStyle(color: Color(0xFF191919)),
-      bodySmall: TextStyle(color: Color(0xFF4A4A4A)),
-      labelLarge: TextStyle(color: Color(0xFF191919)),
-      titleLarge: TextStyle(color: Color(0xFF191919)),
-      titleMedium: TextStyle(color: Color(0xFF191919)),
-      titleSmall: TextStyle(color: Color(0xFF4A4A4A)),
+      bodyLarge: TextStyle(color: Color(0xFF2E2E2E)), // Dark charcoal
+      bodyMedium: TextStyle(color: Color(0xFF2E2E2E)), // Dark charcoal
+      bodySmall: TextStyle(color: Color(0xFF607D8B)), // Muted blue-gray
+      labelLarge: TextStyle(color: Color(0xFF2E2E2E)), // Dark charcoal
+      titleLarge: TextStyle(color: Color(0xFF2E2E2E)), // Dark charcoal
+      titleMedium: TextStyle(color: Color(0xFF2E2E2E)), // Dark charcoal
+      titleSmall: TextStyle(color: Color(0xFF607D8B)), // Muted blue-gray
     ),
 
     // Component specific properties
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF000000),
-        foregroundColor: const Color(0xFFFFFFFF),
+        backgroundColor: const Color(0xFF42A5F5), // Soft sky blue
+        foregroundColor: const Color(0xFFFFFFFF), // Pure white
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -56,78 +54,7 @@ class MonochromeTheme {
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFFF5F5F5),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color(0xFF000000), width: 1.5),
-      ),
-    ),
-
-    // Icons should be black
-    iconTheme: const IconThemeData(
-      color: Color(0xFF000000),
-    ),
-    primaryIconTheme: const IconThemeData(
-      color: Color(0xFF000000),
-    ),
-  );
-
-  // Dark theme using strict black and white monochrome
-  static final ThemeData darkTheme = ThemeData(
-    brightness: Brightness.dark,
-    colorScheme: const ColorScheme.dark(
-      // Strict monochrome for dark theme
-      primary: Color(0xFFFFFFFF), // Pure white (replacing purple)
-      onPrimary: Color(0xFF000000), // Pure black
-      secondary: Color(0xFF303030), // Dark gray (replacing teal)
-      onSecondary: Color(0xFFFFFFFF), // Pure white
-      surface: Color(0xFF121212), // Nearly black
-      onSurface: Color(0xFFFFFFFF), // Pure white
-      background: Color(0xFF121212), // Nearly black
-      onBackground: Color(0xFFFFFFFF), // Pure white
-      error: Color(0xFFFFFFFF), // White for errors (was colored)
-      onError: Color(0xFF000000), // Pure black
-      primaryContainer: Color(0xFF2C2C2C), // Dark gray
-      secondaryContainer: Color(0xFF252525), // Slightly lighter dark gray
-      outline: Color(0xFF404040), // Border color
-    ),
-    scaffoldBackgroundColor: const Color(0xFF121212),
-    cardColor: const Color(0xFF1E1E1E),
-    dividerColor: const Color(0xFF2C2C2C),
-    hintColor: const Color(0xFFABABAB),
-    splashColor: const Color(0xFF333333), // Dark gray splash
-    highlightColor: const Color(0xFF333333), // Dark gray highlight
-    disabledColor: const Color(0xFF5C5C5C), // Medium gray for disabled
-
-    // Typography colors for dark theme
-    textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Color(0xFFFFFFFF)),
-      bodyMedium: TextStyle(color: Color(0xFFFFFFFF)),
-      bodySmall: TextStyle(color: Color(0xFFB0B0B0)),
-      labelLarge: TextStyle(color: Color(0xFFFFFFFF)),
-      titleLarge: TextStyle(color: Color(0xFFFFFFFF)),
-      titleMedium: TextStyle(color: Color(0xFFFFFFFF)),
-      titleSmall: TextStyle(color: Color(0xFFB0B0B0)),
-    ),
-
-    // Component specific properties for dark theme
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFFFFFFF), // Pure white (was purple)
-        foregroundColor: const Color(0xFF000000), // Pure black
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    ),
-
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: const Color(0xFF2C2C2C),
+      fillColor: const Color(0xFFBBDEFB), // Pale blue
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide.none,
@@ -135,19 +62,89 @@ class MonochromeTheme {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: const BorderSide(
-            color: Color(0xFFFFFFFF), width: 1.5), // White (was purple)
+            color: Color(0xFF42A5F5), width: 1.5), // Soft sky blue
       ),
     ),
 
-    // Icons should be white
+    // Icons in soft blue
     iconTheme: const IconThemeData(
-      color: Color(0xFFFFFFFF),
+      color: Color(0xFF42A5F5), // Soft sky blue
     ),
     primaryIconTheme: const IconThemeData(
-      color: Color(0xFFFFFFFF),
+      color: Color(0xFF42A5F5), // Soft sky blue
     ),
   );
 
-  // Use this completely monochrome dark theme instead of the seeded one
+  // Dark theme with tranquil blue tones
+  static final ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    colorScheme: const ColorScheme.dark(
+      // Soothing dark palette with blue tones
+      primary: Color(0xFF64B5F6), // Muted blue
+      onPrimary: Color(0xFF121212), // Near black
+      secondary: Color(0xFF4FC3F7), // Brighter blue accent
+      onSecondary: Color(0xFF121212), // Near black
+      surface: Color(0xFF1E272E), // Dark blue-gray
+      onSurface: Color(0xFFECEFF1), // Off-white
+      error: Color(0xFFEF9A9A), // Soft coral for errors
+      onError: Color(0xFF121212), // Near black
+      primaryContainer: Color(0xFF263238), // Darker blue-gray
+      secondaryContainer: Color(0xFF37474F), // Slightly lighter blue-gray
+      outline: Color(0xFF546E7A), // Muted blue-gray for borders
+    ),
+    scaffoldBackgroundColor: const Color(0xFF1E272E), // Dark blue-gray
+    cardColor: const Color(0xFF263238), // Darker blue-gray for cards
+    dividerColor: const Color(0xFF37474F), // Darker blue-gray divider
+    hintColor: const Color(0xFF90A4AE), // Light blue-gray for hints
+    splashColor: const Color(0xFF37474F), // Dark blue-gray splash
+    highlightColor: const Color(0xFF263238), // Darker blue-gray highlight
+    disabledColor: const Color(0xFF546E7A), // Muted blue-gray for disabled
+
+    // Typography colors for dark theme
+    textTheme: const TextTheme(
+      bodyLarge: TextStyle(color: Color(0xFFECEFF1)), // Off-white
+      bodyMedium: TextStyle(color: Color(0xFFECEFF1)), // Off-white
+      bodySmall: TextStyle(color: Color(0xFF90A4AE)), // Light blue-gray
+      labelLarge: TextStyle(color: Color(0xFFECEFF1)), // Off-white
+      titleLarge: TextStyle(color: Color(0xFFECEFF1)), // Off-white
+      titleMedium: TextStyle(color: Color(0xFFECEFF1)), // Off-white
+      titleSmall: TextStyle(color: Color(0xFF90A4AE)), // Light blue-gray
+    ),
+
+    // Component specific properties for dark theme
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF64B5F6), // Muted blue
+        foregroundColor: const Color(0xFF121212), // Near black
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    ),
+
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: const Color(0xFF263238), // Darker blue-gray
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(
+            color: Color(0xFF64B5F6), width: 1.5), // Muted blue
+      ),
+    ),
+
+    // Icons in muted blue
+    iconTheme: const IconThemeData(
+      color: Color(0xFF64B5F6), // Muted blue
+    ),
+    primaryIconTheme: const IconThemeData(
+      color: Color(0xFF64B5F6), // Muted blue
+    ),
+  );
+
+  // Use this soothing blue dark theme instead of the seeded one
   static final ThemeData monochromeDarkTheme = darkTheme;
 }

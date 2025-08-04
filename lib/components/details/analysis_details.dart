@@ -5,16 +5,19 @@ import 'package:google_fonts/google_fonts.dart';
 class AnalysisDetails extends StatelessWidget {
   final String? category;
   final String? predictedAspect;
+  final String? mood;
 
   const AnalysisDetails({
     super.key,
     this.category,
     this.predictedAspect,
+    this.mood,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    print('Mood: $mood');
 
     if (category == null && predictedAspect == null) {
       return const SizedBox.shrink();
@@ -32,67 +35,33 @@ class AnalysisDetails extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-
-        // Category
-        if (category != null) ...[
-          Row(
-            children: [
-              Icon(
-                Icons.category_outlined,
-                size: 16,
-                color: theme.hintColor,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Selected Category: ',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: theme.hintColor,
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  category!,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-        ],
-
-        // Predicted Aspect
         if (predictedAspect != null) ...[
-          Row(
-            children: [
-              Icon(
-                Icons.psychology_outlined,
-                size: 16,
-                color: theme.hintColor,
+          RichText(
+            text: TextSpan(
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface,
               ),
-              const SizedBox(width: 8),
-              Text(
-                'AI Predicted Aspect: ',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: theme.hintColor,
+              children: [
+                TextSpan(
+                  text: mood == 'Stress'
+                      ? 'This entry highlights significant stress in '
+                      : 'This entry reflects notable ease in ',
                 ),
-              ),
-              Expanded(
-                child: Text(
-                  predictedAspect!,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: theme.colorScheme.onSurface,
+                TextSpan(
+                  text: predictedAspect!,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: mood == 'Stress' ? Colors.red : Colors.green,
                   ),
                 ),
-              ),
-            ],
+                TextSpan(
+                  text: mood == 'Stress'
+                      ? '. It may be weighing heavily on you, indicating an area to be mindful of for your well-being.'
+                      : '. It appears you’re managing this aspect well, reflecting resilience and balance.',
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
         ],

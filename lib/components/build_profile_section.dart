@@ -144,181 +144,102 @@ class _BuildProfileSectionState extends State<BuildProfileSection>
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: FadeTransition(
                   opacity: _fadeAnimation,
-                  child: Container(
+                  child: Card(
                     margin: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 10),
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color:
-                          isDark ? theme.colorScheme.surface : theme.cardColor,
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isDark
-                              ? Colors.black.withAlpha(38)
-                              : Colors.black.withAlpha(12),
-                          offset: const Offset(0, 3),
-                          blurRadius: 10,
-                          spreadRadius: 0,
-                        ),
-                      ],
-                      gradient: isDark
-                          ? LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                theme.colorScheme.surface,
-                                theme.colorScheme.surface.withAlpha(229),
-                              ],
-                            )
-                          : LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                theme.cardColor,
-                                theme.cardColor.withAlpha(242),
-                              ],
-                            ),
+                      side: BorderSide.none,
                     ),
-                    child: Column(
-                      children: [
-                        // User Info Row
-                        Row(
-                          children: [
-                            Container(
-                              height: 56,
-                              width: 56,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: theme.colorScheme.primary
-                                      .withAlpha(isDark ? 204 : 51),
-                                  width: 2,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: theme.colorScheme.primary
-                                        .withAlpha(isDark ? 51 : 25),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: CircleAvatar(
-                                radius: 26,
-                                backgroundImage: const AssetImage(AppMedia.dp),
-                                backgroundColor: isDark
-                                    ? theme.colorScheme.surface.withAlpha(178)
-                                    : theme.colorScheme.secondary.withAlpha(51),
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    username,
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: theme.colorScheme.onSurface,
-                                      letterSpacing: -0.2,
-                                    ),
-                                  ),
-                                  Text(
-                                    email,
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 13,
-                                      color: theme.hintColor,
-                                      fontWeight: FontWeight.w500,
-                                      letterSpacing: -0.1,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Add refresh button
-                            IconButton(
-                              icon: _isRefreshing
-                                  ? SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: theme.colorScheme.primary,
+                    elevation: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Refresh Button Top-Right
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: _isRefreshing
+                                    ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      )
+                                    : Icon(
+                                        Icons.refresh_rounded,
+                                        color: theme.colorScheme.primary
+                                            .withAlpha(204),
                                       ),
-                                    )
-                                  : Icon(
-                                      Icons.refresh_rounded,
-                                      color: theme.colorScheme.primary
-                                          .withAlpha(204),
-                                    ),
-                              onPressed: _isRefreshing ? null : _refreshData,
-                              tooltip: 'Refresh data',
-                            ),
-                          ],
-                        ),
-
-                        // Stats Cards
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 18, bottom: 6),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  _buildStatCard(
-                                    'Entries',
-                                    stats['total_entries'].toString(),
-                                    AppMedia.diary,
-                                    isDark,
-                                    theme,
-                                  ),
-                                  _buildStatCard(
-                                    'Current',
-                                    '${stats['current_streak']} days',
-                                    AppMedia.fire,
-                                    isDark,
-                                    theme,
-                                    isHighlighted: true,
-                                  ),
-                                  _buildStatCard(
-                                    'Longest',
-                                    '${stats['longest_streak']} days',
-                                    AppMedia.trophy,
-                                    isDark,
-                                    theme,
-                                  ),
-                                ],
+                                onPressed: _isRefreshing ? null : _refreshData,
+                                tooltip: 'Refresh data',
                               ),
+                            ],
+                          ),
+                          // Avatar
+                          CircleAvatar(
+                            radius: 36,
+                            backgroundImage: const AssetImage(AppMedia.dp),
+                            backgroundColor: isDark
+                                ? theme.colorScheme.surface.withAlpha(178)
+                                : theme.colorScheme.secondary.withAlpha(51),
+                          ),
+                          const SizedBox(height: 12),
+                          // Username
+                          Text(
+                            username,
+                            style: GoogleFonts.nunito(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface,
                             ),
-
-                            // Show loading indicator overlay during refresh
-                            if (profileProvider.isLoading &&
-                                profileProvider.hasData)
-                              Container(
-                                decoration: BoxDecoration(
-                                  color:
-                                      theme.colorScheme.surface.withAlpha(102),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                padding: const EdgeInsets.all(16),
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                ),
+                          ),
+                          const SizedBox(height: 4),
+                          // Email
+                          Text(
+                            email,
+                            style: GoogleFonts.nunito(
+                              fontSize: 14,
+                              color: theme.hintColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Stats Row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildStatCard(
+                                'Entries',
+                                stats['total_entries'].toString(),
+                                AppMedia.diary,
+                                isDark,
+                                theme,
                               ),
-                          ],
-                        ),
-                      ],
+                              _buildStatCard(
+                                'Current',
+                                '${stats['current_streak']} days',
+                                AppMedia.fire,
+                                isDark,
+                                theme,
+                                isHighlighted: true,
+                              ),
+                              _buildStatCard(
+                                'Longest',
+                                '${stats['longest_streak']} days',
+                                AppMedia.trophy,
+                                isDark,
+                                theme,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

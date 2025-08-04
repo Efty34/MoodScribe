@@ -290,10 +290,6 @@ class CategoryCollectionSection extends StatelessWidget {
       'Movies': Colors.red,
       'Songs': Colors.green,
       'Exercises': Colors.orange,
-      'TV Shows': Colors.amber,
-      'Games': Colors.indigo,
-      'Podcasts': Colors.teal,
-      'Recipes': Colors.pink,
     };
 
     // Return the mapped color or generate one based on the string hash

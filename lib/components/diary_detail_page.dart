@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/components/details/analysis_details.dart';
-import 'package:diary/components/details/confidence_scores.dart';
 import 'package:diary/components/details/content_display.dart';
 import 'package:diary/components/details/delete_confirmation_dialog.dart';
 import 'package:diary/components/details/detail_header.dart';
@@ -129,19 +128,20 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
                 // Analysis Details
                 AnalysisDetails(
+                  mood: mood,
                   category: category,
                   predictedAspect: predictedAspect,
                 ),
 
                 // Confidence Scores
-                ConfidenceScores(
-                  ensembledStressConfidence: ensembledStressConfidence,
-                  logregStressConfidence: logregStressConfidence,
-                  attentionModelStressConfidence:
-                      attentionModelStressConfidence,
-                  attentionModelAspectConfidence:
-                      attentionModelAspectConfidence,
-                ),
+                // ConfidenceScores(
+                //   ensembledStressConfidence: ensembledStressConfidence,
+                //   logregStressConfidence: logregStressConfidence,
+                //   attentionModelStressConfidence:
+                //       attentionModelStressConfidence,
+                //   attentionModelAspectConfidence:
+                //       attentionModelAspectConfidence,
+                // ),
               ],
             ),
           ),

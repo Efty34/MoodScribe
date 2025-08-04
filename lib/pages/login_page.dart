@@ -264,7 +264,7 @@ class _LoginPageState extends State<LoginPage>
                                         colorScheme.onSurface.withOpacity(0.7),
                                   ),
                                 ),
-                                const SizedBox(height: 30),
+                                const SizedBox(height: 28),
 
                                 // Email field with icon
                                 ModernTextField(
@@ -305,7 +305,7 @@ class _LoginPageState extends State<LoginPage>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 30),
+                                const SizedBox(height: 25),
 
                                 // Login button
                                 AnimatedButton(
@@ -314,7 +314,9 @@ class _LoginPageState extends State<LoginPage>
                                   isLoading: _isLoading,
                                 ),
 
-                                const Spacer(),
+                                const SizedBox(
+                                  height: 5,
+                                ),
 
                                 // Register link
                                 Center(

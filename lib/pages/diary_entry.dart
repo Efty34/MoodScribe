@@ -149,8 +149,8 @@ class _DiaryEntryState extends State<DiaryEntry> {
               Container(
                 decoration: BoxDecoration(
                   color: isDark
-                      ? theme.colorScheme.surface.withAlpha(178)
-                      : theme.colorScheme.surface,
+                      ? theme.colorScheme.tertiary.withAlpha(178)
+                      : theme.colorScheme.tertiary,
                   border: Border.all(color: theme.dividerColor),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: isDark
@@ -225,49 +225,26 @@ class _DiaryEntryState extends State<DiaryEntry> {
 
               // Content TextField
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? theme.colorScheme.surface.withAlpha(178)
-                        : theme.colorScheme.surface,
-                    border: Border.all(color: theme.dividerColor),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: isDark
-                        ? [
-                            BoxShadow(
-                              color: Colors.white.withAlpha(12),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withAlpha(12),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                child: TextField(
+                  controller: _contentController,
+                  maxLines: null,
+                  expands: true,
+                  textAlignVertical: TextAlignVertical.top,
+                  decoration: InputDecoration(
+                    hintText: 'Chronicles of a Wandering Mind...',
+                    hintStyle: GoogleFonts.poppins(
+                      color: theme.hintColor,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.all(16),
                   ),
-                  child: TextField(
-                    controller: _contentController,
-                    maxLines: null,
-                    expands: true,
-                    textAlignVertical: TextAlignVertical.top,
-                    decoration: InputDecoration(
-                      hintText: 'Chronicles of a Wandering Mind...',
-                      hintStyle: GoogleFonts.poppins(
-                        color: theme.hintColor,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
-                    ),
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: theme.colorScheme.onSurface,
-                    ),
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ),
+
               const SizedBox(height: 24),
 
               // Submit Button
