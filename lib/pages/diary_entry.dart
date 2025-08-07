@@ -235,7 +235,6 @@ class _DiaryEntryState extends State<DiaryEntry> {
                     hintStyle: GoogleFonts.poppins(
                       color: theme.hintColor,
                     ),
-                    border: InputBorder.none,
                     contentPadding: const EdgeInsets.all(16),
                   ),
                   style: GoogleFonts.poppins(

@@ -53,11 +53,12 @@ class MonochromeTheme {
     ),
 
     inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: const Color(0xFFBBDEFB), // Pale blue
+      // filled: true,
+      // fillColor: const Color.fromARGB(255, 220, 237, 252), // Pale blue
       border: OutlineInputBorder(
+        borderSide:
+            BorderSide(color: Color(0xFFBBDEFB), width: 1.5), // Muted blue-gray
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),

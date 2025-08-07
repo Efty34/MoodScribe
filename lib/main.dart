@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:diary/auth/auth_wrapper.dart';
 import 'package:diary/firebase_options.dart';
 import 'package:diary/notification/notification_controller.dart';
+import 'package:diary/pages/forget_password.dart';
 import 'package:diary/pages/login_page.dart';
 import 'package:diary/pages/register_page.dart';
 import 'package:diary/pages/settings_page.dart';
@@ -134,6 +135,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         AppRoutes.loginPage: (context) => const LoginPage(),
         AppRoutes.registerPage: (context) => const RegisterPage(),
+        AppRoutes.forgetPasswordPage: (context) => const ForgetPasswordPage(),
         AppRoutes.bottomNavBar: (context) => const BottomNavBar(),
         AppRoutes.settingsPage: (context) => const SettingsPage(),
         AppRoutes.statsPage: (context) => const StatsPage(),

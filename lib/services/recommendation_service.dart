@@ -12,7 +12,7 @@ class RecommendationService {
   final FavoritesService _favoritesService = FavoritesService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String baseUrl =
-      'https://ai-agent-three-kappa.vercel.app/get-recommendations';
+      'https://moodscribe-ai-agent.onrender.com/get-recommendations';
 
   Future<Map<String, int>> _getPredictedAspectCounts() async {
     try {

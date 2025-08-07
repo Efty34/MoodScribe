@@ -264,7 +264,7 @@ class _LoginPageState extends State<LoginPage>
                                         colorScheme.onSurface.withOpacity(0.7),
                                   ),
                                 ),
-                                const SizedBox(height: 28),
+                                const SizedBox(height: 16),
 
                                 // Email field with icon
                                 ModernTextField(
@@ -286,7 +286,7 @@ class _LoginPageState extends State<LoginPage>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 20),
+                                const SizedBox(height: 12),
 
                                 // Password field with icon
                                 ModernTextField(
@@ -305,7 +305,23 @@ class _LoginPageState extends State<LoginPage>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 25),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(context,
+                                          AppRoutes.forgetPasswordPage);
+                                    },
+                                    child: Text(
+                                      'Forgot Password?',
+                                      style: GoogleFonts.poppins(
+                                        color: colorScheme.primary,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ),
 
                                 // Login button
                                 AnimatedButton(
@@ -314,9 +330,7 @@ class _LoginPageState extends State<LoginPage>
                                   isLoading: _isLoading,
                                 ),
 
-                                const SizedBox(
-                                  height: 5,
-                                ),
+                                const SizedBox(height: 8),
 
                                 // Register link
                                 Center(
@@ -358,7 +372,7 @@ class _LoginPageState extends State<LoginPage>
                                 ),
 
                                 // Google Sign In button
-                                const SizedBox(height: 20),
+                                const SizedBox(height: 10),
                                 Center(
                                   child: ElevatedButton(
                                     onPressed: _isLoading

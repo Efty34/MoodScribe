@@ -126,6 +126,31 @@ class AuthService {
     await _auth.signOut();
   }
 
+  // Reset password
+  Future<String?> resetPassword({required String email}) async {
+    try {
+      print('Attempting to send reset email to: $email'); // Debug log
+      await _auth.sendPasswordResetEmail(email: email);
+      print('Password reset email sent successfully'); // Debug log
+      return null; // Success
+    } on FirebaseAuthException catch (e) {
+      print('Firebase Auth Error: ${e.code} - ${e.message}'); // Debug log
+      switch (e.code) {
+        case 'user-not-found':
+          return 'No account found with this email address.';
+        case 'invalid-email':
+          return 'Invalid email format.';
+        case 'too-many-requests':
+          return 'Too many requests. Please try again later.';
+        default:
+          return 'Failed to send reset email: ${e.message}';
+      }
+    } catch (e) {
+      print('General Error: $e'); // Debug log
+      return 'An error occurred. Please try again.';
+    }
+  }
+
   // Stream to check auth state changes
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 }
