@@ -5,40 +5,45 @@ class MonochromeTheme {
   // Private constructor to prevent instantiation
   MonochromeTheme._();
 
-  // Light theme
+  // Light theme with improved contrast and tertiary colors
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     colorScheme: const ColorScheme.light(
-      // Core palette - soft blues and cool neutrals
       primary: Color(0xFF42A5F5), // Soft sky blue
       onPrimary: Color(0xFFFFFFFF), // Pure white
       secondary: Color(0xFF90CAF9), // Light blue
-      onSecondary: Color(0xFF263238), // Dark blue-gray
-      surface: Color(0xFFF5F7FA), // Light cool gray
-      onSurface: Color(0xFF2E2E2E), // Dark charcoal
+      onSecondary: Color(0xFF1A2E3B), // Darker blue-gray for contrast
+      tertiary: Color(0xFF26A69A), // Soft teal for accents
+      onTertiary: Color(0xFFFFFFFF), // White for text on tertiary
+      surface: Color(0xFFF8FAFC), // Lighter cool gray
+      onSurface: Color(0xFF1A1A1A), // Near black for high contrast
       error: Color(0xFFE57373), // Soft coral for errors
       onError: Color(0xFFFFFFFF), // Pure white
       primaryContainer: Color(0xFFE1F5FE), // Very light blue
+      onPrimaryContainer: Color(0xFF0D3A5C), // Dark blue for contrast
       secondaryContainer: Color(0xFFBBDEFB), // Pale blue
-      outline: Color(0xFFB0BEC5), // Muted blue-gray for borders
+      onSecondaryContainer: Color(0xFF1A2E3B), // Darker blue-gray
+      tertiaryContainer: Color(0xFFB2DFDB), // Light teal
+      onTertiaryContainer: Color(0xFF0F2F2C), // Dark teal for contrast
+      outline: Color(0xFFA3BFFA), // Soft indigo for borders
     ),
-    scaffoldBackgroundColor: const Color(0xFFE3F2FD), // Very light blue
+    scaffoldBackgroundColor: const Color(0xFFE8F0FE), // Very light indigo
     cardColor: const Color(0xFFFFFFFF), // Pure white for cards
     dividerColor: const Color(0xFFD1D9E0), // Soft blue-gray divider
-    hintColor: const Color(0xFF78909C), // Muted blue-gray for hints
+    hintColor: const Color(0xFF6B7280), // Darker gray for hints
     splashColor: const Color(0xFFBBDEFB), // Pale blue splash
     highlightColor: const Color(0xFFE1F5FE), // Very light blue highlight
     disabledColor: const Color(0xFFB0BEC5), // Muted blue-gray for disabled
 
     // Typography colors
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Color(0xFF2E2E2E)), // Dark charcoal
-      bodyMedium: TextStyle(color: Color(0xFF2E2E2E)), // Dark charcoal
-      bodySmall: TextStyle(color: Color(0xFF607D8B)), // Muted blue-gray
-      labelLarge: TextStyle(color: Color(0xFF2E2E2E)), // Dark charcoal
-      titleLarge: TextStyle(color: Color(0xFF2E2E2E)), // Dark charcoal
-      titleMedium: TextStyle(color: Color(0xFF2E2E2E)), // Dark charcoal
-      titleSmall: TextStyle(color: Color(0xFF607D8B)), // Muted blue-gray
+      bodyLarge: TextStyle(color: Color(0xFF1A1A1A)), // Near black
+      bodyMedium: TextStyle(color: Color(0xFF1A1A1A)), // Near black
+      bodySmall: TextStyle(color: Color(0xFF4B5563)), // Dark gray
+      labelLarge: TextStyle(color: Color(0xFF1A1A1A)), // Near black
+      titleLarge: TextStyle(color: Color(0xFF1A1A1A)), // Near black
+      titleMedium: TextStyle(color: Color(0xFF1A1A1A)), // Near black
+      titleSmall: TextStyle(color: Color(0xFF4B5563)), // Dark gray
     ),
 
     // Component specific properties
@@ -53,70 +58,75 @@ class MonochromeTheme {
     ),
 
     inputDecorationTheme: InputDecorationTheme(
-      // filled: true,
-      // fillColor: const Color.fromARGB(255, 220, 237, 252), // Pale blue
+      filled: true,
+      fillColor: const Color(0xFFE1F5FE), // Very light blue
       border: OutlineInputBorder(
-        borderSide:
-            BorderSide(color: Color(0xFFBBDEFB), width: 1.5), // Muted blue-gray
+        borderSide: const BorderSide(
+            color: Color(0xFFA3BFFA), width: 1.5), // Soft indigo
         borderRadius: BorderRadius.circular(8),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: const BorderSide(
-            color: Color(0xFF42A5F5), width: 1.5), // Soft sky blue
+            color: Color(0xFF42A5F5), width: 2), // Soft sky blue
       ),
     ),
 
-    // Icons in soft blue
+    // Icons in tertiary color for better distinction
     iconTheme: const IconThemeData(
-      color: Color(0xFF42A5F5), // Soft sky blue
+      color: Color(0xFF26A69A), // Soft teal
     ),
     primaryIconTheme: const IconThemeData(
       color: Color(0xFF42A5F5), // Soft sky blue
     ),
   );
 
-  // Dark theme with tranquil blue tones
+  // Dark theme with tranquil blue tones and tertiary colors
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     colorScheme: const ColorScheme.dark(
-      // Soothing dark palette with blue tones
       primary: Color(0xFF64B5F6), // Muted blue
-      onPrimary: Color(0xFF121212), // Near black
+      onPrimary: Color(0xFF0A1C2B), // Darker for contrast
       secondary: Color(0xFF4FC3F7), // Brighter blue accent
-      onSecondary: Color(0xFF121212), // Near black
+      onSecondary: Color(0xFF0A1C2B), // Darker for contrast
+      tertiary: Color(0xFF4DB6AC), // Muted teal
+      onTertiary: Color(0xFF0A1C2B), // Darker for contrast
       surface: Color(0xFF1E272E), // Dark blue-gray
-      onSurface: Color(0xFFECEFF1), // Off-white
+      onSurface: Color(0xFFF1F5F9), // Light gray for high contrast
       error: Color(0xFFEF9A9A), // Soft coral for errors
-      onError: Color(0xFF121212), // Near black
-      primaryContainer: Color(0xFF263238), // Darker blue-gray
+      onError: Color(0xFF0A1C2B), // Darker for contrast
+      primaryContainer: Color(0xFF2E3B4E), // Darker blue-gray
+      onPrimaryContainer: Color(0xFFE1F5FE), // Light blue for contrast
       secondaryContainer: Color(0xFF37474F), // Slightly lighter blue-gray
-      outline: Color(0xFF546E7A), // Muted blue-gray for borders
+      onSecondaryContainer: Color(0xFFE1F5FE), // Light blue for contrast
+      tertiaryContainer: Color(0xFF2F6B66), // Dark teal
+      onTertiaryContainer: Color(0xFFB2DFDB), // Light teal for contrast
+      outline: Color(0xFF64748B), // Muted slate for borders
     ),
-    scaffoldBackgroundColor: const Color(0xFF1E272E), // Dark blue-gray
-    cardColor: const Color(0xFF263238), // Darker blue-gray for cards
+    scaffoldBackgroundColor: const Color(0xFF171F26), // Darker blue-gray
+    cardColor: const Color(0xFF2E3B4E), // Darker blue-gray for cards
     dividerColor: const Color(0xFF37474F), // Darker blue-gray divider
-    hintColor: const Color(0xFF90A4AE), // Light blue-gray for hints
+    hintColor: const Color(0xFF94A3B8), // Light slate for hints
     splashColor: const Color(0xFF37474F), // Dark blue-gray splash
-    highlightColor: const Color(0xFF263238), // Darker blue-gray highlight
-    disabledColor: const Color(0xFF546E7A), // Muted blue-gray for disabled
+    highlightColor: const Color(0xFF2E3B4E), // Darker blue-gray highlight
+    disabledColor: const Color(0xFF64748B), // Muted slate for disabled
 
     // Typography colors for dark theme
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Color(0xFFECEFF1)), // Off-white
-      bodyMedium: TextStyle(color: Color(0xFFECEFF1)), // Off-white
-      bodySmall: TextStyle(color: Color(0xFF90A4AE)), // Light blue-gray
-      labelLarge: TextStyle(color: Color(0xFFECEFF1)), // Off-white
-      titleLarge: TextStyle(color: Color(0xFFECEFF1)), // Off-white
-      titleMedium: TextStyle(color: Color(0xFFECEFF1)), // Off-white
-      titleSmall: TextStyle(color: Color(0xFF90A4AE)), // Light blue-gray
+      bodyLarge: TextStyle(color: Color(0xFFF1F5F9)), // Light gray
+      bodyMedium: TextStyle(color: Color(0xFFF1F5F9)), // Light gray
+      bodySmall: TextStyle(color: Color(0xFF94A3B8)), // Light slate
+      labelLarge: TextStyle(color: Color(0xFFF1F5F9)), // Light gray
+      titleLarge: TextStyle(color: Color(0xFFF1F5F9)), // Light gray
+      titleMedium: TextStyle(color: Color(0xFFF1F5F9)), // Light gray
+      titleSmall: TextStyle(color: Color(0xFF94A3B8)), // Light slate
     ),
 
     // Component specific properties for dark theme
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF64B5F6), // Muted blue
-        foregroundColor: const Color(0xFF121212), // Near black
+        foregroundColor: const Color(0xFF0A1C2B), // Darker for contrast
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -125,21 +135,21 @@ class MonochromeTheme {
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFF263238), // Darker blue-gray
+      fillColor: const Color(0xFF2E3B4E), // Darker blue-gray
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(
-            color: Color(0xFF64B5F6), width: 1.5), // Muted blue
+        borderSide:
+            const BorderSide(color: Color(0xFF64B5F6), width: 2), // Muted blue
       ),
     ),
 
-    // Icons in muted blue
+    // Icons in tertiary color for better distinction
     iconTheme: const IconThemeData(
-      color: Color(0xFF64B5F6), // Muted blue
+      color: Color(0xFF4DB6AC), // Muted teal
     ),
     primaryIconTheme: const IconThemeData(
       color: Color(0xFF64B5F6), // Muted blue

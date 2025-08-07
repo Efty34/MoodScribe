@@ -8,4 +8,5 @@ class AppRoutes {
   static const addtodo = '/add_todo';
   static const settingsPage = '/settings';
   static const statsPage = '/stats';
+  static const String suggestionsPage = '/suggestions';
 }

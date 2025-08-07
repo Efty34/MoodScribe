@@ -126,9 +126,10 @@ class CustomAppDrawer extends StatelessWidget {
                     _buildSectionHeader(context, 'Main'),
                     const SizedBox(height: 8),
                     DrawerMenuItem(
-                      title: 'Journaling',
-                      icon: Icons.book_outlined,
-                      onTap: () => Navigator.pop(context),
+                      title: 'Suggestions',
+                      icon: Icons.lightbulb_outline,
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.suggestionsPage),
                     ),
                     const SizedBox(height: 10),
                     DrawerMenuItem(
@@ -236,7 +237,7 @@ class CustomAppDrawer extends StatelessWidget {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.error.withOpacity(0.9),
+                    backgroundColor: theme.colorScheme.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(

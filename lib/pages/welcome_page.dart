@@ -17,15 +17,13 @@ class _WelcomePageState extends State<WelcomePage>
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _loadingAnimation;
-  late Animation<double> _shimmerAnimation;
-  late Animation<double> _taglineAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3500),
+      duration: const Duration(milliseconds: 3000),
     );
 
     _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
@@ -35,31 +33,17 @@ class _WelcomePageState extends State<WelcomePage>
       ),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1).animate(
+    _scaleAnimation = Tween<double>(begin: 0.9, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
-      ),
-    );
-
-    _shimmerAnimation = Tween<double>(begin: -1.0, end: 2.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.3, 0.8, curve: Curves.easeInOut),
-      ),
-    );
-
-    _taglineAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.5, 0.7, curve: Curves.easeInOut),
+        curve: const Interval(0.0, 0.7, curve: Curves.easeOutCubic),
       ),
     );
 
     _loadingAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.6, 0.9, curve: Curves.easeInOut),
+        curve: const Interval(0.6, 1.0, curve: Curves.easeInOut),
       ),
     );
 
@@ -90,214 +74,112 @@ class _WelcomePageState extends State<WelcomePage>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
-    // Create blue accent colors based on the theme
-    final blueAccent = isDarkMode
-        ? Color.lerp(theme.colorScheme.primary, Colors.blue, 0.3)!
-        : Color.lerp(theme.colorScheme.primary, Colors.blue.shade700, 0.2)!;
-
-    final blueAccentLight = isDarkMode
-        ? Color.lerp(theme.colorScheme.primary, Colors.blue.shade300, 0.4)!
-        : Color.lerp(theme.colorScheme.primary, Colors.blue.shade400, 0.15)!;
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: isDarkMode
-                ? [
-                    Color.lerp(theme.colorScheme.surface, blueAccent, 0.05)!,
-                    theme.colorScheme.surface,
-                  ]
-                : [
-                    Color.lerp(
-                        theme.colorScheme.surface, blueAccentLight, 0.08)!,
-                    theme.colorScheme.surface,
-                  ],
-          ),
-        ),
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Logo and Title
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: ScaleTransition(
-                        scale: _scaleAnimation,
-                        child: Column(
-                          children: [
-                            // Animated Journal Icon with Pen
-                            Container(
-                              height: 110,
-                              width: 110,
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Color.lerp(
-                                  theme.colorScheme.surface,
-                                  blueAccent,
-                                  isDarkMode ? 0.12 : 0.08,
-                                ),
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: blueAccent
-                                        .withOpacity(isDarkMode ? 0.2 : 0.1),
-                                    blurRadius: 20,
-                                    spreadRadius: 1,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  // Icon(
-                                  //   Icons.book_outlined,
-                                  //   size: 50,
-                                  //   color: Color.lerp(
-                                  //     theme.colorScheme.onSurface,
-                                  //     blueAccent,
-                                  //     isDarkMode ? 0.4 : 0.3,
-                                  //   ),
-                                  // ),
-                                  Image.asset(
-                                    AppMedia.logo,
-                                    width: 80,
-                                    height: 80,
-                                  ),
-                                  Positioned(
-                                    top: _shimmerAnimation.value * 10 + 2,
-                                    right: _shimmerAnimation.value * 5 + 5,
-                                    child: Icon(
-                                      Icons.edit,
-                                      size: 22,
-                                      color: Color.lerp(
-                                        theme.colorScheme.onSurface,
-                                        blueAccent,
-                                        isDarkMode ? 0.5 : 0.4,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 40),
-
-                            // App Title with Shimmer Effect
-                            ShaderMask(
-                              shaderCallback: (bounds) => LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  theme.colorScheme.onSurface,
-                                  Color.lerp(theme.colorScheme.onSurface,
-                                      blueAccent, 0.7)!,
-                                  theme.colorScheme.onSurface,
-                                ],
-                                stops: [
-                                  0.0,
-                                  _shimmerAnimation.value,
-                                  1.0,
-                                ],
-                                transform: const GradientRotation(
-                                    0.785), // 45 degrees in radians
-                              ).createShader(bounds),
-                              child: Text(
-                                "MoodScribe",
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 42,
-                                  fontWeight: FontWeight.w500,
-                                  color: theme.colorScheme.onSurface,
-                                  letterSpacing: 1.2,
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            // Tagline with fade in animation
-                            AnimatedOpacity(
-                              opacity: _taglineAnimation.value,
-                              duration: Duration.zero,
-                              child: Text(
-                                "Track, Reflect, Thrive",
-                                style: GoogleFonts.nunito(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: theme.colorScheme.onSurface
-                                      .withOpacity(0.8),
-                                  letterSpacing: 1.8,
-                                ),
-                              ),
+      backgroundColor: colorScheme.surface,
+      body: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo with subtle animation
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: colorScheme.primaryContainer.withOpacity(0.8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: colorScheme.outline.withOpacity(0.2),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
+                        child: Image.asset(
+                          AppMedia.logo,
+                          width: 100,
+                          height: 100,
+                          color: colorScheme
+                              .primary, // Tint logo with primary color
+                        ),
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 32),
 
-                    const SizedBox(height: 80),
-
-                    // Loading Dots Animation
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: _buildLoadingDots(
-                        theme: theme,
-                        blueAccent: blueAccent,
-                        animation: _loadingAnimation.value,
-                        isDarkMode: isDarkMode,
+                  // App Name
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Text(
+                      'MoodScribe',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                        letterSpacing: 1.2,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Tagline
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Text(
+                      'Track Your Mood, Find Your Balance',
+                      style: GoogleFonts.nunito(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: colorScheme.onSurface.withOpacity(0.7),
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+
+                  // Loading Indicator
+                  FadeTransition(
+                    opacity: _loadingAnimation,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(3, (index) {
+                        final delay = index * 0.2;
+                        final individualAnimation =
+                            _loadingAnimation.value > delay
+                                ? (_loadingAnimation.value - delay) < 0.8
+                                    ? (_loadingAnimation.value - delay) / 0.8
+                                    : 1.0
+                                : 0.0;
+
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 6),
+                          height: 10 + (individualAnimation * 4),
+                          width: 10 + (individualAnimation * 4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: colorScheme.tertiary
+                                .withOpacity(0.3 + (individualAnimation * 0.7)),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
-    );
-  }
-
-  Widget _buildLoadingDots({
-    required ThemeData theme,
-    required Color blueAccent,
-    required double animation,
-    required bool isDarkMode,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(3, (index) {
-        // Stagger the animations for each dot
-        final delay = index * 0.2;
-        final individualAnimation = animation > delay
-            ? (animation - delay) < 0.8
-                ? (animation - delay) / 0.8
-                : 1.0
-            : 0.0;
-
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 6),
-          height: 8 + (individualAnimation * 2),
-          width: 8 + (individualAnimation * 2),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color.lerp(
-              theme.colorScheme.primary,
-              blueAccent,
-              isDarkMode ? 0.5 : 0.3,
-            )!
-                .withOpacity(0.2 + (individualAnimation * 0.8)),
-          ),
-        );
-      }),
     );
   }
 }

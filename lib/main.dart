@@ -7,11 +7,13 @@ import 'package:diary/pages/login_page.dart';
 import 'package:diary/pages/register_page.dart';
 import 'package:diary/pages/settings_page.dart';
 import 'package:diary/pages/stats_page.dart';
+import 'package:diary/pages/suggestions.dart';
 import 'package:diary/services/calendar_access_provider.dart';
 import 'package:diary/services/mood_chart_provider.dart';
 import 'package:diary/services/profile_provider.dart';
 import 'package:diary/services/streak_calendar_provider.dart';
 import 'package:diary/services/stress_chart_provider.dart';
+import 'package:diary/services/suggestions_provider.dart';
 import 'package:diary/utils/app_routes.dart';
 import 'package:diary/utils/bottom_nav_bar.dart';
 import 'package:diary/utils/monochrome_theme.dart';
@@ -81,6 +83,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => StreakCalendarProvider()),
         ChangeNotifierProvider(create: (_) => StressChartProvider()),
         ChangeNotifierProvider(create: (_) => CalendarAccessProvider()),
+        ChangeNotifierProvider(create: (_) => SuggestionsProvider()),
       ],
       child: const MyApp(),
     ),
@@ -139,6 +142,7 @@ class _MyAppState extends State<MyApp> {
         AppRoutes.bottomNavBar: (context) => const BottomNavBar(),
         AppRoutes.settingsPage: (context) => const SettingsPage(),
         AppRoutes.statsPage: (context) => const StatsPage(),
+        AppRoutes.suggestionsPage: (context) => const Suggestions(),
       },
     );
   }
