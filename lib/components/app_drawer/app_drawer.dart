@@ -89,7 +89,7 @@ class CustomAppDrawer extends StatelessWidget {
                           borderRadius: BorderRadius.circular(
                               DrawerStyles.borderRadius / 2),
                           child: Image.asset(
-                            'assets/images/logo.png',
+                            'assets/images/logo2.png',
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -126,8 +126,8 @@ class CustomAppDrawer extends StatelessWidget {
                     _buildSectionHeader(context, 'Main'),
                     const SizedBox(height: 8),
                     DrawerMenuItem(
-                      title: 'Suggestions',
-                      icon: Icons.lightbulb_outline,
+                      title: 'Mind Care',
+                      icon: Icons.health_and_safety_outlined,
                       onTap: () => Navigator.pushNamed(
                           context, AppRoutes.suggestionsPage),
                     ),

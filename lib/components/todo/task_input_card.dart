@@ -63,7 +63,11 @@ class TaskInputCard extends StatelessWidget {
                   : theme.colorScheme.surface,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide(
+                  color: isDark
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.primary,
+                ),
               ),
               contentPadding: const EdgeInsets.all(16),
             ),

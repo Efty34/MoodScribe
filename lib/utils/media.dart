@@ -16,6 +16,6 @@ class AppMedia {
   static const graph = '$_baseImage/graph.json';
   static const loginbg = '$_baseImage/login.gif';
   static const registerbg = '$_baseImage/regi.gif';
-  static const logo = '$_baseImage/logo.png';
+  static const logo = '$_baseImage/logo2.png';
   static const google = '$_baseImage/google.png';
 }
