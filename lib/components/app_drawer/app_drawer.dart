@@ -123,7 +123,7 @@ class CustomAppDrawer extends StatelessWidget {
                   ),
                   children: [
                     // Main features group
-                    _buildSectionHeader(context, 'Main'),
+                    _buildSectionHeader(context, 'Assistance'),
                     const SizedBox(height: 8),
                     DrawerMenuItem(
                       title: 'Mind Care',
@@ -131,12 +131,12 @@ class CustomAppDrawer extends StatelessWidget {
                       onTap: () => Navigator.pushNamed(
                           context, AppRoutes.suggestionsPage),
                     ),
-                    const SizedBox(height: 10),
-                    DrawerMenuItem(
-                      title: 'Sessions',
-                      icon: Icons.calendar_month_rounded,
-                      onTap: () => Navigator.pop(context),
-                    ),
+                    // const SizedBox(height: 10),
+                    // DrawerMenuItem(
+                    //   title: 'Sessions',
+                    //   icon: Icons.calendar_month_rounded,
+                    //   onTap: () => Navigator.pop(context),
+                    // ),
 
                     const SizedBox(height: 20),
                     const Divider(height: 1),

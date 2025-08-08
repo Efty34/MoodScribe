@@ -46,26 +46,26 @@ class _StatsPageState extends State<StatsPage> {
         backgroundColor: theme.scaffoldBackgroundColor,
         foregroundColor: theme.colorScheme.onSurface,
         elevation: 0,
-        actions: [
-          // Add refresh button to app bar
-          IconButton(
-            icon: _isRefreshing
-                ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: theme.colorScheme.primary,
-                    ),
-                  )
-                : Icon(
-                    Icons.refresh_rounded,
-                    color: theme.colorScheme.primary.withAlpha(204),
-                  ),
-            onPressed: _isRefreshing ? null : _refreshAllStats,
-            tooltip: 'Refresh all stats',
-          ),
-        ],
+        // actions: [
+        //   // Add refresh button to app bar
+        //   IconButton(
+        //     icon: _isRefreshing
+        //         ? SizedBox(
+        //             width: 20,
+        //             height: 20,
+        //             child: CircularProgressIndicator(
+        //               strokeWidth: 2,
+        //               color: theme.colorScheme.primary,
+        //             ),
+        //           )
+        //         : Icon(
+        //             Icons.refresh_rounded,
+        //             color: theme.colorScheme.primary.withAlpha(204),
+        //           ),
+        //     onPressed: _isRefreshing ? null : _refreshAllStats,
+        //     tooltip: 'Refresh all stats',
+        //   ),
+        // ],
       ),
       body: SafeArea(
         child: RefreshIndicator(

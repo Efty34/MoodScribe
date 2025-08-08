@@ -70,23 +70,23 @@ class StreakHeader extends StatelessWidget {
         ),
 
         // Refresh button
-        IconButton(
-          icon: isRefreshing
-              ? SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: theme.colorScheme.primary,
-                  ),
-                )
-              : Icon(
-                  Icons.refresh_rounded,
-                  color: theme.colorScheme.primary.withAlpha(204),
-                ),
-          onPressed: isRefreshing ? null : onRefresh,
-          tooltip: 'Refresh calendar',
-        ),
+        // IconButton(
+        //   icon: isRefreshing
+        //       ? SizedBox(
+        //           width: 20,
+        //           height: 20,
+        //           child: CircularProgressIndicator(
+        //             strokeWidth: 2,
+        //             color: theme.colorScheme.primary,
+        //           ),
+        //         )
+        //       : Icon(
+        //           Icons.refresh_rounded,
+        //           color: theme.colorScheme.primary.withAlpha(204),
+        //         ),
+        //   onPressed: isRefreshing ? null : onRefresh,
+        //   tooltip: 'Refresh calendar',
+        // ),
       ],
     );
   }

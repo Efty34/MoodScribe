@@ -27,29 +27,31 @@ class _SuggestionsState extends State<Suggestions> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: Text(
           'Mind Care',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w700,
+            fontSize: 24,
+            letterSpacing: -0.5,
           ),
         ),
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
-        elevation: 2,
-        shadowColor: colorScheme.outline.withOpacity(0.3),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: colorScheme.tertiary),
-            onPressed: () =>
-                context.read<SuggestionsProvider>().refreshSuggestions(),
-            tooltip: 'Refresh Suggestions',
-          ),
-        ],
+        elevation: 0,
+        scrolledUnderElevation: 1,
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.refresh, color: colorScheme.primary),
+        //     onPressed: () =>
+        //         context.read<SuggestionsProvider>().refreshSuggestions(),
+        //     tooltip: 'Refresh Suggestions',
+        //   ),
+        // ],
       ),
       body: RefreshIndicator(
-        color: colorScheme.tertiary,
+        color: colorScheme.primary,
         backgroundColor: colorScheme.surface,
         onRefresh: () =>
             context.read<SuggestionsProvider>().refreshSuggestions(),
@@ -58,9 +60,8 @@ class _SuggestionsState extends State<Suggestions> {
             if (suggestionsProvider.isLoading) {
               return Center(
                 child: CircularProgressIndicator(
-                  color: colorScheme.tertiary,
-                  backgroundColor:
-                      colorScheme.tertiaryContainer.withOpacity(0.3),
+                  color: colorScheme.primary,
+                  backgroundColor: colorScheme.primaryContainer,
                 ),
               );
             }
@@ -72,15 +73,16 @@ class _SuggestionsState extends State<Suggestions> {
                   children: [
                     Icon(
                       Icons.error_outline,
-                      size: 64,
+                      size: 48,
                       color: colorScheme.error,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       suggestionsProvider.error!,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onError,
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
                         fontWeight: FontWeight.w500,
+                        color: colorScheme.onSurface,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -88,15 +90,22 @@ class _SuggestionsState extends State<Suggestions> {
                     ElevatedButton(
                       onPressed: () => suggestionsProvider.refreshSuggestions(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.tertiary,
-                        foregroundColor: colorScheme.onTertiary,
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
+                            horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      child: const Text('Retry'),
                     ),
                   ],
                 ),
@@ -107,9 +116,10 @@ class _SuggestionsState extends State<Suggestions> {
               return Center(
                 child: Text(
                   'No suggestions available',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.7),
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               );
@@ -117,20 +127,20 @@ class _SuggestionsState extends State<Suggestions> {
 
             final suggestionData = suggestionsProvider.data!;
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildStressLevelCard(suggestionData),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   _buildAnalysisSummary(suggestionData),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   _buildMentalHealthAnalysis(suggestionData),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   _buildSuggestionsSection(suggestionData),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   _buildEmergencyResources(suggestionData),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   _buildDisclaimer(suggestionData),
                 ],
               ),
@@ -146,15 +156,15 @@ class _SuggestionsState extends State<Suggestions> {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.outline.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow.withAlpha(30),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -163,27 +173,28 @@ class _SuggestionsState extends State<Suggestions> {
         children: [
           Text(
             'Stress Level',
-            style: theme.textTheme.titleLarge?.copyWith(
+            style: GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
               color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: Container(
-                  height: 10,
+                  height: 8,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: colorScheme.tertiaryContainer.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(4),
+                    color: colorScheme.primaryContainer,
                   ),
                   child: FractionallySizedBox(
                     alignment: Alignment.centerLeft,
                     widthFactor: suggestionData.userStressPercentage / 100,
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(4),
                         color: _getStressColor(
                             suggestionData.userStressPercentage),
                       ),
@@ -191,21 +202,20 @@ class _SuggestionsState extends State<Suggestions> {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: colorScheme.tertiaryContainer,
-                  borderRadius: BorderRadius.circular(10),
-                  border:
-                      Border.all(color: colorScheme.outline.withOpacity(0.3)),
+                  color: colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '${suggestionData.userStressPercentage.toStringAsFixed(1)}%',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onTertiaryContainer,
-                    fontWeight: FontWeight.bold,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onPrimaryContainer,
                   ),
                 ),
               ),
@@ -229,15 +239,15 @@ class _SuggestionsState extends State<Suggestions> {
     final summary = suggestionData.analysisSummary;
 
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.outline.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow.withAlpha(30),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -246,55 +256,56 @@ class _SuggestionsState extends State<Suggestions> {
         children: [
           Text(
             'Analysis Summary',
-            style: theme.textTheme.titleLarge?.copyWith(
+            style: GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
               color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                   child: _buildStatChip('Total Entries',
                       summary.totalEntriesAnalyzed.toString())),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Expanded(
                   child: _buildStatChip(
                       'Stress Entries', summary.stressEntries.toString())),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Expanded(
                   child: _buildStatChip(
                       'Non-Stress', summary.nonStressEntries.toString())),
             ],
           ),
           if (summary.mainStressSources.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Text(
               'Main Stress Sources:',
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: colorScheme.onSurface,
+              style: GoogleFonts.inter(
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: summary.mainStressSources
                   .map((source) => Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: colorScheme.errorContainer.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                              color: colorScheme.outline.withOpacity(0.3)),
+                          color: colorScheme.errorContainer,
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           source,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onErrorContainer,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
+                            color: colorScheme.onErrorContainer,
                           ),
                         ),
                       ))
@@ -311,25 +322,27 @@ class _SuggestionsState extends State<Suggestions> {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: colorScheme.tertiaryContainer.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
+        color: colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Text(
             value,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.onTertiaryContainer,
-              fontWeight: FontWeight.bold,
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onPrimaryContainer,
             ),
           ),
           Text(
             label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onTertiaryContainer.withOpacity(0.8),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.onPrimaryContainer,
             ),
           ),
         ],
@@ -343,15 +356,15 @@ class _SuggestionsState extends State<Suggestions> {
     final analysis = suggestionData.mentalHealthAnalysis;
 
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.outline.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow.withAlpha(30),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -360,27 +373,28 @@ class _SuggestionsState extends State<Suggestions> {
         children: [
           Text(
             'Mental Health Analysis',
-            style: theme.textTheme.titleLarge?.copyWith(
+            style: GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
               color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           _buildAnalysisItem('Assessment', analysis.stressLevelAssessment),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           _buildAnalysisItem('Summary', analysis.mentalStateSummary),
           if (analysis.riskFactors.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             _buildListSection('Risk Factors', analysis.riskFactors,
                 colorScheme.errorContainer, colorScheme.onErrorContainer),
           ],
           if (analysis.positiveIndicators.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             _buildListSection(
                 'Positive Indicators',
                 analysis.positiveIndicators,
-                colorScheme.tertiaryContainer,
-                colorScheme.onTertiaryContainer),
+                colorScheme.primaryContainer,
+                colorScheme.onPrimaryContainer),
           ],
         ],
       ),
@@ -396,16 +410,20 @@ class _SuggestionsState extends State<Suggestions> {
       children: [
         Text(
           '$title:',
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: colorScheme.onSurface,
+          style: GoogleFonts.inter(
+            fontSize: 16,
             fontWeight: FontWeight.w600,
+            color: colorScheme.onSurface,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Text(
           content,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.9),
+          style: GoogleFonts.inter(
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+            color: colorScheme.onSurface,
+            height: 1.5,
           ),
         ),
       ],
@@ -422,30 +440,30 @@ class _SuggestionsState extends State<Suggestions> {
       children: [
         Text(
           '$title:',
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: colorScheme.onSurface,
+          style: GoogleFonts.inter(
+            fontSize: 16,
             fontWeight: FontWeight.w600,
+            color: colorScheme.onSurface,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: items
               .map((item) => Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: chipColor.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                          color: colorScheme.outline.withOpacity(0.3)),
+                      color: chipColor,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       item,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: textColor,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
+                        color: textColor,
                       ),
                     ),
                   ))
@@ -465,18 +483,19 @@ class _SuggestionsState extends State<Suggestions> {
       children: [
         Text(
           'Suggestions',
-          style: theme.textTheme.headlineSmall?.copyWith(
+          style: GoogleFonts.inter(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
             color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         _buildSuggestionCategory('Immediate Actions',
             suggestions.immediateActions, colorScheme.error),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         _buildSuggestionCategory('Short Term Goals', suggestions.shortTermGoals,
             colorScheme.secondary),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         _buildSuggestionCategory('Long Term Changes',
             suggestions.longTermChanges, colorScheme.primary),
       ],
@@ -489,15 +508,15 @@ class _SuggestionsState extends State<Suggestions> {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.outline.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow.withAlpha(30),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -508,23 +527,24 @@ class _SuggestionsState extends State<Suggestions> {
             children: [
               Container(
                 width: 4,
-                height: 24,
+                height: 28,
                 decoration: BoxDecoration(
                   color: accentColor,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Text(
                 title,
-                style: theme.textTheme.titleLarge?.copyWith(
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
                   color: colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           ...items
               .map((item) => _buildSuggestionItem(item, accentColor))
               .toList(),
@@ -538,20 +558,16 @@ class _SuggestionsState extends State<Suggestions> {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: colorScheme.outline.withOpacity(0.2),
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.outline.withOpacity(0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 1),
+            color: colorScheme.shadow.withAlpha(20),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -564,103 +580,98 @@ class _SuggestionsState extends State<Suggestions> {
               Expanded(
                 child: Text(
                   item.title,
-                  style: theme.textTheme.titleMedium?.copyWith(
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: _getPriorityColor(item.priority),
-                  borderRadius: BorderRadius.circular(8),
-                  border:
-                      Border.all(color: colorScheme.outline.withOpacity(0.3)),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   item.priority,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: _getPriorityTextColor(item.priority),
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
+                    color: _getPriorityTextColor(item.priority),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             'Category: ${item.category}',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.7),
+            style: GoogleFonts.inter(
+              fontSize: 14,
               fontWeight: FontWeight.w500,
+              color: colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             item.description,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.9),
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+              color: colorScheme.onSurface,
+              height: 1.5,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Row(
             children: [
-              Icon(
-                Icons.access_time,
-                size: 16,
-                color: colorScheme.onSurface.withOpacity(0.7),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                item.timeframe,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurface.withOpacity(0.7),
-                ),
-              ),
               const SizedBox(width: 12),
               Icon(
                 Icons.trending_up,
                 size: 16,
-                color: colorScheme.onSurface.withOpacity(0.7),
+                color: colorScheme.onSurface,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 6),
               Text(
                 item.difficulty,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurface.withOpacity(0.7),
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             'Benefits:',
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: colorScheme.onSurface,
+            style: GoogleFonts.inter(
+              fontSize: 16,
               fontWeight: FontWeight.w600,
+              color: colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Wrap(
-            spacing: 6,
-            runSpacing: 6,
+            spacing: 8,
+            runSpacing: 8,
             children: item.benefits
                 .map((benefit) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: colorScheme.tertiaryContainer.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                            color: colorScheme.outline.withOpacity(0.3)),
+                        color: colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         benefit,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onTertiaryContainer,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
+                          color: colorScheme.onPrimaryContainer,
                         ),
                       ),
                     ))
@@ -679,7 +690,7 @@ class _SuggestionsState extends State<Suggestions> {
       case 'medium':
         return colorScheme.secondaryContainer;
       case 'low':
-        return colorScheme.tertiaryContainer;
+        return colorScheme.primaryContainer;
       default:
         return colorScheme.surfaceContainerHighest;
     }
@@ -693,7 +704,7 @@ class _SuggestionsState extends State<Suggestions> {
       case 'medium':
         return colorScheme.onSecondaryContainer;
       case 'low':
-        return colorScheme.onTertiaryContainer;
+        return colorScheme.onPrimaryContainer;
       default:
         return colorScheme.onSurface;
     }
@@ -704,19 +715,15 @@ class _SuggestionsState extends State<Suggestions> {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: colorScheme.errorContainer.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: colorScheme.error.withOpacity(0.4),
-          width: 1,
-        ),
+        color: colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.outline.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow.withAlpha(30),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -730,35 +737,38 @@ class _SuggestionsState extends State<Suggestions> {
                 color: colorScheme.error,
                 size: 24,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Text(
                 'Emergency Resources',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: colorScheme.onError,
-                  fontWeight: FontWeight.bold,
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onErrorContainer,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           ...suggestionData.emergencyResources
               .map((resource) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.only(bottom: 12),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
                           Icons.circle,
-                          size: 6,
+                          size: 8,
                           color: colorScheme.error,
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             resource,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onErrorContainer,
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
                               fontWeight: FontWeight.w500,
+                              color: colorScheme.onErrorContainer,
+                              height: 1.5,
                             ),
                           ),
                         ),
@@ -776,19 +786,15 @@ class _SuggestionsState extends State<Suggestions> {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: colorScheme.outline.withOpacity(0.2),
-          width: 1,
-        ),
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.outline.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow.withAlpha(30),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -799,25 +805,28 @@ class _SuggestionsState extends State<Suggestions> {
             children: [
               Icon(
                 Icons.info_outline,
-                color: colorScheme.tertiary,
+                color: colorScheme.primary,
                 size: 20,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Text(
                 'Disclaimer',
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                   color: colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             suggestionData.disclaimer,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.8),
-              height: 1.4,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: colorScheme.onSurface,
+              height: 1.5,
             ),
           ),
         ],

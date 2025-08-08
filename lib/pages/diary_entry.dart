@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:diary/models/stress_prediction_response.dart';
 import 'package:diary/services/calendar_access_provider.dart';
@@ -20,7 +21,18 @@ class _DiaryEntryState extends State<DiaryEntry> {
   final TextEditingController _contentController = TextEditingController();
   final DiaryService _diaryService = DiaryService();
   bool _isLoading = false;
-  String? _selectedCategory;
+
+  // Generate random category for API
+  String _generateRandomCategory() {
+    final categories = [
+      'Relationships & Family',
+      'Financial Stress',
+      'Health & Well-being',
+      'Severe Trauma',
+    ];
+    final random = Random();
+    return categories[random.nextInt(categories.length)];
+  }
 
   void _saveEntry() async {
     final content = _contentController.text.trim();
@@ -32,14 +44,17 @@ class _DiaryEntryState extends State<DiaryEntry> {
           _isLoading = true;
         });
 
+        // Generate random category for API
+        final randomCategory = _generateRandomCategory();
+
         // Get prediction from Flask backend
         final predictionResponse =
-            await _monitorStress(content, _selectedCategory);
+            await _monitorStress(content, randomCategory);
 
         // Save to Firestore using DiaryService
         await _diaryService.addDiaryEntry(
           content: content,
-          category: _selectedCategory,
+          category: randomCategory,
           mood: predictionResponse.ensembledStressPrediction,
           date: DateTime.now(),
           predictedAspect: predictionResponse.predictedAspect,
@@ -54,9 +69,6 @@ class _DiaryEntryState extends State<DiaryEntry> {
 
         // Clear the TextField & show a SnackBar
         _contentController.clear();
-        setState(() {
-          _selectedCategory = null;
-        });
 
         // Trigger calendar access check via provider
         if (mounted) {
@@ -144,84 +156,6 @@ class _DiaryEntryState extends State<DiaryEntry> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Category Dropdown
-              Container(
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? theme.colorScheme.tertiary.withAlpha(178)
-                      : theme.colorScheme.tertiary,
-                  border: Border.all(color: theme.dividerColor),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: isDark
-                      ? [
-                          BoxShadow(
-                            color: Colors.white.withAlpha(12),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(12),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                ),
-                child: DropdownButtonFormField<String>(
-                  value: _selectedCategory,
-                  decoration: InputDecoration(
-                    hintText: 'Select a category (optional)',
-                    hintStyle: GoogleFonts.poppins(
-                      color: theme.hintColor,
-                      fontSize: 14,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.category_outlined,
-                      color: theme.hintColor,
-                      size: 20,
-                    ),
-                  ),
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                  dropdownColor: theme.colorScheme.surface,
-                  icon: Icon(
-                    Icons.keyboard_arrow_down,
-                    color: theme.hintColor,
-                  ),
-                  items: [
-                    'Relationships & Family',
-                    'Financial Stress',
-                    'Health & Well-being',
-                    'Severe Trauma',
-                  ].map((category) {
-                    return DropdownMenuItem<String>(
-                      value: category,
-                      child: Text(
-                        category,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCategory = value;
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
 
               // Content TextField
               Expanded(
