@@ -107,7 +107,7 @@ __1. MoodScribe AI Agent__
 __2. MoodScribe Stress Model__
 - **Description:** This repository contains the custom-trained ensemble machine learning model (Guided Attention Newtork + BiLSTM) used for stress detection and classification. It is also deployed as a FastAPI service on Render.
 
-- [MoodScribe Ai Agent](https://github.com/kaizen2112/ensembled-stress-aspect-model)
+- [MoodScribe Stress Model](https://github.com/kaizen2112/ensembled-stress-aspect-model)
 
 
 ## Getting Started
